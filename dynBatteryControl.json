@@ -196,7 +196,7 @@
   "env": [],
   "meta": {
     "module": "node-red-contrib-batteryusageoptimization",
-    "version": "1.0.0",
+    "version": "1.0.4",
     "author": "Ingo Seeberg-Hinrichs",
     "desc": "optimizing home battery storage usage",
     "keywords": "home battery, battery storage optimization",
