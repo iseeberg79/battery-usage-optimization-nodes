@@ -1,6 +1,6 @@
 [
     {
-        "id": "b3c2373bdde0e06b",
+        "id": "batteryoptimization",
         "type": "subflow",
         "name": "batteryoptimization",
         "info": "<h1>Optimierung der Verwendung des Hausspeichers im Zusammenspiel von ioBroker, evcc und einem dynamischen Stromtarif</h1><h2>Bezeichnungen für die Ausgabekanäle</h2><ul><li>1. Minimum-SoC</li><li>2. Batteriemodus</li><li>3. Netzladungspreis</li><li>4. eff.Eigenstrompreis</li><li>5. dyn.Regelungsgrenze</li><li>6. Nachrichtentext</li><li>7. letzter Netzladungspreis</li><li>8. letzte Netzladungskosten (@5kWh)</li><li>9. letzte Netzladungsmenge (@5kWh)</li><li>10. heutige Preisdifferenz</li><li>11. heutige Preiabweichung</li><li>12. erlaube Netzladung</li><li>13. erlaube Batteriesteuerung</li><li>14. verbleibender Solarertrag</li><li>15. verbleibender Strombedarf</li></ul><h2>Funktionsweise:</h2><p>Der Batteriespeicher soll bei überschüssigem PV-Strom geladen, aber nicht in Zeiten günstigen Netzstromes entladen werden. Ist die Preisdifferenz ausreichend hoch (>15ct) wird eine Netzladung zum günstigsten Zeitpunkt des Tages erwogen und die Batterie bis zum Füllstand von 80% geladen. Um die Batterie nicht ungünstig zu entladen, wird der Netzladungspreis bei der weiteren Steuerung der Batteriesperre berücksichtigt, und die Freigabe der Batterie erfolgt nur bei einem Netzstrompreis, der ausreichend über dem Netzladungspreis liegt (~130%). Die Batterie wird außerdem nur geladen, wenn Stand des Batteriespeichers ausreichend gering (<30%) ist, auch um ein Pendeln von Laden/Entladen zu vermeiden.</p><p>Die optimierte Batteriesteuerung ist nur aktiv, wenn die PV Erzeugungsleistung des aktuellen Tages geringer als der Tagesstrombedarf ist (PVgesamt prognostiziert < 17.5kWh). Eine Standardlastverteilung des Bedarfs, für einen 4 Personen-Haushalt (24h, berufstätig mit Schulkindern) und einem Stromverbrauch von etwa 15kWh / Tag ist vordefiniert. Der Strombedarf wird dabei grundsätzlich vom aktuellen Zeitpunkt bis zum nächsten Morgen (6 Uhr) bestimmt und berücksichtigt dabei den stündlichen Strombedarf der Lastverteilung.</p><p>Im Verlauf des Tages wird der noch zu erwartende PV-Ertrag bei der Steuerung berücksichtigt. Bei Verfügbarkeit des Strompreises für den kommenden Tag, sowie der entsprechenden PV-Prognose wird dies ebenfalls berücksichtgt.<p>Die Alias-Definitionen sind eingespielt (json), mit lokalen Datenwerten verknüpft und im Node erreichbar.</p><p>Es wird vorausgesetzt:</p><ul><li>aktuelle Verbrauchswerte</li><li>aktuelle und zukünftige Preisinformationen</li><li>der durchschnittliche Strompreis der letzten Woche (zur Optimierung) ermittelbar z.B. per Abfrage (AVG, group by week) aus den Werten der InfluxDB in IOBroker (ansonsten statisch vorzugeben, z.B. 0.24 Euro)</li><li>tagesaktuelle PV Prognosedaten des Gesamtertrages inkl. der Verteilung des Ertrags über den Tag</li><li>Leistungsdaten der Batterie, zur Regelung:</li><ul><li>Batteriestand (soc)</li><li>minimaler Batteriestand (minsoc)</li><li>Batterieleistungswerte (Laderegelung, intern zur Prüfung!)</li></ul></ul><p>In der Node-Konfiguration ist ebenfalls eine Grundeinstellung enthalten:</p><ul><li>Tagesverbrauch ~15kWh, Standardlastkurve</li><li>weitere Konfigurationseinstellungen, wie z.B. maximaler Ladepreis, etc.</li></ul><p>Der Knoten sollte instantiiert werden, um dann die Werte der Ausgabekanäle weiter zu verarbeiten. So wird der aktuell empfohlene Zustand für die Batteriekontrolle (normal, hold, charge) dynamisch berechnet und im ersten Ausgang ein empfohlener Wert für den minimalen Ladestand ausgegeben. Dieser ist entweder minimal, oder maximal; d.h. er legt die Grundlage für eine Batteriesperre mit anderen Mitteln, z.B. per modbus-Kontrolle.</p><p>Die evcc-Zustände haben dabei Vorrang, d.h. es wird nur im evcc-Batteriemodus unknown/normal/charge gesteuert. Gibt evcc den Modus für die Batteriesperre (hold) vor, überschreibt dieser den berechneten Mechanismus. Es wird davon ausgegangen, dass die Netzladung per evcc-Instanz unter Konfiguration des aktuellen Strompreises gestartet werden kann.</p><p>An einem anderen Ausgang wird der Strompreis (in Euro) als Grenzwert für die Netzladung zur Weitergabe als 'GridChargeLimit' an evcc ausgegeben, dies kann z.B. per HTTP- oder MQTT-API erfolgen.</p><p>Die anderen Ausgänge sind für eine mögliche Visualisierung oder Statistik sowie für weitergehende Integrationen gedacht und enthalten ergänzende Informationen.</p><p>Ohne aktivierte Batteriesteuerung und dynamischem Stromtarif ist eine Steuerung nicht möglich.</p><h2>detaillierte Beschreibung der Alias-Definitionen:</h2><table><thead><tr><th>Alias</th><th>Beschreibung</th><th>Zugriff</th><th>Typ</th></tr></thead><tbody><tr><td>energy.control.effectiveGridChargeCostLimit</td><td>aktuelle Regelgrenze für die Batteriesperre</td><td>schreibend</td><td>float</td></tr><tr><td>energy.control.enableGridcharging</td><td>erlaube die Netzladung der Batterie</td><td>schreibend</td><td>bool</td></tr><tr><td>energy.control.enableOptimization</td><td>erlaube die Steuerung der Hausbatterie</td><td>schreibend</td><td>bool</td></tr><tr><td>energy.control.lastGridChargePrice</td><td>letzter Preis für die Netzladung der Hausbatterie</td><td>schreibend</td><td>float</td></tr><tr><td></td><td></td></tr><tr><td>energy.battery.targetMode</td><td>bestimmter Batteriemodus (unknown/normal/hold/charge)</td><td>schreibend</td><td>string</td></tr><tr><td></td><td></td></tr><tr><td>energy.control.batterylock</td><td>erzwungene Batteriesperre z.B. per UI</td><td>lesend</td><td>bool</td></tr><tr><td>energy.control.gridChargeCostLimit</td><td>regelbare Preisgrenze für die Netzladung (bis 0.35€)</td><td>lesend</td><td>float</td></tr><tr><td></td><td></td></tr><tr><td>energy.battery.chargePower</td><td>aktuelle Batterieleistung</td><td>lesend</td><td>int</td></tr><tr><td>energy.battery.minsoc</td><td>aktueller minSoC der Batterie</td><td>lesend</td><td>int</td></tr><tr><td>energy.battery.soc</td><td>aktueller SoC der Batterie</td><td>lesend</td><td>int</td></tr><tr><td></td><td></td></tr><tr><td>energy.grid.consumption</td><td>aktueller Strombedarf (Zählerwert in Watt)</td><td>lesend</td><td>int</td></tr><tr><td>energy.grid.price</td><td>Strompreis (jetzt)</td><td>lesend</td><td>float</td></tr><tr><td>energy.grid.prive_avg_weekly</td><td>durchschnittlicher Strompreis (historisch, 1 Woche)</td><td>lesend</td><td>float</td></tr><tr><td>energy.grid.price_max</td><td>maximaler Strompreis (bekannt)</td><td>lesend</td><td>float</td></tr><tr><td>energy.grid.price_min</td><td>minimaler Strompreis (bekannt)</td><td>lesend</td><td>float</td></tr><tr><td>energy.grid.price_today</td><td>durchschnittlicher Strompreis (heute)</td><td>lesend</td><td>float</td></tr><tr><td>energy.grid.price_tomorrow</td><td>durchschnittlicher Strompreis (morgen)</td><td>lesend</td><td>float</td></tr><tr><td>energy.grid.pricelevel</td><td>aktuelles Preislevel (heute) (VERY CHEAP / CHEAP / NORMAL / EXPENSIVE / VERY EXPENSIVE)</td><td>lesend</td><td>string</td></tr><tr><td>energy.grid.pricelevel_min</td><td>günstigstes Preislevel (heute) (VERY CHEAP / CHEAP / NORMAL / EXPENSIVE / VERY EXPENSIVE)</td><td>lesend</td><td>string</td></tr><tr><td></td><td></td></tr><tr><td>energy.evcc.batteryDischargeControl</td><td>Konfigurationseinstellung (evcc) der Batteriesteuerung</td><td>lesend</td><td>bool</td></tr><tr><td>energy.evcc.tariffPriceHome</td><td>aktuell kalkulierter Preis (evcc) für den Hausverbrauch</td><td>lesend</td><td>float</td></tr><tr><td></td><td></td></tr><tr><td>energy.pv.forecast_today</td><td>prog. Solarstromertrag (heute)</td><td>lesend</td><td>float</td></tr><tr><td>energy.pv.price_feedin</td><td>Einspeisevergütung (fix)</td><td>lesend</td><td>float</td></tr><tr><td>energy.pv.production</td><td>aktuelle Stromerzeugung (in Watt)</td><td>lesend</td><td>int</td></tr><tr><td>energy.pv.pvforecast_summary_JSONData</td><td>gelieferter Datensatz der Solarprognose (solcast-Format?)</td><td>lesend</td><td>json</td></tr></tbody></table></p><h2>Vorschlag zur Preisermittlung:</h2><p>Mit Hilfe eines InfluxDB Node und folgender Abfrage an die InfluxDB kann ein Veränderungen erfassender Datenwert als Grundlage herangezogen werden:</p><p><strong>SQL:</strong> <code>select mean(*) from \"tibberlink.x.xxx-yyy-zzz.CurrentPrice.total\" where time>(now() - 7d) group by time(7d) fill(none)</code></p><p>Der eigentliche Wert erhält man dann z.B. mit folgender Bearbeitung und speichert ihn z.B. in einem eigenen Datenwert dauerhaft ab:</p><h2>Beispielintegration:</h2><p>Der aufwändige Aufbau für die Steuerung der Batteriesperr(schreiben 1042 ff.) ist in diesem Beispiel nötig, um nicht konkurrierend zur evcc-Instanz mit dem modbus-Proxy zu steuern und ermöglicht eine Verallgemeinerung der Logik. Außerdem wird sichergestellt, dass die Steuerung im richtigen Kontext erfolgt und Rücksicht auf eventuelle vorherige Zustände von evcc nimmt.</p><p>Dieses Beispiel nutzt abweichend zu evcc das Register für den minimalen Ladestand der Batterie (1042), um eine PV-Ladung von überschüssigem Strom bei Batteriesperre zu ermöglichen. Da nicht zwingend ein Ladepunkt aktiv ist, der die PV Leistung abnimmt, ist dies hier von Vorteil für die optimale Verwendung des erzeugten Solarstromes.</p><p>Alternativ könnte mit den Ausgaben z.B. eine Steuerung über einen Ladepunkt (<a href=\"https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren\" target=\"_blank\">Workaround</a>) oder eventuell zukünftig(!) mit Hilfe eines Parameters für eine externe Steuerung in evcc realisiert werden.</p>",
@@ -204,7 +204,7 @@
     {
         "id": "5a8c9511ed56cd1a",
         "type": "ioBroker in",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "aktueller Strompreis (Änderung)",
         "attrname": "price",
         "topic": "alias.0.energy.grid.price",
@@ -225,7 +225,7 @@
     {
         "id": "58ea42236428d159",
         "type": "ioBroker out",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladungspreis",
         "topic": "0_userdata.0.Custom.Netzladungspreis",
         "ack": "false",
@@ -244,7 +244,7 @@
     {
         "id": "942aed01c01bfd01",
         "type": "ioBroker out",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "lastGridChargePrice",
         "topic": "alias.0.energy.control.lastGridChargePrice",
         "ack": "false",
@@ -263,7 +263,7 @@
     {
         "id": "8e7b7a10edb760ea",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Statistics [optional]",
         "info": "",
         "x": 4370,
@@ -273,7 +273,7 @@
     {
         "id": "8d57d13a7c85ce47",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "automatische Netzladung // Laderegelung",
         "info": "",
         "x": 370,
@@ -283,7 +283,7 @@
     {
         "id": "b0a535f7c1e8e1de",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "payload",
         "action": "",
@@ -299,7 +299,7 @@
     {
         "id": "cc9541e476fe1a11",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Konfiguration",
         "props": [
             {
@@ -327,7 +327,7 @@
     {
         "id": "e8f62258c9ea12bf",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "erlaube Netzladung",
         "topic": "alias.0.energy.control.enableGridcharging",
         "attrname": "payload",
@@ -344,7 +344,7 @@
     {
         "id": "e2f98046b18f06ab",
         "type": "ioBroker in",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "erlaube Netzladung",
         "attrname": "payload",
         "topic": "alias.0.energy.control.enableGridcharging",
@@ -365,7 +365,7 @@
     {
         "id": "cbbd8575f3d69c8f",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "zurücksetzen",
         "rules": [
             {
@@ -390,7 +390,7 @@
     {
         "id": "1af8718e9bd90c29",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -459,7 +459,7 @@
     {
         "id": "edc0368fa681ebcc",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "morgiger Strompreis bekannt",
         "property": "tomorrow",
         "propertyType": "msg",
@@ -488,7 +488,7 @@
     {
         "id": "1c2402d626f61b4c",
         "type": "special-date",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "dates": [
             {
                 "type": "range",
@@ -518,7 +518,7 @@
     {
         "id": "81d17703242e186d",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "within",
         "action": "obj",
@@ -534,7 +534,7 @@
     {
         "id": "49cb9d73315bc9fe",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -559,7 +559,7 @@
     {
         "id": "7f0335c79bd188e9",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Winter?",
         "property": "within",
         "propertyType": "msg",
@@ -588,7 +588,7 @@
     {
         "id": "adb1c077ebbae790",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzpreisgrenze",
         "topic": "alias.0.energy.control.gridChargeCostLimit",
         "attrname": "preisgrenze",
@@ -605,7 +605,7 @@
     {
         "id": "055fcceeaa53a968",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "preisgrenze",
         "action": "",
@@ -621,7 +621,7 @@
     {
         "id": "650c34eee9564cf9",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Mindeststrompreis für die Regelung (Winter) auswerten",
         "rules": [
             {
@@ -662,7 +662,7 @@
     {
         "id": "3aca59fb44ff3927",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Preislevel",
         "topic": "alias.0.energy.grid.pricelevel",
         "attrname": "pricelevel",
@@ -679,7 +679,7 @@
     {
         "id": "b4a130b2a1178d1a",
         "type": "trigger",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "op1": "",
         "op2": "",
@@ -704,7 +704,7 @@
     {
         "id": "94def2808b532d4b",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "morgiger Strompreis gültig",
         "property": "tomorrow",
         "propertyType": "msg",
@@ -730,7 +730,7 @@
     {
         "id": "01872efd838041e0",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "tomorrow",
         "propertyType": "flow",
@@ -753,7 +753,7 @@
     {
         "id": "55e8d0bab2cd364d",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzpreisgrenze",
         "topic": "alias.0.energy.control.gridChargeCostLimit",
         "attrname": "preisgrenze",
@@ -770,7 +770,7 @@
     {
         "id": "180af5876d93688b",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "preisgrenze",
         "action": "",
@@ -786,7 +786,7 @@
     {
         "id": "6ffa1b5a71bcb398",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "zurücksetzen",
         "rules": [
             {
@@ -811,7 +811,7 @@
     {
         "id": "0fbeb0872ef9a4e7",
         "type": "trigger",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "op1": "",
         "op2": "",
@@ -836,7 +836,7 @@
     {
         "id": "4d65f7e9a1ef4e22",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Initialisieren",
         "props": [
             {
@@ -862,7 +862,7 @@
     {
         "id": "ea9c208afd93bded",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "zurücksetzen",
         "rules": [
             {
@@ -917,7 +917,7 @@
     {
         "id": "f0f3fd02fe0bb794",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriemodus",
         "topic": "alias.0.energy.battery.targetMode",
         "attrname": "batteryMode",
@@ -934,7 +934,7 @@
     {
         "id": "046aa8f3f26ebfb7",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Ladereglung aktiv?",
         "property": "regelung",
         "propertyType": "msg",
@@ -963,7 +963,7 @@
     {
         "id": "a32c239a1281ccd4",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Watchdog",
         "props": [
             {
@@ -987,7 +987,7 @@
     {
         "id": "15a773d7d7db2bec",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriemodus",
         "property": "batteryMode",
         "propertyType": "flow",
@@ -1034,7 +1034,7 @@
     {
         "id": "d6bef6a818dfb8c1",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Minimum SOC",
         "topic": "alias.0.energy.battery.minsoc",
         "attrname": "minsoc",
@@ -1051,7 +1051,7 @@
     {
         "id": "d77efb49bd4306e3",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladungsleistung (Batterie)",
         "topic": "alias.0.energy.battery.chargePower",
         "attrname": "chargePower",
@@ -1068,7 +1068,7 @@
     {
         "id": "3f5c2b5ceaabaa66",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "chargePower",
         "action": "",
@@ -1084,7 +1084,7 @@
     {
         "id": "653f8a1e7dc07802",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladung inaktiv",
         "property": "chargePower",
         "propertyType": "msg",
@@ -1116,7 +1116,7 @@
     {
         "id": "1a7d3a72899dddf9",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "stoppen",
         "rules": [
             {
@@ -1159,7 +1159,7 @@
     {
         "id": "c13b3579bc1c6984",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "sperren",
         "rules": [
             {
@@ -1194,7 +1194,7 @@
     {
         "id": "b6213f1789a2dadf",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "klein oder verschieden?",
         "property": "minsoc",
         "propertyType": "msg",
@@ -1225,7 +1225,7 @@
     {
         "id": "85035fda3bc7a613",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "reset",
         "rules": [
             {
@@ -1259,7 +1259,7 @@
     {
         "id": "8fb8d87c5c0466af",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "starten",
         "rules": [
             {
@@ -1294,7 +1294,7 @@
     {
         "id": "94e4b69dc3e75cbe",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "stoppen, speichern",
         "rules": [
             {
@@ -1336,7 +1336,7 @@
     {
         "id": "4f8fe3bee569a9c3",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "EVCC Steuerung aktiv?",
         "property": "batteryMode",
         "propertyType": "msg",
@@ -1391,7 +1391,7 @@
     {
         "id": "a3c05460a20ed8f4",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriemodus",
         "active": true,
         "tosidebar": false,
@@ -1408,7 +1408,7 @@
     {
         "id": "8bbaa52fcc6bbd48",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladung aktiv",
         "active": true,
         "tosidebar": false,
@@ -1425,7 +1425,7 @@
     {
         "id": "71d0c1bd5d24acaa",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "aktueller Strompreis",
         "topic": "alias.0.energy.grid.price",
         "attrname": "price",
@@ -1442,7 +1442,7 @@
     {
         "id": "5b3545b00618092c",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladung erlaubt?",
         "property": "enableGridcharge",
         "propertyType": "flow",
@@ -1471,7 +1471,7 @@
     {
         "id": "fb78d213d8a3f876",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Ladereglung aktiv?",
         "property": "regelung",
         "propertyType": "msg",
@@ -1501,7 +1501,7 @@
     {
         "id": "489b1dc5ef3034a7",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladung",
         "property": "batteryMode",
         "propertyType": "flow",
@@ -1534,7 +1534,7 @@
     {
         "id": "8c5c919c5aeb182a",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -1570,7 +1570,7 @@
     {
         "id": "43d32d70e352c362",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "ändern",
         "rules": [
             {
@@ -1597,7 +1597,7 @@
     {
         "id": "fa87a1fea7f433f7",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "ändern",
         "rules": [
             {
@@ -1624,7 +1624,7 @@
     {
         "id": "2ff392f940eb9220",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -1651,7 +1651,7 @@
     {
         "id": "3ee9135467715378",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre?",
         "property": "batteryLock",
         "propertyType": "flow",
@@ -1680,7 +1680,7 @@
     {
         "id": "c8f26c11cc2b3a64",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Sperre setzen",
         "rules": [
             {
@@ -1715,7 +1715,7 @@
     {
         "id": "ce052e8de707ea72",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladung?",
         "property": "batteryMode",
         "propertyType": "flow",
@@ -1744,7 +1744,7 @@
     {
         "id": "d37ff2a816d2ee42",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladung?",
         "property": "batteryMode",
         "propertyType": "flow",
@@ -1773,7 +1773,7 @@
     {
         "id": "9494a89701816a1e",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Sperre aufheben",
         "rules": [
             {
@@ -1807,7 +1807,7 @@
     {
         "id": "74850b815da81b6d",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batteryLock",
         "action": "",
@@ -1823,7 +1823,7 @@
     {
         "id": "76d7c529a1e90486",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriemodus Info speichern",
         "rules": [
             {
@@ -1848,7 +1848,7 @@
     {
         "id": "1bb6ed4e2d5521ee",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batterienetzladung Info",
         "rules": [
             {
@@ -1882,7 +1882,7 @@
     {
         "id": "5e4c6b4a811f4424",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "verschieden?",
         "property": "payload",
         "propertyType": "msg",
@@ -1907,7 +1907,7 @@
     {
         "id": "2ecfa5f8a5119c16",
         "type": "function",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Nachricht",
         "func": "var message = msg.payload\n\nmsg.payload = msg.topic + ': ' + message\nreturn msg;",
         "outputs": 1,
@@ -1927,7 +1927,7 @@
     {
         "id": "59bf35ccca403115",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "batterySOC",
         "topic": "alias.0.energy.battery.soc",
         "attrname": "soc",
@@ -1944,7 +1944,7 @@
     {
         "id": "da9a643128d2896c",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "soc",
         "action": "",
@@ -1962,7 +1962,7 @@
     {
         "id": "386a469dedb9b005",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "minTotal",
         "topic": "alias.0.energy.grid.price_min",
         "attrname": "minTotal",
@@ -1979,7 +1979,7 @@
     {
         "id": "36bd4c3c0d3ef7fe",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "günstigster Preis heute",
         "property": "price",
         "propertyType": "msg",
@@ -2010,7 +2010,7 @@
     {
         "id": "8609b336a7dae183",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Preislevel",
         "property": "pricelevel",
         "propertyType": "msg",
@@ -2049,7 +2049,7 @@
     {
         "id": "86b8ef8de0b7c839",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriestand hoch (>80)",
         "property": "soc",
         "propertyType": "msg",
@@ -2080,7 +2080,7 @@
     {
         "id": "0f80a34f198c5caf",
         "type": "special-date",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "dates": [
             {
                 "type": "range",
@@ -2110,7 +2110,7 @@
     {
         "id": "f3684f27692599ae",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "within",
         "action": "obj",
@@ -2126,7 +2126,7 @@
     {
         "id": "ca6c98bde93515ab",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Winter?",
         "property": "within",
         "propertyType": "msg",
@@ -2155,7 +2155,7 @@
     {
         "id": "64ff7273e10fd36c",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "pvforecast today",
         "topic": "alias.0.energy.pv.forecast_today",
         "attrname": "today",
@@ -2172,7 +2172,7 @@
     {
         "id": "edf85c522f88d891",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "today",
         "action": "",
@@ -2188,7 +2188,7 @@
     {
         "id": "8b34069ca8a9daca",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -2229,7 +2229,7 @@
     {
         "id": "26a6bf85ea3516e7",
         "type": "within-time-switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "nameInt": "",
         "positionConfig": "b12652c19b5a403a",
@@ -2292,7 +2292,7 @@
     {
         "id": "c7fd7b021755fef3",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "zu wenig Restertrag (PV)",
         "property": "pvforecast_now",
         "propertyType": "flow",
@@ -2323,7 +2323,7 @@
     {
         "id": "2829bf4d60449170",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "normal",
         "rules": [
             {
@@ -2357,7 +2357,7 @@
     {
         "id": "ee4bff002ffba634",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriestand niedrig",
         "property": "soc",
         "propertyType": "msg",
@@ -2388,7 +2388,7 @@
     {
         "id": "fb55e25136a9f2ee",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "innerhalb Preisgrenze",
         "property": "price",
         "propertyType": "msg",
@@ -2419,7 +2419,7 @@
     {
         "id": "79f6a0b75dc479ee",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "minLevel",
         "topic": "alias.0.energy.grid.privelevel_min",
         "attrname": "minLevel",
@@ -2436,7 +2436,7 @@
     {
         "id": "53e558eeb7382405",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Preislevel",
         "property": "minLevel",
         "propertyType": "msg",
@@ -2467,7 +2467,7 @@
     {
         "id": "d981060db94bd4f3",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "hold",
         "rules": [
             {
@@ -2501,7 +2501,7 @@
     {
         "id": "b031fbbaca9c5dd7",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "charge",
         "rules": [
             {
@@ -2536,7 +2536,7 @@
     {
         "id": "bebca51ee6c8492a",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladen aktiv?",
         "property": "batteryMode",
         "propertyType": "flow",
@@ -2567,7 +2567,7 @@
     {
         "id": "5419341709852504",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriestand ausreichend",
         "property": "soc",
         "propertyType": "msg",
@@ -2607,7 +2607,7 @@
     {
         "id": "2655c96f3ee7ba1a",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladen erlaubt?",
         "property": "enableGridcharge",
         "propertyType": "flow",
@@ -2637,7 +2637,7 @@
     {
         "id": "f13d22f16b27d3bf",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "PV ungenügend (Bedarf)",
         "property": "pvforecast_now",
         "propertyType": "flow",
@@ -2668,7 +2668,7 @@
     {
         "id": "a5fd70e616ce8788",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -2697,7 +2697,7 @@
     {
         "id": "9fac21a89b87831d",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "tariffPriceHome",
         "topic": "alias.0.energy.evcc.tariffPriceHome",
         "attrname": "payload",
@@ -2716,7 +2716,7 @@
     {
         "id": "8832d02e954a9420",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "verschieden",
         "property": "batteryMode",
         "propertyType": "flow",
@@ -2742,7 +2742,7 @@
     {
         "id": "14d6676324d4a06e",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Zeitstempel",
         "active": true,
         "tosidebar": false,
@@ -2759,7 +2759,7 @@
     {
         "id": "32ba90adc53b1a21",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "innerhalb Preisgrenze",
         "property": "price",
         "propertyType": "msg",
@@ -2790,7 +2790,7 @@
     {
         "id": "9407577bb0bab5da",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "EVCC darf eigenständig laden (GUI)",
         "active": true,
         "tosidebar": false,
@@ -2807,7 +2807,7 @@
     {
         "id": "60c271b7c9fdc3eb",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Zeitstempel",
         "active": true,
         "tosidebar": false,
@@ -2824,7 +2824,7 @@
     {
         "id": "7c38709e7f7d0bab",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Zeitstempel",
         "active": true,
         "tosidebar": false,
@@ -2841,7 +2841,7 @@
     {
         "id": "f14d3630371b8f63",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Entladung vermeiden",
         "rules": [
             {
@@ -2875,7 +2875,7 @@
     {
         "id": "7b1f8ad23fe41e68",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladung aktiv",
         "rules": [],
         "action": "",
@@ -2894,7 +2894,7 @@
     {
         "id": "52250d22445967a6",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre (UI) aktiv?",
         "property": "batteryLock",
         "propertyType": "flow",
@@ -2924,7 +2924,7 @@
     {
         "id": "b49dd3c3c93f677a",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre (UI) aktiv?",
         "property": "batteryLock",
         "propertyType": "flow",
@@ -2954,7 +2954,7 @@
     {
         "id": "9c2d0bc7be220fdf",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "ändern",
         "rules": [
             {
@@ -2982,7 +2982,7 @@
     {
         "id": "7c808aec982f7a77",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "minsoc",
         "action": "",
@@ -2998,7 +2998,7 @@
     {
         "id": "ac3d2163184668bb",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "günstiger als Preisgrenze?",
         "property": "price",
         "propertyType": "msg",
@@ -3029,7 +3029,7 @@
     {
         "id": "d4cd3d488c8225a1",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladungspreisgrenze",
         "topic": "alias.0.energy.control.gridChargeCostLimit",
         "attrname": "gridlimit",
@@ -3046,7 +3046,7 @@
     {
         "id": "e5d962c628e908ce",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "gridlimit",
         "action": "",
@@ -3062,7 +3062,7 @@
     {
         "id": "31085cdfd6b2f082",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Dauer",
         "rules": [
             {
@@ -3118,7 +3118,7 @@
     {
         "id": "b835cef8cc8ac73c",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Dauer",
         "active": true,
         "tosidebar": false,
@@ -3135,7 +3135,7 @@
     {
         "id": "4dcfd0f794563c5a",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladung",
         "property": "batteryMode",
         "propertyType": "msg",
@@ -3161,7 +3161,7 @@
     {
         "id": "f40cecb354f57064",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -3218,7 +3218,7 @@
     {
         "id": "49f6eca32a529e7f",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriemodus",
         "topic": "alias.0.energy.battery.targetMode",
         "attrname": "batteryMode",
@@ -3235,7 +3235,7 @@
     {
         "id": "6ef1f5e947b00879",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "verschieden",
         "property": "batteryMode",
         "propertyType": "msg",
@@ -3260,7 +3260,7 @@
     {
         "id": "c8d05f17d301ce56",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -3285,7 +3285,7 @@
     {
         "id": "a8e8556473eb2c17",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -3319,7 +3319,7 @@
     {
         "id": "2311aa2a09deea1e",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "props": [
             {
@@ -3349,7 +3349,7 @@
     {
         "id": "e6e9d1012e577843",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Kosten ausgeglichen",
         "property": "(msg.price*1.2)",
         "propertyType": "jsonata",
@@ -3380,7 +3380,7 @@
     {
         "id": "5e5befcdd31aa2f3",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batterieladung erschöpft (<10)",
         "property": "soc",
         "propertyType": "msg",
@@ -3405,7 +3405,7 @@
     {
         "id": "9cfce4b4f692965b",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Kosten zurücksetzen",
         "rules": [
             {
@@ -3453,7 +3453,7 @@
     {
         "id": "5ace0cc285a44401",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Einspeisevergütung",
         "topic": "alias.0.energy.pv.price_feedin",
         "attrname": "_feedin",
@@ -3470,7 +3470,7 @@
     {
         "id": "6d6f0db2ee160755",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "_feedin",
         "action": "",
@@ -3486,7 +3486,7 @@
     {
         "id": "23405317973b5435",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Kostenausgleich",
         "active": true,
         "tosidebar": false,
@@ -3503,7 +3503,7 @@
     {
         "id": "bdf4bd47777eb3eb",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Kostendifferenz",
         "active": true,
         "tosidebar": false,
@@ -3520,7 +3520,7 @@
     {
         "id": "7167c85bc1434b79",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "günstiger als Preisgrenze?",
         "property": "price",
         "propertyType": "msg",
@@ -3551,7 +3551,7 @@
     {
         "id": "b2dba7f59fc00347",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "price",
         "action": "",
@@ -3567,7 +3567,7 @@
     {
         "id": "80e23acb1546d688",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "minTotal",
         "action": "",
@@ -3583,7 +3583,7 @@
     {
         "id": "5b018cdb29303135",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "rules": [
             {
@@ -3615,7 +3615,7 @@
     {
         "id": "9f4ea3b90cd38adf",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -3640,7 +3640,7 @@
     {
         "id": "8ef10440387514a8",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "rules": [
             {
@@ -3667,7 +3667,7 @@
     {
         "id": "7d7a677f277ba7b9",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batterie ausreichend (>90)",
         "property": "soc",
         "propertyType": "msg",
@@ -3692,7 +3692,7 @@
     {
         "id": "39f389aa935f4f94",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -3719,7 +3719,7 @@
     {
         "id": "7365a89a3f640e29",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "täglich",
         "props": [
             {
@@ -3748,7 +3748,7 @@
     {
         "id": "9bbb4dca6e54aaac",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Differenz",
         "rules": [
             {
@@ -3783,7 +3783,7 @@
     {
         "id": "8ea392ace4b3443a",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "pvforecast today",
         "topic": "alias.0.energy.pv.forecast_today",
         "attrname": "today",
@@ -3800,7 +3800,7 @@
     {
         "id": "d4d185df241f65b9",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "today",
         "action": "",
@@ -3820,7 +3820,7 @@
     {
         "id": "547399bd31238a06",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "PV < 16kW",
         "property": "today",
         "propertyType": "msg",
@@ -3851,7 +3851,7 @@
     {
         "id": "f3e5d896a69f39c5",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Preisspanne",
         "property": "diff",
         "propertyType": "msg",
@@ -3883,7 +3883,7 @@
     {
         "id": "40b9f4a1465bd111",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "nicht optimieren",
         "rules": [
             {
@@ -3912,7 +3912,7 @@
     {
         "id": "2f40a08263c8f470",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "optimieren",
         "rules": [
             {
@@ -3940,7 +3940,7 @@
     {
         "id": "343d90235910594e",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "ohne Netzladung",
         "rules": [
             {
@@ -3968,7 +3968,7 @@
     {
         "id": "a93ef65495237389",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "mit Netzladung",
         "rules": [
             {
@@ -3996,7 +3996,7 @@
     {
         "id": "c7628883125e2718",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "PV < 10kW",
         "property": "today",
         "propertyType": "msg",
@@ -4027,7 +4027,7 @@
     {
         "id": "1e86d4fd1c50fec0",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Differenz",
         "active": true,
         "tosidebar": false,
@@ -4044,7 +4044,7 @@
     {
         "id": "107f28267edba49c",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Differenz in ct",
         "rules": [
             {
@@ -4069,7 +4069,7 @@
     {
         "id": "8b4c30822e7f5461",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Modus \"Kappung\"",
         "rules": [
             {
@@ -4094,7 +4094,7 @@
     {
         "id": "100e2023ef7e736a",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Modus \"Netzladung\"",
         "rules": [
             {
@@ -4119,7 +4119,7 @@
     {
         "id": "1f5bf20819cc56fb",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Modus \"normal\"",
         "rules": [
             {
@@ -4144,7 +4144,7 @@
     {
         "id": "e8be562a3a8703ea",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Abweichung",
         "active": true,
         "tosidebar": false,
@@ -4161,7 +4161,7 @@
     {
         "id": "85e123f21d812cc1",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Spreizung",
         "property": "spreizung",
         "propertyType": "msg",
@@ -4193,7 +4193,7 @@
     {
         "id": "6b63025041307fc1",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Abweichung in ct",
         "rules": [
             {
@@ -4218,7 +4218,7 @@
     {
         "id": "f7e0bdd61b87ef8d",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "starten, speichern",
         "rules": [
             {
@@ -4259,7 +4259,7 @@
     {
         "id": "f99e2f73be56fe6f",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "verbleibender Strompreis (avg)",
         "topic": "alias.0.energy.grid.price_today",
         "attrname": "avg",
@@ -4276,7 +4276,7 @@
     {
         "id": "62a7bc54e5f15137",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "avg",
         "action": "",
@@ -4292,7 +4292,7 @@
     {
         "id": "40ca197bf58c4485",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "morgiger Strompreis (avg)",
         "topic": "alias.0.energy.grid.price_tomorrow",
         "attrname": "avg",
@@ -4309,7 +4309,7 @@
     {
         "id": "ba3c172c3281c788",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "avg",
         "action": "",
@@ -4325,7 +4325,7 @@
     {
         "id": "3c6a1bd6aae55740",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Kosten",
         "rules": [
             {
@@ -4352,7 +4352,7 @@
     {
         "id": "7c5c14ed8fb8ed9f",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Kosten",
         "rules": [
             {
@@ -4379,7 +4379,7 @@
     {
         "id": "7234a32a8d0dc42a",
         "type": "within-time-switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "nameInt": "",
         "positionConfig": "b12652c19b5a403a",
@@ -4442,7 +4442,7 @@
     {
         "id": "bf4e4fc8eefa9a26",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "geringer",
         "property": "costs",
         "propertyType": "msg",
@@ -4473,7 +4473,7 @@
     {
         "id": "87cb16c5fb385e99",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "zu teuer",
         "property": "price",
         "propertyType": "msg",
@@ -4506,7 +4506,7 @@
     {
         "id": "2d9d47668870c4db",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "lastGridChargeCost",
         "topic": "alias.0.energy.control.lastGridChargePrice",
         "attrname": "lastGridChargeCost",
@@ -4523,7 +4523,7 @@
     {
         "id": "7e7b71fcfb8248e6",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "lastGridChargeCost",
         "action": "",
@@ -4539,7 +4539,7 @@
     {
         "id": "5dcf896cd4f97574",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -4573,7 +4573,7 @@
     {
         "id": "b0615d63be7ec00f",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "vorherige Ladungskosten",
         "property": "avg",
         "propertyType": "msg",
@@ -4605,7 +4605,7 @@
     {
         "id": "f177dde0d83f9305",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "props": [
             {
@@ -4634,7 +4634,7 @@
     {
         "id": "95a76ad12152489f",
         "type": "function",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "map",
         "func": "const millis = msg.millis = new Date().getTime();\nmsg.diff = millis - msg.lastchange;\n\nconst current = msg.current = new Date().getHours();\nconst offset = msg.offset = (new Date().getTimezoneOffset())/60;\n//const hour = msg.hour = new Date(msg.lastchange).getHours();\nconst hour = msg.hour = (new Date(msg.payload.estimations[0].t).getHours()+offset);\nconst n = 24-hour;\nconst h = current - hour;\n\nconst today = msg.today = msg.payload.estimations.map(estimation => estimation.y).slice(0,(n*2));\nconst remain = msg.remain =  today.slice((h*2)); \nmsg.payload = remain;\n\nreturn msg;",
         "outputs": 1,
@@ -4654,7 +4654,7 @@
     {
         "id": "6b5d4f87cdacbfe8",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "move",
         "rules": [
             {
@@ -4688,7 +4688,7 @@
     {
         "id": "ad570c5a4269fd66",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "payload",
         "action": "",
@@ -4704,7 +4704,7 @@
     {
         "id": "7b70b2814740283d",
         "type": "calculator",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "inputMsgField": "payload",
         "outputMsgField": "sum",
@@ -4723,7 +4723,7 @@
     {
         "id": "51dfd63ded64ac1d",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -4750,7 +4750,7 @@
     {
         "id": "5e3903103cfd621f",
         "type": "within-time-switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "nameInt": "",
         "positionConfig": "b12652c19b5a403a",
@@ -4813,7 +4813,7 @@
     {
         "id": "274c70ef0e6a9c18",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "JSONData",
         "topic": "alias.0.energy.pv.pvforecast_summary_JSONData",
         "attrname": "payload",
@@ -4830,7 +4830,7 @@
     {
         "id": "6481ae109528c0a8",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "kein Ertrag",
         "rules": [
             {
@@ -4857,7 +4857,7 @@
     {
         "id": "7d86b66b5df8dda7",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "laden",
         "rules": [
             {
@@ -4889,7 +4889,7 @@
     {
         "id": "c17d6a1ace328248",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "stündlich",
         "props": [
             {
@@ -4914,7 +4914,7 @@
     {
         "id": "953232befbe66b0d",
         "type": "function",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "remain",
         "func": "const current = msg.current = new Date().getHours();\nconst n = 24-current;\nconst h = current;\nconst t = 8;\nmsg.n=n;\n\nmsg.tomorrow = msg.lastprofil;\n\nconst remain = msg.remain =  msg.lastprofil.slice(h);\nconst tomorrow = msg.remain2 = msg.tomorrow.slice(0,t);\n\nreturn msg;",
         "outputs": 1,
@@ -4934,7 +4934,7 @@
     {
         "id": "0b2e1a3a92a1b6fa",
         "type": "calculator",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "verbleibend (heute)",
         "inputMsgField": "remain",
         "outputMsgField": "sum",
@@ -4953,7 +4953,7 @@
     {
         "id": "f6ba7bd41972dd4a",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -4992,7 +4992,7 @@
     {
         "id": "0d559e8b2889fe57",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "initialisieren (~500W/h)",
         "props": [
             {
@@ -5017,7 +5017,7 @@
     {
         "id": "a4aa2497ee060437",
         "type": "calculator",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "verbleibend (morgen)",
         "inputMsgField": "remain2",
         "outputMsgField": "sum2",
@@ -5036,7 +5036,7 @@
     {
         "id": "122b2adf77ddff6a",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Bedarf gedeckt",
         "property": "energy_req",
         "propertyType": "flow",
@@ -5070,7 +5070,7 @@
     {
         "id": "19a8fe2be60538fc",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Modus",
         "property": "payload",
         "propertyType": "msg",
@@ -5103,7 +5103,7 @@
     {
         "id": "52f6e366f07a3009",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Kosten",
         "rules": [
             {
@@ -5137,7 +5137,7 @@
     {
         "id": "1c190c5640831970",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "manuell",
         "props": [
             {
@@ -5167,7 +5167,7 @@
     {
         "id": "64e37229c6d36611",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "rules": [
             {
@@ -5192,7 +5192,7 @@
     {
         "id": "b3dd1b0a3c849f7c",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzbezug",
         "property": "wirkleistung",
         "propertyType": "msg",
@@ -5224,7 +5224,7 @@
     {
         "id": "3aaac877bf22ac47",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batterieleistung",
         "property": "battery",
         "propertyType": "msg",
@@ -5255,7 +5255,7 @@
     {
         "id": "3c315fa63330d598",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Einspeisevergütung",
         "rules": [
             {
@@ -5283,7 +5283,7 @@
     {
         "id": "ad7dfadf4043fa2b",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Einspeisevergütung",
         "rules": [
             {
@@ -5311,7 +5311,7 @@
     {
         "id": "940dc63622c8b4d8",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "aktuelle Kosten",
         "active": false,
         "tosidebar": true,
@@ -5328,7 +5328,7 @@
     {
         "id": "7474b731beae0dc8",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "props": [
             {
@@ -5357,7 +5357,7 @@
     {
         "id": "e0956a8b56ac0086",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "war msg.today",
         "info": "",
         "x": 2840,
@@ -5367,7 +5367,7 @@
     {
         "id": "d4be7618f0dd9191",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "hatte auch msg.now",
         "info": "",
         "x": 2950,
@@ -5377,7 +5377,7 @@
     {
         "id": "42f7cbcccfc97fd3",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "war 12kW - besser 15kW",
         "info": "bzw. vorher zu kleine 12kW",
         "x": 1590,
@@ -5387,7 +5387,7 @@
     {
         "id": "23d3af62205a3296",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "15ct Preisdifferenz nötig ",
         "info": "vielleicht geringer auch ok, 25?!",
         "x": 1780,
@@ -5397,7 +5397,7 @@
     {
         "id": "54f92fa43cc41181",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "energy_req_today? 9 kW ",
         "info": "vielleicht an den heutigen Bedarf anpassen?\n9kW sind 75% des Tagesbedarfs",
         "x": 2080,
@@ -5407,7 +5407,7 @@
     {
         "id": "1f6e51f519329828",
         "type": "inject",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "zurücksetzen",
         "props": [
             {
@@ -5432,7 +5432,7 @@
     {
         "id": "7c91b176a5346b94",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Entladungskosten",
         "info": "",
         "x": 3320,
@@ -5442,7 +5442,7 @@
     {
         "id": "96b0be48561643c0",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Einspeisevergütung",
         "info": "",
         "x": 3320,
@@ -5452,7 +5452,7 @@
     {
         "id": "91f90113abfb0e2e",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Einspeisevergütung",
         "info": "",
         "x": 3320,
@@ -5462,7 +5462,7 @@
     {
         "id": "53efad8ea2cf4469",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "verschieden?",
         "property": "_feedin",
         "propertyType": "msg",
@@ -5488,7 +5488,7 @@
     {
         "id": "5fdd98749d8e2057",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "10ct, vielleicht besser 5ct",
         "info": "Idee: Abweichung vom Durchschnitt",
         "x": 1960,
@@ -5498,7 +5498,7 @@
     {
         "id": "6ea6acfdd4ecd852",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "30ct Preisdifferenz nötig (vorher)",
         "info": "vielleicht geringer auch ok, 25?!",
         "x": 1750,
@@ -5508,7 +5508,7 @@
     {
         "id": "188b2f2870c7c147",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Spreizung",
         "active": false,
         "tosidebar": true,
@@ -5525,7 +5525,7 @@
     {
         "id": "cae7c9d47d0c73ea",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "inaktiv",
         "rules": [
             {
@@ -5552,7 +5552,7 @@
     {
         "id": "a6a158b059c319d3",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre",
         "topic": "alias.0.energy.control.batterylock",
         "attrname": "batteryLock",
@@ -5569,7 +5569,7 @@
     {
         "id": "2e0759e94f45af99",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batteryLock",
         "action": "",
@@ -5585,7 +5585,7 @@
     {
         "id": "827066d676734a53",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre?",
         "property": "batteryLock",
         "propertyType": "msg",
@@ -5608,7 +5608,7 @@
     {
         "id": "ad3c3fdcb7534fa3",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "payload",
         "action": "",
@@ -5624,7 +5624,7 @@
     {
         "id": "bc1fe72855ad0621",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -5658,7 +5658,7 @@
     {
         "id": "802ef28cc974369c",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "verschieden?",
         "property": "payload",
         "propertyType": "msg",
@@ -5683,7 +5683,7 @@
     {
         "id": "527587bed23eb806",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Anpassungen",
         "rules": [
             {
@@ -5710,7 +5710,7 @@
     {
         "id": "ea54f6eefedd6eed",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "valide",
         "property": "n",
         "propertyType": "msg",
@@ -5741,7 +5741,7 @@
     {
         "id": "891ea0edef053f99",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "rules": [
             {
@@ -5768,7 +5768,7 @@
     {
         "id": "348886da86b26fba",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "minTotal+",
         "active": false,
         "tosidebar": false,
@@ -5785,7 +5785,7 @@
     {
         "id": "e9c1943219e9b6df",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "2% Abweichung",
         "rules": [
             {
@@ -5813,7 +5813,7 @@
     {
         "id": "ac64cd71740c0d1f",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "false",
         "rules": [
             {
@@ -5838,7 +5838,7 @@
     {
         "id": "df065e5bbe84e7e5",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Kostenoptimierung",
         "property": "avgGridPriceWeekly",
         "propertyType": "msg",
@@ -5871,7 +5871,7 @@
     {
         "id": "b2f6ccbd37acbd40",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriestand",
         "property": "soc",
         "propertyType": "msg",
@@ -5902,7 +5902,7 @@
     {
         "id": "6912641b25ffca4d",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladungskompatibel!",
         "info": "",
         "x": 3420,
@@ -5912,7 +5912,7 @@
     {
         "id": "5148adcb08333787",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "war verbunden, Quatsch?!",
         "info": "verbunden mit Laderegelung aktiv = false ",
         "x": 1650,
@@ -5922,7 +5922,7 @@
     {
         "id": "9cbce5866ed41866",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "avgGridPriceWeekly",
         "topic": "alias.0.energy.grid.price_avg_weekly",
         "attrname": "avgGridPriceWeekly",
@@ -5939,7 +5939,7 @@
     {
         "id": "1478f0e4245997fa",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "avgGridPriceWeekly",
         "action": "",
@@ -5955,7 +5955,7 @@
     {
         "id": "c58fe93265ace1ff",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladungsmenge",
         "active": true,
         "tosidebar": false,
@@ -5972,7 +5972,7 @@
     {
         "id": "bfb4a196553da003",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladungskosten",
         "active": true,
         "tosidebar": false,
@@ -5989,7 +5989,7 @@
     {
         "id": "1198f5691bf5f5ed",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre",
         "topic": "alias.0.energy.control.batterylock",
         "attrname": "batteryLock",
@@ -6006,7 +6006,7 @@
     {
         "id": "0df79a72c2a5060e",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batteryLock",
         "action": "",
@@ -6022,7 +6022,7 @@
     {
         "id": "e1d6ae8a0896a2df",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "zurücksetzen",
         "rules": [
             {
@@ -6049,7 +6049,7 @@
     {
         "id": "47e0a73014f7c892",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Bedingung: PVForecast-Adapter",
         "info": "aus Tibber und InfluxDB den wöchentlichen Preisdurchschnitt ermitteln\nVoraussetzung:\n- in InfluxDB gespeicherte Tibber-Stundenpreisinformationen\n- Laufzeit: 1 Woche\n- alternativ: auf festen Wert, z.B. 0.24ct setzen!",
         "x": 350,
@@ -6059,7 +6059,7 @@
     {
         "id": "4c8a75a782af5315",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "main configuration here",
         "info": "",
         "x": 1300,
@@ -6069,7 +6069,7 @@
     {
         "id": "54c0a40dc97cca0d",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Glättung der Kosten",
         "info": "",
         "x": 2840,
@@ -6079,7 +6079,7 @@
     {
         "id": "dc2ff105f2ef41a1",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre?",
         "property": "batteryLock",
         "propertyType": "msg",
@@ -6102,7 +6102,7 @@
     {
         "id": "17dcde62c5b26356",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "sammeln für Ausgabe",
         "rules": [
             {
@@ -6129,7 +6129,7 @@
     {
         "id": "f1d7a7bb4e66f4ad",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Output",
         "rules": [],
         "action": "",
@@ -6148,7 +6148,7 @@
     {
         "id": "0699808bff5b30f0",
         "type": "ioBroker in",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre (UI)",
         "attrname": "batteryLock",
         "topic": "alias.0.energy.control.batterylock",
@@ -6169,7 +6169,7 @@
     {
         "id": "09f082d1dcfbd129",
         "type": "ioBroker in",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "batteryDischargeControl",
         "attrname": "payload",
         "topic": "alias.0.energy.evcc.batteryDischargeControl",
@@ -6190,7 +6190,7 @@
     {
         "id": "eb442d39995bb2bf",
         "type": "ioBroker in",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzpreisgrenze",
         "attrname": "preisgrenze",
         "topic": "alias.0.energy.control.gridChargeCostLimit",
@@ -6211,7 +6211,7 @@
     {
         "id": "7f9fca2013456f1d",
         "type": "ioBroker in",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "lastGridChargePrice",
         "attrname": "payload",
         "topic": "alias.0.energy.control.lastGridChargePrice",
@@ -6232,7 +6232,7 @@
     {
         "id": "ce07a31e2ce4aba3",
         "type": "ioBroker in",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "SoC-Batterie ",
         "attrname": "payload",
         "topic": "alias.0.energy.battery.soc",
@@ -6253,7 +6253,7 @@
     {
         "id": "c97002647b5966d0",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Output",
         "rules": [],
         "action": "",
@@ -6272,7 +6272,7 @@
     {
         "id": "984f0db091e7927a",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -6297,7 +6297,7 @@
     {
         "id": "ed1942f7fbabdbff",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -6322,7 +6322,7 @@
     {
         "id": "684559ba59abec7d",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "speichern",
         "rules": [
             {
@@ -6356,7 +6356,7 @@
     {
         "id": "d1d8dcc7f2480dcb",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Output",
         "rules": [],
         "action": "",
@@ -6375,7 +6375,7 @@
     {
         "id": "4311fd73e46fa54e",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "gültig",
         "property": "payload",
         "propertyType": "msg",
@@ -6404,7 +6404,7 @@
     {
         "id": "02bfc7a2db0c0a6e",
         "type": "ioBroker out",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriemodus",
         "topic": "alias.0.energy.battery.targetMode",
         "ack": "false",
@@ -6423,7 +6423,7 @@
     {
         "id": "b8b61ef5486db436",
         "type": "ioBroker out",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "effectiveGridChargeCostLimit",
         "topic": "alias.0.energy.control.effectiveGridChargeCostLimit",
         "ack": "false",
@@ -6442,7 +6442,7 @@
     {
         "id": "63d8cf81766d6c14",
         "type": "ioBroker out",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Netzladung",
         "topic": "alias.0.energy.control.enableGridcharging",
         "ack": "false",
@@ -6461,7 +6461,7 @@
     {
         "id": "59061e271880d606",
         "type": "ioBroker out",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Laderegelung",
         "topic": "alias.0.energy.control.enableOptimization",
         "ack": "false",
@@ -6480,7 +6480,7 @@
     {
         "id": "d20645e44a50d52a",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Konfiguration",
         "rules": [
             {
@@ -6563,7 +6563,7 @@
     {
         "id": "a6faa4f0035eb1db",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "initialisieren",
         "rules": [
             {
@@ -6658,7 +6658,7 @@
     {
         "id": "8170219b178f8959",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Thresholds for battery charging redefined here",
         "info": "",
         "x": 2110,
@@ -6668,7 +6668,7 @@
     {
         "id": "08ba3932ae497b01",
         "type": "special-date",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "dates": [
             {
                 "type": "range",
@@ -6698,7 +6698,7 @@
     {
         "id": "1066566a4cde2dfb",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "within",
         "action": "obj",
@@ -6714,7 +6714,7 @@
     {
         "id": "76bfd6db41e46116",
         "type": "switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Winter?",
         "property": "within",
         "propertyType": "msg",
@@ -6737,7 +6737,7 @@
     {
         "id": "d5a941ec5b3044d3",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "minSoC (im Winter)",
         "rules": [
             {
@@ -6762,7 +6762,7 @@
     {
         "id": "ef6853a364e38e43",
         "type": "comment",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Definition \"Standardlastverteilung\" (24h)",
         "info": "24 Werte für den durchschnittlichen Stundenverbrauch des Haushaltes",
         "x": 370,
@@ -6772,7 +6772,7 @@
     {
         "id": "fd567863b35929b6",
         "type": "debug",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Ausgabe minSoC",
         "active": true,
         "tosidebar": true,
@@ -6789,7 +6789,7 @@
     {
         "id": "9cedfb163289c148",
         "type": "within-time-switch",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "nameInt": "",
         "positionConfig": "b12652c19b5a403a",
@@ -6850,7 +6850,7 @@
     {
         "id": "af33b1fcb1370f36",
         "type": "trigger",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "op1": "",
         "op2": "",
@@ -6875,7 +6875,7 @@
     {
         "id": "5ead875f06748af7",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "reset",
         "rules": [
             {
@@ -6902,7 +6902,7 @@
     {
         "id": "bed11df2f7a7830e",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "sammeln",
         "rules": [],
         "action": "",
@@ -6921,7 +6921,7 @@
     {
         "id": "d509ced37156f884",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "maximaler Strompreis",
         "topic": "alias.0.energy.grid.price_max",
         "attrname": "max",
@@ -6938,7 +6938,7 @@
     {
         "id": "2df19d7c6044cddd",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "minimaler Strompreis",
         "topic": "alias.0.energy.grid.price_min",
         "attrname": "min",
@@ -6955,7 +6955,7 @@
     {
         "id": "82ddc3ec65f9f812",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "max",
         "action": "",
@@ -6971,7 +6971,7 @@
     {
         "id": "73ef99e7a716ab6a",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "min",
         "action": "",
@@ -6987,7 +6987,7 @@
     {
         "id": "1ae1da7ee3deae6b",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "durchschnittlicher Strompreis",
         "topic": "alias.0.energy.grid.price_today",
         "attrname": "avg",
@@ -7004,7 +7004,7 @@
     {
         "id": "ca22c7df376af88e",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "avg",
         "action": "",
@@ -7020,7 +7020,7 @@
     {
         "id": "847838f2010c124f",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Strompreis (morgen)",
         "topic": "alias.0.energy.grid.price_tomorrow",
         "attrname": "tomorrow",
@@ -7037,7 +7037,7 @@
     {
         "id": "f57c3d349ffeadca",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "tomorrow",
         "action": "",
@@ -7053,7 +7053,7 @@
     {
         "id": "7512f911b1a59d67",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "regelung",
         "action": "",
@@ -7069,7 +7069,7 @@
     {
         "id": "d3f655fdb7dc0a3b",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Laderegelung",
         "topic": "alias.0.energy.control.enableOptimization",
         "attrname": "regelung",
@@ -7086,7 +7086,7 @@
     {
         "id": "395523122f22d522",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriemodus (EVCC)",
         "topic": "mqtt.0.evcc.site.batteryMode",
         "attrname": "batteryMode",
@@ -7103,7 +7103,7 @@
     {
         "id": "8a0d9f7bf365daed",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "PV Leistung",
         "topic": "alias.0.energy.pv.production",
         "attrname": "pv",
@@ -7120,7 +7120,7 @@
     {
         "id": "3e198260da52e7e5",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "pv",
         "action": "",
@@ -7136,7 +7136,7 @@
     {
         "id": "4968da8fb4422cfe",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "batterySOC",
         "topic": "alias.0.energy.battery.soc",
         "attrname": "batterySoC",
@@ -7153,7 +7153,7 @@
     {
         "id": "551bce45691f71d4",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batterySoC",
         "action": "",
@@ -7169,7 +7169,7 @@
     {
         "id": "4fbf3a9d9ba8623e",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "wirkleistung",
         "action": "",
@@ -7185,7 +7185,7 @@
     {
         "id": "2d151d61af41ee37",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Wirkleistung",
         "topic": "alias.0.energy.grid.consumption",
         "attrname": "wirkleistung",
@@ -7202,7 +7202,7 @@
     {
         "id": "f5c87883bdb89bbc",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "batteryDischargeControl",
         "topic": "alias.0.energy.evcc.batteryDischargeControl",
         "attrname": "batteryDischargeControl",
@@ -7219,7 +7219,7 @@
     {
         "id": "61df41087c3161cb",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batteryDischargeControl",
         "action": "",
@@ -7235,7 +7235,7 @@
     {
         "id": "5274221cd3da610f",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Strompreis (heute)",
         "topic": "alias.0.energy.grid.price_today",
         "attrname": "today",
@@ -7252,7 +7252,7 @@
     {
         "id": "bdc44d878bd6377e",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "today",
         "action": "",
@@ -7268,7 +7268,7 @@
     {
         "id": "fbc1fbcb6f852427",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "aktueller Strompreis",
         "topic": "alias.0.energy.grid.price",
         "attrname": "price",
@@ -7285,7 +7285,7 @@
     {
         "id": "cc5258d4358272f8",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "price",
         "action": "",
@@ -7301,7 +7301,7 @@
     {
         "id": "17646457dc6f5d55",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre",
         "topic": "alias.0.energy.control.batterylock",
         "attrname": "batteryLock",
@@ -7318,7 +7318,7 @@
     {
         "id": "883847127b91f53a",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batteryLock",
         "action": "",
@@ -7334,7 +7334,7 @@
     {
         "id": "06bdd505a440ea28",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Einspeiseverfügung",
         "rules": [
             {
@@ -7361,7 +7361,7 @@
     {
         "id": "3608d35d36f975c3",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "maximaler Strompreis",
         "topic": "alias.0.energy.grid.price_max",
         "attrname": "max",
@@ -7378,7 +7378,7 @@
     {
         "id": "44dc8b7673fb2ce9",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "minimaler Strompreis",
         "topic": "alias.0.energy.grid.price_min",
         "attrname": "min",
@@ -7395,7 +7395,7 @@
     {
         "id": "dce01e447a37fced",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "max",
         "action": "",
@@ -7411,7 +7411,7 @@
     {
         "id": "05bd997115720744",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "min",
         "action": "",
@@ -7427,7 +7427,7 @@
     {
         "id": "b0c592c09f4bafb5",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "durchschnittlicher Strompreis",
         "topic": "alias.0.energy.grid.price_today",
         "attrname": "avg",
@@ -7444,7 +7444,7 @@
     {
         "id": "53db34841cdba2fe",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "avg",
         "action": "",
@@ -7460,7 +7460,7 @@
     {
         "id": "912ca24855a3f674",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Strompreis (morgen)",
         "topic": "alias.0.energy.grid.price_tomorrow",
         "attrname": "tomorrow",
@@ -7477,7 +7477,7 @@
     {
         "id": "6bb3a4c44cc7abba",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "tomorrow",
         "action": "",
@@ -7493,7 +7493,7 @@
     {
         "id": "2c5c8dbfe9ce6002",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "regelung",
         "action": "",
@@ -7509,7 +7509,7 @@
     {
         "id": "6c6b2182997aa6b8",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Laderegelung",
         "topic": "alias.0.energy.control.enableOptimization",
         "attrname": "regelung",
@@ -7526,7 +7526,7 @@
     {
         "id": "5dfbc19ce631c02a",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriemodus (EVCC)",
         "topic": "mqtt.0.evcc.site.batteryMode",
         "attrname": "batteryMode",
@@ -7543,7 +7543,7 @@
     {
         "id": "d788716629c7720f",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "PV Leistung",
         "topic": "alias.0.energy.pv.production",
         "attrname": "pv",
@@ -7560,7 +7560,7 @@
     {
         "id": "159faf93969ec050",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "pv",
         "action": "",
@@ -7576,7 +7576,7 @@
     {
         "id": "5806d21058f968cd",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "batterySOC",
         "topic": "alias.0.energy.battery.soc",
         "attrname": "batterySoC",
@@ -7593,7 +7593,7 @@
     {
         "id": "764746c9502fee95",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batterySoC",
         "action": "",
@@ -7609,7 +7609,7 @@
     {
         "id": "f191936364ed153d",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "wirkleistung",
         "action": "",
@@ -7625,7 +7625,7 @@
     {
         "id": "53e2d07ab02949b6",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Wirkleistung",
         "topic": "alias.0.energy.grid.consumption",
         "attrname": "wirkleistung",
@@ -7642,7 +7642,7 @@
     {
         "id": "aa6fd6426bbe0ba6",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "batteryDischargeControl",
         "topic": "alias.0.energy.evcc.batteryDischargeControl",
         "attrname": "batteryDischargeControl",
@@ -7659,7 +7659,7 @@
     {
         "id": "94e8607226375751",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batteryDischargeControl",
         "action": "",
@@ -7675,7 +7675,7 @@
     {
         "id": "f8c9422f54e835b0",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Strompreis (heute)",
         "topic": "alias.0.energy.grid.price_today",
         "attrname": "today",
@@ -7692,7 +7692,7 @@
     {
         "id": "b5e71198dc5ae830",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "today",
         "action": "",
@@ -7708,7 +7708,7 @@
     {
         "id": "28c07db7bcde5606",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "aktueller Strompreis",
         "topic": "alias.0.energy.grid.price",
         "attrname": "price",
@@ -7725,7 +7725,7 @@
     {
         "id": "17927d0984e777e0",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "price",
         "action": "",
@@ -7741,7 +7741,7 @@
     {
         "id": "34f2d82fc5706f00",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre",
         "topic": "alias.0.energy.control.batterylock",
         "attrname": "batteryLock",
@@ -7758,7 +7758,7 @@
     {
         "id": "563e1d969c16d654",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batteryLock",
         "action": "",
@@ -7774,7 +7774,7 @@
     {
         "id": "05edb89dd7d7472e",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Einspeiseverfügung",
         "rules": [
             {
@@ -7801,7 +7801,7 @@
     {
         "id": "8b8b1251bb87ab16",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "maximaler Strompreis",
         "topic": "alias.0.energy.grid.price_max",
         "attrname": "max",
@@ -7818,7 +7818,7 @@
     {
         "id": "dfa889a66e135fa8",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "minimaler Strompreis",
         "topic": "alias.0.energy.grid.price_min",
         "attrname": "min",
@@ -7835,7 +7835,7 @@
     {
         "id": "39e66cda0dae2225",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "max",
         "action": "",
@@ -7851,7 +7851,7 @@
     {
         "id": "78496a2fbb5f7640",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "min",
         "action": "",
@@ -7867,7 +7867,7 @@
     {
         "id": "03b49fe377c69bbe",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "durchschnittlicher Strompreis",
         "topic": "alias.0.energy.grid.price_today",
         "attrname": "avg",
@@ -7884,7 +7884,7 @@
     {
         "id": "0305093981230882",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "avg",
         "action": "",
@@ -7900,7 +7900,7 @@
     {
         "id": "a6bc93b14557a0da",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Strompreis (morgen)",
         "topic": "alias.0.energy.grid.price_tomorrow",
         "attrname": "tomorrow",
@@ -7917,7 +7917,7 @@
     {
         "id": "6145a36701e7d2ba",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "tomorrow",
         "action": "",
@@ -7933,7 +7933,7 @@
     {
         "id": "72ca4db31558f729",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "regelung",
         "action": "",
@@ -7949,7 +7949,7 @@
     {
         "id": "ff7cb183f95d0506",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Laderegelung",
         "topic": "alias.0.energy.control.enableOptimization",
         "attrname": "regelung",
@@ -7966,7 +7966,7 @@
     {
         "id": "cc0f1c6b602b7562",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriemodus (EVCC)",
         "topic": "mqtt.0.evcc.site.batteryMode",
         "attrname": "batteryMode",
@@ -7984,7 +7984,7 @@
     {
         "id": "a45fc603474f123e",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "PV Leistung",
         "topic": "alias.0.energy.pv.production",
         "attrname": "pv",
@@ -8001,7 +8001,7 @@
     {
         "id": "5717f7ecf5b8f52f",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "pv",
         "action": "",
@@ -8017,7 +8017,7 @@
     {
         "id": "81977c90c0d114e9",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "batterySOC",
         "topic": "alias.0.energy.battery.soc",
         "attrname": "batterySoC",
@@ -8034,7 +8034,7 @@
     {
         "id": "2e0d5423f17f1b9f",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batterySoC",
         "action": "",
@@ -8050,7 +8050,7 @@
     {
         "id": "2805890c9723f914",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "wirkleistung",
         "action": "",
@@ -8066,7 +8066,7 @@
     {
         "id": "bd4d689a6ee2f1c9",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Wirkleistung",
         "topic": "alias.0.energy.grid.consumption",
         "attrname": "wirkleistung",
@@ -8083,7 +8083,7 @@
     {
         "id": "69442f0a753e8da6",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "batteryDischargeControl",
         "topic": "alias.0.energy.evcc.batteryDischargeControl",
         "attrname": "batteryDischargeControl",
@@ -8100,7 +8100,7 @@
     {
         "id": "0fd2b10eb8d4e2be",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batteryDischargeControl",
         "action": "",
@@ -8116,7 +8116,7 @@
     {
         "id": "9064939ebe3c5f85",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Strompreis (heute)",
         "topic": "alias.0.energy.grid.price_today",
         "attrname": "today",
@@ -8133,7 +8133,7 @@
     {
         "id": "2c6e29c501b93e2b",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "today",
         "action": "",
@@ -8149,7 +8149,7 @@
     {
         "id": "312daeb00936db23",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "aktueller Strompreis",
         "topic": "alias.0.energy.grid.price",
         "attrname": "price",
@@ -8166,7 +8166,7 @@
     {
         "id": "1c077a8e0c472597",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "price",
         "action": "",
@@ -8182,7 +8182,7 @@
     {
         "id": "b59fa631dda2ad45",
         "type": "ioBroker get",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Batteriesperre",
         "topic": "alias.0.energy.control.batterylock",
         "attrname": "batteryLock",
@@ -8199,7 +8199,7 @@
     {
         "id": "6b3eeb668b4f84c2",
         "type": "json",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "",
         "property": "batteryLock",
         "action": "",
@@ -8215,7 +8215,7 @@
     {
         "id": "61bd0c4e46d524ec",
         "type": "change",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Einspeiseverfügung",
         "rules": [
             {
@@ -8242,7 +8242,7 @@
     {
         "id": "b12652c19b5a403a",
         "type": "position-config",
-        "z": "b3c2373bdde0e06b",
+        "z": "batteryoptimization",
         "name": "Deutschland",
         "isValide": "true",
         "longitude": "0",
