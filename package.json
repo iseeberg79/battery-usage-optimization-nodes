@@ -1,7 +1,7 @@
 
 {
   "name": "@iseeberg79/node-red-contrib-batteryusageoptimization",
-  "version": "1.0.4-rc14",
+  "version": "1.0.4-rc17",
   "description": "optimizing home battery usage",
   "main": "index.js",
   "scripts": {
