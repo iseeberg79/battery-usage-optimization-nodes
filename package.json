@@ -1,6 +1,6 @@
 {
     "name": "@iseeberg79/battery-usage-optimization-nodes",
-    "version": "0.1.0-rc1",
+    "version": "0.1.0-rc2",
     "description": "A custom Node-RED package for battery usage optimization",
     "main": "gControlBattery.js",
     "keywords": [

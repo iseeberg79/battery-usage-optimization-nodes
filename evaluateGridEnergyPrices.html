@@ -5,9 +5,7 @@
         defaults: {
             name: { value: "" },
             bzn: { value: "DE-LU" },
-            url: { value: "https://api.energy-charts.info/price" },
-            charges: { value: 0 },
-            tax: { value: 19 }
+            url: { value: "https://api.energy-charts.info/price" }
         },
         inputs: 1,
         outputs: 1,
@@ -20,40 +18,29 @@
 
 <script type="text/x-red" data-template-name="@iseeberg79/EvaluateGridEnergyPrices">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" class="input-typed"/>
     </div>
     <div class="form-row">
-        <label for="node-input-bzn"><i class="fa fa-map-marker"></i> BZN</label>
-        <input type="text" id="node-input-bzn" placeholder="DE-LU">
+        <label for="node-input-bzn">BZN</label>
+        <input type="text" id="node-input-bzn" placeholder="DE-LU" class="input-typed"/>
     </div>
     <div class="form-row">
-        <label for="node-input-url"><i class="fa fa-link"></i> URL</label>
-        <input type="text" id="node-input-url" placeholder="https://api.energy-charts.info/price">
-    </div>
-    <div class="form-row">
-        <label for="node-input-charges"><i class="fa fa-money"></i> Charges</label>
-        <input type="number" id="node-input-charges" placeholder="0" step="0.01">
-    </div>
-    <div class="form-row">
-        <label for="node-input-tax"><i class="fa fa-percent"></i> Tax (%)</label>
-        <input type="number" id="node-input-tax" placeholder="19" step="0.1">
+        <label for="node-input-url">URL</label>
+        <input type="text" id="node-input-url" placeholder="https://api.energy-charts.info/price" class="input-typed"/>
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="@iseeberg79/EvaluateGridEnergyPrices">
-    <p>Dieser Node wertet die Strompreise auf Basis der bereitgestellten Daten aus.</p>
+    <p>Dieser Node ermöglicht den Abruf und die Verarbeitung der aktuellen Netzenergiepreise von Fraunhofer ISE.</p>
     <p><b>Inputs:</b></p>
     <ul>
-        <li><b>payload</b> - Die zu verarbeitenden Daten</li>
-        <li><b>bzn</b> - Gebietsnetz (BZN)</li>
-        <li><b>url</b> - Die URL für die Datenanfrage</li>
-        <li><b>charges</b> - Zuzüglich berechnete Gebühren</li>
-        <li><b>tax</b> - Steuerprozentsatz</li>
+        <li><b>BZN</b> - Die BZN für die API-Anfrage</li>
+        <li><b>URL</b> - Die URL für die API-Anfrage</li>
     </ul>
     <p><b>Outputs:</b></p>
     <ul>
-        <li><b>payload</b> - Die verarbeiteten Strompreise</li>
+        <li><b>Output 1</b> - Die berechneten Netzenergiepreise</li>
     </ul>
 </script>
 
