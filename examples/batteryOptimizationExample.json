@@ -425,7 +425,7 @@
         "id": "e9acb2f006d925f8",
         "type": "comment",
         "z": "cd9dc0e3193f2e03",
-        "name": "Berechnung des aktuellen Batteriemodus, stündlich",
+        "name": "Berechnung des aktuellen Batteriemodus, minütlich",
         "info": "",
         "x": 310,
         "y": 760,
