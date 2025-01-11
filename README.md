@@ -13,122 +13,182 @@ Im Verlauf des Tages wird der noch zu erwartende PV-Ertrag bei der Steuerung ber
 Bei Verfügbarkeit des Strompreises für den kommenden Tag, sowie der entsprechenden PV-Prognose wird dies ebenfalls berücksichtigt.
 
 
-<h2>Abhängigkeiten:</h2>
-<h3>Hardware:</h3>
 
- - <a href="https://evcc.io" target="_blank">evcc</a>  integrierter Wechselrichter und Batterie
- - Steuerungsmöglichkeit des Wechselrichters bzw. der Batterie
-   - aktive Batteriesteuerung  
+<h1>@iseeberg79/battery-usage-optimization-nodes</h1>
+<h2>Einführung</h2>
 
-<h3>Software:</h3>
+Dieses Node-RED-Paket bietet eine Reihe von Nodes zur Optimierung der Batterienutzung. Es umfasst Nodes zur Bestimmung des Batteriemodus, zur Bewertung von Solarprognosen, zur Steuerung des Batteriemodus und mehr.
+Installation
 
- - installierte evcc Instanz
- - installiertes IOBroker inkl.
-   - Pvforecast-Instanz (hier: solcast)
-   - Tibber-Instanz
-   - Alias-Instanz
-   - node.red-Instanz, mit 'node-red-contrib-sun-position' und 'node-red-contrib-special-date',
-   - import dieses Paketes 
-     
-(vorzugsweise mit MQTT und InfluxDB)
- 
-Von node.red aus wird auf die integrierten Daten von IOBroker zugegriffen (z.B. evcc, Wechselrichter&Batterie, dyn. Stromanbieter, sowie PVForecast-Adapter).
-Eine Installation von evcc ist integriert und per MQTT steuerbar/abfragbar
+npm install @iseeberg79/battery-usage-optimization-nodes
+Enthaltene Nodes
+DetermineBatteryMode Node
 
-Die Alias-Definitionen sind eingespielt (json), mit lokalen Datenwerten verknüpft und im Node erreichbar. 
-Es wird vorausgesetzt:
- - aktuelle Verbrauchswerte
- - aktuelle und zukünftige Preisinformationen
- - der durchschnittliche Strompreis der letzten Woche (zur Optimierung)
-   - ermittelbar z.B. per Abfrage (AVG, group by week)  aus den Werten der InfluxDB in IOBroker (ansonsten statisch vorzugeben, z.B. 0.24 Euro)
- - tagesaktuelle PV Prognosedaten des Gesamtertrages
-   - inkl. der Verteilung des Ertrags über den Tag
- - Leistungsdaten der Batterie, zur Regelung:
-   - Batteriestand (soc)
-   - minimaler Batteriestand (minsoc)
-   - Batterieleistungswerte (Laderegelung, intern zur Prüfung!)
- 
-In der Node-Konfiguration ist ebenfalls eine Grundeinstellung enthalten:
- - Tagesverbrauch ~15kWh, Standardlastkurve 
- - weitere Konfigurationseinstellungen, wie z.B. maximaler Ladepreis, etc.
+Dieser Node ermöglicht die Bestimmung des Batteriemodus.
+Konfigurationsparameter
 
-Der Knoten sollte instantiiert werden, um dann die Werte der Ausgabekanäle weiter zu verarbeiten. So wird der aktuell empfohlene Zustand für die Batteriekontrolle (normal, hold, charge) dynamisch berechnet und im ersten Ausgang ein empfohlener Wert für den minimalen Ladestand ausgegeben. 
-Dieser ist entweder minimal, oder maximal – d.h. er legt die Grundlage für eine Batteriesperre mit anderen Mitteln, z.B. per modbus-Kontrolle.
+    Name: Der Name des Nodes.
 
-Die evcc-Zustände haben dabei Vorrang, d.h. es wird nur im evcc-Batteriemodus „unknown/normal/charge“ gesteuert. Gibt evcc den Modus für die Batteriesperre („hold“) vor, überschreibt dieser den berechneten Mechanismus. Es wird davon ausgegangen, das die Netzladung per evcc-Instanz unter Konfiguration des aktuellen Strompreises gestartet werden kann.
+    Enable Grid Charge Threshold (%): Schwellenwert zum Aktivieren der Netzladung.
 
-An einem anderen Ausgang wird der Strompreis (in Euro) als Grenzwert für die Netzladung zur Weitergabe als "GridChargeLimit" an evcc ausgegeben, dies kann z.B. per HTTP- oder MQTT-API erfolgen.
+    Disable Grid Charge Threshold (%): Schwellenwert zum Deaktivieren der Netzladung.
 
-Die anderen Ausgänge sind für eine mögliche Visualisierung oder Statistik, sowie für weitergehende Integrationen gedacht und enthalten ergänzende Informationen.
+    Battery Capacity (mAh): Batteriekapazität.
 
-Ohne aktivierte Batteriesteuerung und dynamischem Stromtarif ist eine Steuerung nicht möglich.
+    Minimum State of Charge (%): Mindestladezustand.
 
+    Maximum State of Charge (%): Maximaler Ladezustand.
 
-<h2>detaillierte Beschreibung der Alias-Definitionen:</h3>
+    Efficiency (%): Effizienz.
 
-| Alias | Beschreibung | Zugriff | Typ |
-| --- | --- | --- | --- |
-| energy.control.effectiveGridChargeCostLimit | aktuelle Regelgrenze für die Batteriesperre | schreibend | float
-| energy.control.enableGridcharging | erlaube die Netzladung der Batterie | schreibend | bool
-| energy.control.enableOptimization | erlaube die Steuerung der Hausbatterie | schreibend | bool
-| energy.control.lastGridChargePrice | letzter Preis für die Netzladung der Hausbatterie | schreibend | float
-|  |  |
-| energy.battery.targetMode	| bestimmter Batteriemodus (unknown/normal/hold/charge) | schreibend |  string
-|  |  |
-| energy.control.batterylock | erzwungende Batteriesperre z.B. per UI | lesend | bool
-| energy.control.gridChargeCostLimit | regelbare Preisgrenze für die Netzladung (bis 0.35€) | lesend | float
-|  |  |
-| energy.battery.chargePower | aktuelle Batterieleistung | lesend | int
-| energy.battery.minsoc | aktueller minSoC der Batterie | lesend | int
-| energy.battery.soc | aktueller SoC der Batterie | lesend | int
-|  |  |
-| energy.grid.consumption	| aktueller Strombedarf (Zählerwert in Watt) | lesend | int
-| energy.grid.price | Strompreis (jetzt) | lesend | float
-| energy.grid.prive_avg_weekly | durchschnittlicher Strompreis (historisch, 1 Woche) | lesend | float
-| energy.grid.price_max | maximaler Strompreis (bekannt) | lesend | float
-| energy.grid.price_min | minimaler Strompreis (bekannt) | lesend | float
-| energy.grid.price_today | durchschnittlicher Strompreis (heute)|lesend | float
-| energy.grid.price_tomorrow | durchschnittlicher Strompreis (morgen) | lesend | float
-| energy.grid.pricelevel | aktuelles Preislevel (heute)<br>(VERY CHEAP" / CHEAP / NORMAL / EXPENSIVE / "VERY EXPENSIVE" | lesend | string 
-| energy.grid.pricelevel_min | günstigstes Preislevel (heute)<br>"VERY CHEAP" / CHEAP / NORMAL / EXPENSIVE / "VERY EXPENSIVE" | lesend | string
-|  |  | 
-| energy.evcc.batteryDischargeControl | Konfigurationseinstellung (evcc) der Batteriesteuerung | lesend | bool
-| energy.evcc.tariffPriceHome | aktuell kalkulierter Preis (evcc) für den Hausverbrauch | lesend | float
-|  |  | 
-| energy.pv.forecast_today | prog. Solarstromertrag (heute) | lesend | float
-| energy.pv.price_feedin | Einspeisevergütung (fix) | lesend | float
-| energy.pv.production | aktuelle Stromerzeugung (in Watt) | lesend | int
-| energy.pv.pvforecast_summary_JSONData | gelieferter Datensatz der Solarprognose (solcast-Format?) | lesend | json
+Eingänge und Ausgänge
 
-<h3>Vorschlag zur Preisermittlung</h3>
+    Inputs: 1
 
-![image](https://github.com/user-attachments/assets/a69cdc5b-7a3c-4f80-83de-2e6877d01662)
+    Outputs: 3
 
-Mit Hilfe eines InfluxDB Node und folgender Abfrage an die InfluxDB kann ein Veränderungen erfassender Datenwert als Grundlage herangezogen werden:
+Beispiel
 
-![image](https://github.com/user-attachments/assets/43921dac-2ce3-456b-b8aa-6cabf5d9b53b)
+[ { "id": "82dd0e75ab4e8057", "type": "@iseeberg79/DetermineBatteryMode", "name": "DetermineBatteryMode", "enableGridchargeThreshold": 50, "disableGridchargeThreshold": 80, "batteryCapacity": 10000, "minsoc": 10, "maxsoc": 90, "efficiency": 80, "wires": [ ["92756aee73cf3429"], ["bda0e3da5f255de3"], ["80e651b549dd7fd6"] ] } ]
+EvaluateSolarForecast Node
 
-![image](https://github.com/user-attachments/assets/fe501c9d-9dc1-4187-a42d-5c51739904ce)
+Dieser Node ermöglicht die Abrufung und Verarbeitung von Solarertragsprognosen.
+Konfigurationsparameter
 
-![image](https://github.com/user-attachments/assets/5a077772-2399-4057-8248-323821a99068)
+    Name: Der Name des Nodes.
 
+    Rooftop ID: Die ID des Solardachs.
 
-SQL:
-select mean(*) from "tibberlink.x.xxx-yyy-zzz.CurrentPrice.total" where time>(now() - 7d) group by time(7d) fill(none)
+    Token: Das Authentifizierungstoken.
 
-![image](https://github.com/user-attachments/assets/c87578c6-3648-43b0-a198-d96422c589e1)
+Eingänge und Ausgänge
 
-Der eigentlichen Wert erhält man dann z.B. mit folgender Bearbeitung und speichert ihn z.B. in einem eigenen Datenwert dauerhaft ab:
+    Inputs: 1
 
-![image](https://github.com/user-attachments/assets/b471150d-b6de-4951-abbe-745efd0e9cf2)
+    Outputs: 1
 
+Beispiel
 
+[ { "id": "b77a8513151be91c", "type": "@iseeberg79/EvaluateSolarForecast", "name": "EvaluateSolarForecast", "rooftopid": "exampleRooftopID", "token": "exampleToken", "wires": [ ["1a669e4a805a3853"] ] } ]
+ControlBattery Node
 
-<h2>Beispielintegration</h2>
+Dieser Node ermöglicht die Steuerung des Batteriemodus.
+Konfigurationsparameter
 
-![image](https://github.com/user-attachments/assets/13b9fc2e-bb54-4344-885d-6044d5d0241a)
+    Name: Der Name des Nodes.
 
-Der aufwändige Aufbau für die Steuerung der Batteriesperre („schreiben 1042“, ff.) ist in diesem Beispiel nötig, um nicht konkurrierend zur evcc-Instanz mit dem modbus-Proxy zu steuern und ermöglicht eine Verallgemeinerung der Logik. Außerdem wird sichergestellt, dass die Steuerung im richtigen Kontext erfolgt und Rücksicht auf eventuelle vorherige Zustände von evcc nimmt.
-Dieses Beispiel nutzt abweichend zu evcc das Register für den minimalen Ladestand der Batterie (1042), um eine PV-Ladung von überschüssigem Strom bei Batteriesperre zu ermöglichen. Da nicht zwingend ein Ladepunkt aktiv ist, der die PV Leistung abnimmt, ist dies hier von Vorteil für die optimale Verwendung des erzeugten Solarstromes.
+    Configured Min SoC (%): Konfigurierter Mindestladezustand.
 
-Alternativ könnte mit den Ausgaben z.B. eine Steuerung über einen Ladepunkt (<a href="https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren" target="_blank">Workaround</a>) oder eventuell zukünftig(!) mit Hilfe eines Parameters für eine externe Steuerung in evcc realisiert werden.
+    Maximum Grid Price: Maximale Stromnetzpreis.
+
+    Configured Battery Lock: Konfigurierte Batteriesperre.
+
+Eingänge und Ausgänge
+
+    Inputs: 1
+
+    Outputs: 4
+
+Beispiel
+
+[ { "id": "d09f6df58df1c555", "type": "@iseeberg79/ControlBattery", "name": "ControlBattery", "configuredMinSoC": 5, "maximumGridprice": 0.35, "configuredBatteryLock": false, "wires": [ ["a1c7df7658c158df"], ["5ca5af7eb067158a"], ["02518b11ef345f08"], ["75e92935fdb92674"] ] } ]
+DeterminePowerValues Node
+
+Dieser Node ermöglicht den Abruf und die Verarbeitung der aktuellen Leistungsdaten von evcc.
+Konfigurationsparameter
+
+    Name: Der Name des Nodes.
+
+    URL: Die URL für die API-Anfrage.
+
+Eingänge und Ausgänge
+
+    Inputs: 1
+
+    Outputs: 1
+
+Beispiel
+
+[ { "id": "589d8efc8953672a", "type": "@iseeberg79/DeterminePowerValues", "name": "DeterminePowerValues", "url": "http://localhost:7070/api/state", "wires": [ ["9fc0a768b4993fb7"] ] } ]
+DetermineControlMode Node
+
+Dieser Node ermöglicht die Bestimmung des Steuerungsmodus.
+Konfigurationsparameter
+
+    Name: Der Name des Nodes.
+
+Eingänge und Ausgänge
+
+    Inputs: 1
+
+    Outputs: 1
+
+Beispiel
+
+[ { "id": "abc123", "type": "@iseeberg79/DetermineControlMode", "name": "DetermineControlMode", "wires": [ ["def456"] ] } ]
+EstimateHouseholdConsumption Node
+
+Dieser Node ermöglicht die Schätzung des Haushaltsverbrauchs.
+Konfigurationsparameter
+
+    Name: Der Name des Nodes.
+
+Eingänge und Ausgänge
+
+    Inputs: 1
+
+    Outputs: 1
+
+Beispiel
+
+[ { "id": "ghi789", "type": "@iseeberg79/EstimateHouseholdConsumption", "name": "EstimateHouseholdConsumption", "wires": [ ["jkl012"] ] } ]
+EvaluateGridEnergyPricesAPI Node
+
+Dieser Node ermöglicht die Bewertung von Netzenergiepreisen über eine API.
+Konfigurationsparameter
+
+    Name: Der Name des Nodes.
+
+    API Key: Der API-Schlüssel.
+
+Eingänge und Ausgänge
+
+    Inputs: 1
+
+    Outputs: 1
+
+Beispiel
+
+[ { "id": "mno345", "type": "@iseeberg79/EvaluateGridEnergyPricesAPI", "name": "EvaluateGridEnergyPricesAPI", "apikey": "exampleApiKey", "wires": [ ["pqr678"] ] } ]
+EvaluateGridEnergyPrices Node
+
+Dieser Node ermöglicht die Bewertung von Netzenergiepreisen.
+Konfigurationsparameter
+
+    Name: Der Name des Nodes.
+
+Eingänge und Ausgänge
+
+    Inputs: 1
+
+    Outputs: 1
+
+Beispiel
+
+[ { "id": "stu901", "type": "@iseeberg79/EvaluateGridEnergyPrices", "name": "EvaluateGridEnergyPrices", "wires": [ ["vwx234"] ] } ]
+EstimateSolarEnergy Node
+
+Dieser Node ermöglicht die Schätzung der Solarenergie.
+Konfigurationsparameter
+
+    Name: Der Name des Nodes.
+
+Eingänge und Ausgänge
+
+    Inputs: 1
+
+    Outputs: 1
+
+Beispiel
+
+[ { "id": "yz567", "type": "@iseeberg79/EstimateSolarEnergy", "name": "EstimateSolarEnergy", "wires": [ ["abc890"] ] } ]
