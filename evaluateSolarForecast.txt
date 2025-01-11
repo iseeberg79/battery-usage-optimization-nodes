@@ -2,37 +2,108 @@
 
 ## EvaluateSolarForecast Node
 
-Dieser Node ermöglicht die Abrufung und Verarbeitung von Solarertragsprognosen.
+Der `EvaluateSolarForecast` Node berechnet die Solarprognosen basierend auf den bereitgestellten Daten von Solcast. Dieser Node verarbeitet die Prognosen und berechnet die geschätzte Solarenergie für den aktuellen Tag, den Rest des heutigen Tages und für den folgenden Tag.
 
 ### Konfigurationsparameter
 
-- **Name**: Der Name des Nodes.
-- **Rooftop ID**: Die ID des Solardachs.
-- **Token**: Das Authentifizierungstoken.
+- **Name**: Ein benutzerdefinierter Name für den Node.
+- **Rooftop ID**: Die ID Ihres Solardachs.
+- **Token**: Ihr Authentifizierungs-Token.
 
 ### Eingänge und Ausgänge
 
 - **Inputs**: 1
+  - **rooftopid**: Die ID des Solardachs (optional, kann auch in der Konfiguration festgelegt werden).
+  - **token**: Das Authentifizierungs-Token (optional, kann auch in der Konfiguration festgelegt werden).
+  
 - **Outputs**: 1
+  - **msg.payload**: Enthält die berechneten Werte der Solarenergie:
+    - **msg.payload.today**: Geschätzte Solarenergie für den aktuellen Tag (in kWh).
+    - **msg.payload.remain**: Verbleibende Solarenergie für den Rest des heutigen Tages (in kWh).
+    - **msg.payload.tomorrow**: Geschätzte Solarenergie für den folgenden Tag (in kWh).
 
 ### Verwendung
 
-1. Fügen Sie den Node zu Ihrem Flow hinzu.
-2. Konfigurieren Sie die erforderlichen Parameter (Name, Rooftop ID, Token).
-3. Verbinden Sie den Node mit anderen Nodes in Ihrem Flow.
+1. **Node hinzufügen**: Fügen Sie den `EvaluateSolarForecast` Node zu Ihrem Flow hinzu.
+2. **Konfiguration**: Konfigurieren Sie den Namen des Nodes, die Rooftop ID und das Token im Einstellungsdialog.
+3. **Verkabelung**: Verbinden Sie den Node mit anderen Nodes in Ihrem Flow. Der Input des Nodes sollte die Solardach-ID und das Authentifizierungs-Token enthalten.
+4. **Ausführung**: Der Node führt eine HTTP-Anfrage an die Solcast API durch, um die Prognosedaten zu erhalten und berechnet die Solarenergie, die als Output zurückgegeben wird.
 
-### Beispiel
+### Beispiel Flow
 
 ```json
 [
     {
-        "id": "b77a8513151be91c",
-        "type": "@iseeberg79/EvaluateSolarForecast",
-        "name": "EvaluateSolarForecast",
-        "rooftopid": "exampleRooftopID",
-        "token": "exampleToken",
+        "id": "31a983906e48f58a",
+        "type": "inject",
+        "z": "794bee8860f702f2",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "rooftopid",
+                "v": "xxxx-yyyy-zzzz-aaaa",
+                "vt": "str"
+            },
+            {
+                "p": "token",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "05 00 * * *",
+        "once": true,
+        "onceDelay": "10",
+        "topic": "",
+        "x": 130,
+        "y": 80,
         "wires": [
-            ["1a669e4a805a3853"]
+            [
+                "90b6c31b3a2925ae"
+            ]
+        ]
+    },
+    {
+        "id": "90b6c31b3a2925ae",
+        "type": "@iseeberg79/EvaluateSolarForecast",
+        "name": "Evaluate Solar Forecast",
+        "rooftopid": "your_rooftop_id",
+        "token": "your_auth_token",
+        "wires": [
+            [
+                "1a669e4a805a3853"
+            ]
+        ]
+    },
+    {
+        "id": "1a669e4a805a3853",
+        "type": "change",
+        "z": "794bee8860f702f2",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pvForecast1",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 80,
+        "wires": [
+            [
+                "8bb61eb703e8c270"
+            ]
         ]
     }
 ]

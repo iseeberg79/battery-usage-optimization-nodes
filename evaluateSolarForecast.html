@@ -22,25 +22,27 @@
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-rooftopid"><i class="fa fa-id-card"></i> Rooftop ID</label>
+        <label for="node-input-rooftopid"><i class="fa fa-key"></i> Rooftop ID</label>
         <input type="text" id="node-input-rooftopid" placeholder="Rooftop ID">
     </div>
     <div class="form-row">
-        <label for="node-input-token"><i class="fa fa-key"></i> Token</label>
+        <label for="node-input-token"><i class="fa fa-lock"></i> Token</label>
         <input type="text" id="node-input-token" placeholder="Token">
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="@iseeberg79/EvaluateSolarForecast">
-    <p>Dieser Node ermöglicht die Abrufung und Verarbeitung von Solarertragsprognosen.</p>
+    <p>Dieser Node berechnet die Solarprognosen basierend auf den bereitgestellten Daten.</p>
     <p><b>Inputs:</b></p>
     <ul>
-        <li><b>rooftopid</b> - Die ID des Solardachs</li>
-        <li><b>token</b> - Das Authentifizierungstoken</li>
+        <li><b>rooftopid</b> - ID des Solardachs</li>
+        <li><b>token</b> - Authentifizierungs-Token</li>
     </ul>
     <p><b>Outputs:</b></p>
     <ul>
-        <li><b>payload</b> - Die verarbeiteten Solarertragsprognosen</li>
+        <li><b>payload.today</b> - Geschätzte Solarenergie für heute</li>
+        <li><b>payload.remain</b> - Verbleibende Solarenergie für heute</li>
+        <li><b>payload.tomorrow</b> - Geschätzte Solarenergie für morgen</li>
     </ul>
 </script>
 

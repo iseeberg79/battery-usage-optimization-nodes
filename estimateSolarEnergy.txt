@@ -2,33 +2,98 @@
 
 ## EstimateSolarEnergy Node
 
-Dieser Node schätzt die Solarenergie basierend auf den bereitgestellten Prognosen.
+Der `EstimateSolarEnergy` Node schätzt die Solarenergie basierend auf den bereitgestellten Prognosen aus den Solcast-Daten. Dieser Node verarbeitet die Prognosen und berechnet die geschätzte Solarenergie für den aktuellen Tag, den Rest des heutigen Tages und für den folgenden Tag.
 
 ### Konfigurationsparameter
 
-- **Name**: Der Name des Nodes.
+- **Name**: Ein benutzerdefinierter Name für den Node.
 
 ### Eingänge und Ausgänge
 
 - **Inputs**: 1
+  - **msg.payload.forecasts**: Ein Array von Solarprognosenobjekten mit den Feldern `pv_estimate`, `pv_estimate10`, `pv_estimate90`, und `period_end`.
+  
 - **Outputs**: 1
+  - **msg.payload**: Enthält die berechneten Werte der Solarenergie:
+    - **msg.payload.today**: Geschätzte Solarenergie für den aktuellen Tag (in kWh).
+    - **msg.payload.remain**: Verbleibende Solarenergie für den Rest des heutigen Tages (in kWh).
+    - **msg.payload.tomorrow**: Geschätzte Solarenergie für den folgenden Tag (in kWh).
 
 ### Verwendung
 
-1. Fügen Sie den Node zu Ihrem Flow hinzu.
-2. Konfigurieren Sie die erforderlichen Parameter (Name).
-3. Verbinden Sie den Node mit anderen Nodes in Ihrem Flow.
+1. **Node hinzufügen**: Fügen Sie den `EstimateSolarEnergy` Node zu Ihrem Flow hinzu.
+2. **Konfiguration**: Konfigurieren Sie den Namen des Nodes im Einstellungsdialog.
+3. **Verkabelung**: Verbinden Sie den Node mit anderen Nodes in Ihrem Flow. Der Input des Nodes sollte ein Array von Solarprognosen enthalten.
+4. **Ausführung**: Der Node verarbeitet die Prognosen und berechnet die Solarenergie, die als Output zurückgegeben wird.
 
-### Beispiel
+### Beispiel Flow
 
 ```json
 [
     {
-        "id": "c6d40f3e72575bf4",
-        "type": "@iseeberg79/EstimateSolarEnergy",
-        "name": "EstimateSolarEnergy",
+        "id": "5c4da12769a7e04a",
+        "type": "inject",
+        "z": "794bee8860f702f2",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "20",
+        "topic": "",
+        "payload": "pvForecast1",
+        "payloadType": "flow",
+        "x": 170,
+        "y": 180,
         "wires": [
-            ["4b58e49713f946cd"]
+            [
+                "e7830f2dc686b5d9"
+            ]
+        ]
+    },
+    {
+        "id": "e7830f2dc686b5d9",
+        "type": "@iseeberg79/EstimateSolarEnergy",
+        "name": "Estimate Solar Energy",
+        "wires": [
+            [
+                "4b58e49713f946cd"
+            ]
+        ]
+    },
+    {
+        "id": "4b58e49713f946cd",
+        "type": "change",
+        "z": "794bee8860f702f2",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pvForecast1",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 180,
+        "wires": [
+            [
+                "997b5b87f81b6dd4"
+            ]
         ]
     }
 ]
