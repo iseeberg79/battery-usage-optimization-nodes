@@ -16,15 +16,15 @@
     },
     "node-red": {
         "nodes": {
-            "DetermineBatteryMode": "DetermineBatteryMode.js",
-            "EvaluateSolarForecast": "EvaluateSolarForecast.js",
-            "ControlBattery": "ControlBattery.js",
-            "DeterminePowerValues": "DeterminePowerValues.js",
-            "DetermineControlMode": "DetermineControlMode.js",
-            "EstimateHouseholdConsumption": "EstimateHouseholdConsumption.js",
-            "EvaluateGridEnergyPricesAPI": "EvaluateGridEnergyPricesAPI.js",
-            "EvaluateGridEnergyPrices": "EvaluateGridEnergyPrices.js",
-            "EstimateSolarEnergy": "EstimateSolarEnergy.js"
+            "DetermineBatteryMode": "determineBatteryMode.js",
+            "EvaluateSolarForecast": "evaluateSolarForecast.js",
+            "ControlBattery": "controlBattery.js",
+            "DeterminePowerValues": "determinePowerValues.js",
+            "DetermineControlMode": "determineControlMode.js",
+            "EstimateHouseholdConsumption": "estimateHouseholdConsumption.js",
+            "EvaluateGridEnergyPricesAPI": "evaluateGridEnergyPricesAPI.js",
+            "EvaluateGridEnergyPrices": "evaluateGridEnergyPrices.js",
+            "EstimateSolarEnergy": "estimateSolarEnergy.js"
         }
     }
 }
