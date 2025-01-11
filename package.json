@@ -1,0 +1,31 @@
+{
+    "name": "@iseeberg79/battery-usage-optimization-nodes",
+    "version": "0.1.0-rc1",
+    "description": "A custom Node-RED package for battery usage optimization",
+    "main": "gControlBattery.js",
+    "keywords": [
+        "node-red",
+        "battery-optimization",
+        "solar-energy-control"
+    ],
+    "author": "Ingo Seeberg-Hinrichs",
+    "license": "MIT",
+    "dependencies": {
+        "node-red": "^2.0.0",
+        "axios": "^0.21.1"
+    },
+    "node-red": {
+        "nodes": {
+            "DetermineBatteryMode": "DetermineBatteryMode.js",
+            "EvaluateSolarForecast": "EvaluateSolarForecast.js",
+            "ControlBattery": "ControlBattery.js",
+            "DeterminePowerValues": "DeterminePowerValues.js",
+            "DetermineControlMode": "DetermineControlMode.js",
+            "EstimateHouseholdConsumption": "EstimateHouseholdConsumption.js",
+            "EvaluateGridEnergyPricesAPI": "EvaluateGridEnergyPricesAPI.js",
+            "EvaluateGridEnergyPrices": "EvaluateGridEnergyPrices.js",
+            "EstimateSolarEnergy": "EstimateSolarEnergy.js"
+        }
+    }
+}
+

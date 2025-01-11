@@ -1,0 +1,35 @@
+# @iseeberg79/solar-forecast-nodes
+
+## EstimateSolarEnergy Node
+
+Dieser Node schätzt die Solarenergie basierend auf den bereitgestellten Prognosen.
+
+### Konfigurationsparameter
+
+- **Name**: Der Name des Nodes.
+
+### Eingänge und Ausgänge
+
+- **Inputs**: 1
+- **Outputs**: 1
+
+### Verwendung
+
+1. Fügen Sie den Node zu Ihrem Flow hinzu.
+2. Konfigurieren Sie die erforderlichen Parameter (Name).
+3. Verbinden Sie den Node mit anderen Nodes in Ihrem Flow.
+
+### Beispiel
+
+```json
+[
+    {
+        "id": "c6d40f3e72575bf4",
+        "type": "@iseeberg79/EstimateSolarEnergy",
+        "name": "EstimateSolarEnergy",
+        "wires": [
+            ["4b58e49713f946cd"]
+        ]
+    }
+]
+

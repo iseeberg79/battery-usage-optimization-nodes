@@ -1,0 +1,72 @@
+<script type="text/javascript">
+    RED.nodes.registerType('@iseeberg79/DetermineBatteryMode', {
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: { value: "" },
+            enableGridchargeThreshold: { value: 50 },
+            disableGridchargeThreshold: { value: 80 },
+            batteryCapacity: { value: 10000 },
+            minsoc: { value: 10 },
+            maxsoc: { value: 90 },
+            efficiency: { value: 80 }
+        },
+        inputs: 1,
+        outputs: 3,
+        icon: "file.png",
+        label: function() {
+            return this.name || "Determine Battery Mode";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="@iseeberg79/DetermineBatteryMode">
+    <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-enableGridchargeThreshold">Enable Grid Charge Threshold (%)</label>
+        <input type="number" id="node-input-enableGridchargeThreshold" placeholder="50" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-disableGridchargeThreshold">Disable Grid Charge Threshold (%)</label>
+        <input type="number" id="node-input-disableGridchargeThreshold" placeholder="80" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-batteryCapacity">Battery Capacity (mAh)</label>
+        <input type="number" id="node-input-batteryCapacity" placeholder="10000" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-minsoc">Minimum State of Charge (%)</label>
+        <input type="number" id="node-input-minsoc" placeholder="10" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-maxsoc">Maximum State of Charge (%)</label>
+        <input type="number" id="node-input-maxsoc" placeholder="90" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-efficiency">Efficiency (%)</label>
+        <input type="number" id="node-input-efficiency" placeholder="80" class="input-typed"/>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="@iseeberg79/DetermineBatteryMode">
+    <p>Dieser Node ermöglicht die Bestimmung des Batteriemodus.</p>
+    <p><b>Inputs:</b></p>
+    <ul>
+        <li><b>enableGridchargeThreshold</b> - Schwellenwert zum Aktivieren der Netzladung</li>
+        <li><b>disableGridchargeThreshold</b> - Schwellenwert zum Deaktivieren der Netzladung</li>
+        <li><b>batteryCapacity</b> - Batteriekapazität</li>
+        <li><b>minsoc</b> - Mindestladezustand</li>
+        <li><b>maxsoc</b> - Maximaler Ladezustand</li>
+        <li><b>efficiency</b> - Effizienz</li>
+    </ul>
+    <p><b>Outputs:</b></p>
+    <ul>
+        <li><b>Output 1</b> - Der berechnete Batteriemodus</li>
+        <li><b>Output 2</b> - Der letzte Ladepreis</li>
+        <li><b>Output 3</b> - Die Originalnachricht mit allen Parametern</li>
+    </ul>
+</script>
+

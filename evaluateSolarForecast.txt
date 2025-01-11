@@ -1,0 +1,39 @@
+# @iseeberg79/solar-forecast-nodes
+
+## EvaluateSolarForecast Node
+
+Dieser Node ermöglicht die Abrufung und Verarbeitung von Solarertragsprognosen.
+
+### Konfigurationsparameter
+
+- **Name**: Der Name des Nodes.
+- **Rooftop ID**: Die ID des Solardachs.
+- **Token**: Das Authentifizierungstoken.
+
+### Eingänge und Ausgänge
+
+- **Inputs**: 1
+- **Outputs**: 1
+
+### Verwendung
+
+1. Fügen Sie den Node zu Ihrem Flow hinzu.
+2. Konfigurieren Sie die erforderlichen Parameter (Name, Rooftop ID, Token).
+3. Verbinden Sie den Node mit anderen Nodes in Ihrem Flow.
+
+### Beispiel
+
+```json
+[
+    {
+        "id": "b77a8513151be91c",
+        "type": "@iseeberg79/EvaluateSolarForecast",
+        "name": "EvaluateSolarForecast",
+        "rooftopid": "exampleRooftopID",
+        "token": "exampleToken",
+        "wires": [
+            ["1a669e4a805a3853"]
+        ]
+    }
+]
+

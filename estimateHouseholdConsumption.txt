@@ -1,0 +1,35 @@
+# @iseeberg79/solar-forecast-nodes
+
+## EstimateHouseholdConsumption Node
+
+Dieser Node schätzt den Stromverbrauch eines Haushalts stündlich.
+
+### Konfigurationsparameter
+
+- **Name**: Der Name des Nodes.
+
+### Eingänge und Ausgänge
+
+- **Inputs**: 1
+- **Outputs**: 1
+
+### Verwendung
+
+1. Fügen Sie den Node zu Ihrem Flow hinzu.
+2. Konfigurieren Sie die erforderlichen Parameter (Name).
+3. Verbinden Sie den Node mit anderen Nodes in Ihrem Flow.
+
+### Beispiel
+
+```json
+[
+    {
+        "id": "4b901a7ba313e356",
+        "type": "@iseeberg79/EstimateHouseholdConsumption",
+        "name": "EstimateHouseholdConsumption",
+        "wires": [
+            ["c414e4e307a4dfd5"]
+        ]
+    }
+]
+
