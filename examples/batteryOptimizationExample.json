@@ -1,5 +1,1195 @@
 [
     {
+        "id": "d828cc95360f4c45",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "20",
+        "topic": "",
+        "payload": "pvForecast1",
+        "payloadType": "flow",
+        "x": 170,
+        "y": 260,
+        "wires": [
+            [
+                "69602ecf457ecfc8"
+            ]
+        ]
+    },
+    {
+        "id": "00b09473d8685ebd",
+        "type": "comment",
+        "z": "cd9dc0e3193f2e03",
+        "name": "erwarteter Solarertrag zweier PV Anlagen",
+        "info": "",
+        "x": 280,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "e063e5af6110505f",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "05 00 * * *",
+        "once": true,
+        "onceDelay": "10",
+        "topic": "",
+        "x": 130,
+        "y": 160,
+        "wires": [
+            [
+                "bbae2bf77e5df7f4",
+                "d75f1f608f08c020"
+            ]
+        ]
+    },
+    {
+        "id": "4e640ae19780edc2",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 900,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "4f406597326ac519",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pvForecast1",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 160,
+        "wires": [
+            [
+                "4e640ae19780edc2"
+            ]
+        ]
+    },
+    {
+        "id": "657e7d78f98ea24b",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 900,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "62d508aeb1f7efab",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pvForecast1",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 260,
+        "wires": [
+            [
+                "657e7d78f98ea24b",
+                "a0b4d4567c6ed771"
+            ]
+        ]
+    },
+    {
+        "id": "9742c76cebbfb222",
+        "type": "comment",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Abruf des erwarten Solarertrags von zwei PV Anlagen",
+        "info": "",
+        "x": 320,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "06478e77d6131403",
+        "type": "comment",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Abruf des erwarten Strompreises (Fraunhofer ISE)",
+        "info": "",
+        "x": 310,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "a828d51d3b373f2b",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "charges",
+                "v": "12.945",
+                "vt": "num"
+            },
+            {
+                "p": "tax",
+                "v": "19",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "10",
+        "topic": "",
+        "x": 130,
+        "y": 380,
+        "wires": [
+            [
+                "3127cb8de95cd5ca"
+            ]
+        ]
+    },
+    {
+        "id": "b7c21f4c0d694786",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "gridPrices",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 380,
+        "wires": [
+            [
+                "8716ef41c51f5cc8"
+            ]
+        ]
+    },
+    {
+        "id": "8716ef41c51f5cc8",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "bc7751ab9b712009",
+        "type": "comment",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Abruf des erwarten Strompreises (evcc)",
+        "info": "",
+        "x": 270,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "9b9289568196ac1c",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "10",
+        "topic": "",
+        "x": 130,
+        "y": 480,
+        "wires": [
+            [
+                "0319aaa02c87f4e9"
+            ]
+        ]
+    },
+    {
+        "id": "1d6ff2c5c998aba7",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "9786fbf15b1cebd4",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "gridPrices",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 480,
+        "wires": [
+            [
+                "1d6ff2c5c998aba7"
+            ]
+        ]
+    },
+    {
+        "id": "cc3635dd544a1dc1",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "profile",
+                "v": "[0.4,0.4,0.4,0.4,0.4,0.4,1,1,0.4,0.4,0.4,0.4,1,1,0.4,0.4,0.4,1,1,1,1,1,0.4,0.4]",
+                "vt": "jsonata"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "20",
+        "topic": "",
+        "x": 130,
+        "y": 580,
+        "wires": [
+            [
+                "db9c00f61794fc54"
+            ]
+        ]
+    },
+    {
+        "id": "217976be437efae6",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "household",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 580,
+        "wires": [
+            [
+                "49ef78ea7b74b6ca"
+            ]
+        ]
+    },
+    {
+        "id": "49ef78ea7b74b6ca",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "8f03b68bbf2e9574",
+        "type": "comment",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Berechnung der benötigen Energie (Stromverbrauch)",
+        "info": "",
+        "x": 310,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "abb3f3ac8916d559",
+        "type": "comment",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Auswertung des heutigen Steuerungsmodus",
+        "info": "",
+        "x": 290,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "e9acb2f006d925f8",
+        "type": "comment",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Berechnung des aktuellen Batteriemodus, stündlich",
+        "info": "",
+        "x": 310,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "418896f9ac224aa1",
+        "type": "comment",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Berechnung des aktuellen Batteriemodus, watchdog-Intervall",
+        "info": "",
+        "x": 340,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "e428a5bc437feca2",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "average",
+                "v": "gridPrices.average",
+                "vt": "flow"
+            },
+            {
+                "p": "diff",
+                "v": "gridPrices.diff",
+                "vt": "flow"
+            },
+            {
+                "p": "deviation",
+                "v": "gridPrices.deviation",
+                "vt": "flow"
+            },
+            {
+                "p": "pvforecast",
+                "v": "pvForecast.today",
+                "vt": "flow"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "avgWeekly",
+                "v": "avgGridPriceWeekly",
+                "vt": "flow"
+            },
+            {
+                "p": "priceLimit",
+                "v": "lastGridChargePrice",
+                "vt": "flow"
+            }
+        ],
+        "repeat": "",
+        "crontab": "10 00 * * *",
+        "once": true,
+        "onceDelay": "20",
+        "topic": "",
+        "x": 130,
+        "y": 680,
+        "wires": [
+            [
+                "32dcd5f264915cc2"
+            ]
+        ]
+    },
+    {
+        "id": "2a20e598db29cc39",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "optimize",
+                "v": "control.optimize",
+                "vt": "flow"
+            },
+            {
+                "p": "enableGridcharge",
+                "v": "control.gridcharge",
+                "vt": "flow"
+            },
+            {
+                "p": "batterymode",
+                "v": "batterymode",
+                "vt": "flow"
+            },
+            {
+                "p": "soc",
+                "v": "evcc.batterySoc",
+                "vt": "flow"
+            },
+            {
+                "p": "minimum",
+                "v": "gridPrices.minimum",
+                "vt": "flow"
+            },
+            {
+                "p": "price",
+                "v": "evcc.tariffGrid",
+                "vt": "flow"
+            },
+            {
+                "p": "pvforecast",
+                "v": "pvForecast.remain",
+                "vt": "flow"
+            },
+            {
+                "p": "lastGridchargePrice",
+                "v": "lastGridchargePrice",
+                "vt": "flow"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "30",
+        "topic": "",
+        "x": 130,
+        "y": 800,
+        "wires": [
+            [
+                "90069f15cec585d3"
+            ]
+        ]
+    },
+    {
+        "id": "3da7fdf4e8e372e4",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "optimize",
+                "v": "control.optimize",
+                "vt": "flow"
+            },
+            {
+                "p": "batterymode",
+                "v": "batterymode",
+                "vt": "flow"
+            },
+            {
+                "p": "evccBatteryMode",
+                "v": "evcc.batteryMode",
+                "vt": "flow"
+            },
+            {
+                "p": "actualsoc",
+                "v": "evcc.batterySoc",
+                "vt": "flow"
+            },
+            {
+                "p": "minsoc",
+                "v": "20",
+                "vt": "num"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "20",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "60",
+        "topic": "",
+        "x": 130,
+        "y": 940,
+        "wires": [
+            [
+                "a8e1208a697baf0a"
+            ]
+        ]
+    },
+    {
+        "id": "dcf58549ea1eea09",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "86a20d6230cc9b5b",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "f1909c82699d0831",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "d7a8430bb0f242d7",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "96fc5504a6b2e415",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "8067f82adefbf68b",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "0f7c08aaca6ef252",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "5d4e9c0d101552dd",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "e5900435c808c8e0",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "control",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 680,
+        "wires": [
+            [
+                "dcf58549ea1eea09"
+            ]
+        ]
+    },
+    {
+        "id": "11f603b1c5db6eca",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "batterymode",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 740,
+        "wires": [
+            [
+                "86a20d6230cc9b5b"
+            ]
+        ]
+    },
+    {
+        "id": "4d8c6cdae78da54c",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "lastGridchargePrice",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 800,
+        "wires": [
+            [
+                "f1909c82699d0831"
+            ]
+        ]
+    },
+    {
+        "id": "99793a19973b61b6",
+        "type": "comment",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Abruf der aktuellen Leistungsdaten (evcc)",
+        "info": "",
+        "x": 280,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "d197f5dbb546bc56",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "30",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 80,
+        "wires": [
+            [
+                "d145172187cf635a"
+            ]
+        ]
+    },
+    {
+        "id": "40ba76623a8741b5",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 900,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "2280166f9af1cf73",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "evcc",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 80,
+        "wires": [
+            [
+                "40ba76623a8741b5"
+            ]
+        ]
+    },
+    {
+        "id": "167d584a6c709594",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "setBatterySoc",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 920,
+        "wires": [
+            [
+                "d7a8430bb0f242d7"
+            ]
+        ]
+    },
+    {
+        "id": "6e9eb3a408218377",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "setBatteryMode",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 960,
+        "wires": [
+            [
+                "96fc5504a6b2e415"
+            ]
+        ]
+    },
+    {
+        "id": "d41095de37554de3",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "lastGridChargePrice",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 1000,
+        "wires": [
+            [
+                "8067f82adefbf68b"
+            ]
+        ]
+    },
+    {
+        "id": "bbae2bf77e5df7f4",
+        "type": "@iseeberg79/EvaluateSolarForecast",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "rooftopid": "bbe7-e02c-bbbe-4728",
+        "token": "vmW1k96ANafa641N7gZF3Z1N1rjVcwHF",
+        "x": 390,
+        "y": 160,
+        "wires": [
+            [
+                "4f406597326ac519"
+            ]
+        ]
+    },
+    {
+        "id": "69602ecf457ecfc8",
+        "type": "@iseeberg79/EstimateSolarEnergy",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "x": 400,
+        "y": 260,
+        "wires": [
+            [
+                "62d508aeb1f7efab"
+            ]
+        ]
+    },
+    {
+        "id": "3127cb8de95cd5ca",
+        "type": "@iseeberg79/EvaluateGridEnergyPrices",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "bzn": "DE-LU",
+        "url": "https://api.energy-charts.info/price",
+        "x": 400,
+        "y": 380,
+        "wires": [
+            [
+                "b7c21f4c0d694786"
+            ]
+        ]
+    },
+    {
+        "id": "0319aaa02c87f4e9",
+        "type": "@iseeberg79/EvaluateGridEnergyPricesAPI",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "url": "http://localhost:7070/api/tariff/grid",
+        "x": 410,
+        "y": 480,
+        "wires": [
+            [
+                "9786fbf15b1cebd4"
+            ]
+        ]
+    },
+    {
+        "id": "db9c00f61794fc54",
+        "type": "@iseeberg79/EstimateHouseholdConsumption",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "x": 420,
+        "y": 580,
+        "wires": [
+            [
+                "217976be437efae6"
+            ]
+        ]
+    },
+    {
+        "id": "32dcd5f264915cc2",
+        "type": "@iseeberg79/DetermineControlMode",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "minPvRequired": 16000,
+        "minPriceDeviation": 6,
+        "minPriceDifference": 15,
+        "priceLimit": 0.35,
+        "avg": 0.24,
+        "x": 390,
+        "y": 680,
+        "wires": [
+            [
+                "e5900435c808c8e0"
+            ]
+        ]
+    },
+    {
+        "id": "90069f15cec585d3",
+        "type": "@iseeberg79/DetermineBatteryMode",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "enableGridchargeThreshold": 50,
+        "disableGridchargeThreshold": 80,
+        "batteryCapacity": 10000,
+        "minsoc": 10,
+        "maxsoc": 90,
+        "efficiency": 80,
+        "x": 390,
+        "y": 800,
+        "wires": [
+            [
+                "11f603b1c5db6eca"
+            ],
+            [
+                "4d8c6cdae78da54c"
+            ],
+            [
+                "5d4e9c0d101552dd"
+            ]
+        ]
+    },
+    {
+        "id": "a8e1208a697baf0a",
+        "type": "@iseeberg79/ControlBattery",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "configuredMinSoC": 5,
+        "maximumGridprice": 0.35,
+        "configuredBatteryLock": false,
+        "x": 360,
+        "y": 940,
+        "wires": [
+            [
+                "167d584a6c709594"
+            ],
+            [
+                "6e9eb3a408218377"
+            ],
+            [
+                "d41095de37554de3"
+            ],
+            [
+                "0f7c08aaca6ef252"
+            ]
+        ]
+    },
+    {
+        "id": "d145172187cf635a",
+        "type": "@iseeberg79/DeterminePowerValues",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "url": "http://localhost:7070/api/state",
+        "x": 410,
+        "y": 80,
+        "wires": [
+            [
+                "2280166f9af1cf73"
+            ]
+        ]
+    },
+    {
+        "id": "d75f1f608f08c020",
+        "type": "@iseeberg79/EvaluateSolarForecast",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "rooftopid": "0754-8be7-2fe8-eed4",
+        "token": "vmW1k96ANafa641N7gZF3Z1N1rjVcwHF",
+        "x": 410,
+        "y": 180,
+        "wires": [
+            [
+                "409ec49b81beddba"
+            ]
+        ]
+    },
+    {
+        "id": "409ec49b81beddba",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pvForecast2",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cd07e27f530f869b",
+        "type": "@iseeberg79/EstimateSolarEnergy",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "x": 420,
+        "y": 280,
+        "wires": [
+            [
+                "73f66af5a8d07e25"
+            ]
+        ]
+    },
+    {
         "id": "e67d08b5e7356f27",
         "type": "inject",
         "z": "cd9dc0e3193f2e03",
@@ -25,6 +1215,236 @@
         "wires": [
             [
                 "cd07e27f530f869b"
+            ]
+        ]
+    },
+    {
+        "id": "73f66af5a8d07e25",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pvForecast2",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 280,
+        "wires": [
+            [
+                "a0b4d4567c6ed771"
+            ]
+        ]
+    },
+    {
+        "id": "a0b4d4567c6ed771",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "summieren",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pv1",
+                "pt": "msg",
+                "to": "pvForecast1",
+                "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "pv2",
+                "pt": "msg",
+                "to": "pvForecast2",
+                "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{ \"today\": pv1.today + pv2.today, \"tomorrow\": pv1.tomorrow + pv2.tomorrow, \"remain\": pv1.remain + pv2.remain }",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "pvForecast",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 910,
+        "y": 280,
+        "wires": [
+            [
+                "fe9e1f5e36324ac1"
+            ]
+        ]
+    },
+    {
+        "id": "fe9e1f5e36324ac1",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 1080,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "1309c85bad05b955",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "avgGridPriceWeekly",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 740,
+        "y": 1160,
+        "wires": [
+            [
+                "9734e9d9c72f3824"
+            ]
+        ]
+    },
+    {
+        "id": "9734e9d9c72f3824",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 880,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "70dbc8466ddc6558",
+        "type": "ioBroker in",
+        "z": "cd9dc0e3193f2e03",
+        "name": "price_avg_weekly",
+        "attrname": "payload",
+        "topic": "alias.0.energy.grid.price_avg_weekly",
+        "payloadType": "value",
+        "onlyack": "",
+        "func": "rbe-preinitvalue",
+        "gap": "",
+        "fireOnStart": "false",
+        "outFormat": "MQTT",
+        "x": 530,
+        "y": 1180,
+        "wires": [
+            [
+                "1309c85bad05b955"
+            ]
+        ]
+    },
+    {
+        "id": "049c4121ee772cb5",
+        "type": "ioBroker get",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "topic": "alias.0.energy.grid.price_avg_weekly",
+        "attrname": "payload",
+        "payloadType": "value",
+        "errOnInvalidState": "nothing",
+        "x": 470,
+        "y": 1140,
+        "wires": [
+            [
+                "1309c85bad05b955"
+            ]
+        ]
+    },
+    {
+        "id": "a19789bb81087401",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 1080,
+        "wires": [
+            [
+                "028a7c855dd01c15"
+            ]
+        ]
+    },
+    {
+        "id": "028a7c855dd01c15",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "initialisieren",
+        "rules": [
+            {
+                "t": "set",
+                "p": "lastGridChargePrice",
+                "pt": "flow",
+                "to": "0.095",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 230,
+        "y": 1140,
+        "wires": [
+            [
+                "049c4121ee772cb5"
             ]
         ]
     }
