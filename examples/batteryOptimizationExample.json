@@ -1,13 +1,5 @@
 [
     {
-        "id": "cd9dc0e3193f2e03",
-        "type": "tab",
-        "label": "BatteryUsageOptimizationExample",
-        "disabled": false,
-        "info": "10.01.2025",
-        "env": []
-    },
-    {
         "id": "d828cc95360f4c45",
         "type": "inject",
         "z": "cd9dc0e3193f2e03",
