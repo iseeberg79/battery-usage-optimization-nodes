@@ -18,6 +18,10 @@ Bei Verfügbarkeit des Strompreises für den kommenden Tag, sowie der entspreche
 <h2>Einführung</h2>
 
 Dieses Node-RED-Paket bietet eine Reihe von Nodes zur Optimierung der Batterienutzung. Es umfasst Nodes zur Bestimmung des Batteriemodus, zur Bewertung von Solarprognosen, zur Steuerung des Batteriemodus und mehr.
+
+![image](https://github.com/user-attachments/assets/1c4a369d-64c1-418e-a78a-64b8db0d65cb)
+
+
 Installation
 
 npm install @iseeberg79/battery-usage-optimization-nodes
