@@ -13,44 +13,44 @@ module.exports = function(RED) {
             const minPvRequired = (typeof msg.minPvRequired !== 'undefined') ? msg.minPvRequired : (node.minPvRequired || 16000);
             const minPriceDeviation = (typeof msg.minPriceDeviation !== 'undefined') ? msg.minPriceDeviation : (node.minPriceDeviation || 6);
             const minPriceDifference = (typeof msg.minPriceDifference !== 'undefined') ? msg.minPriceDifference : (node.minPriceDifference || 15);
-            const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || 0.35)) * 100;
+            const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || 0.25)) * 100;
 
             // Werte zur Berechnung, mit sicheren Standards belegt
-            const avgPriceWeekly = ((typeof msg.avgWeekly !== 'undefined') ? msg.avgWeekly : priceLimit) * 100;
-            const avgPrice = ((typeof msg.average !== 'undefined') ? msg.avg : (node.avg || 0.24)) * 100;
+            const avgPriceWeekly = ((typeof msg.avgWeekly !== 'undefined') ? msg.avgWeekly : (node.avg || 0.24)) * 100;
+            const avgPrice = ((typeof msg.average !== 'undefined') ? msg.average : 0.24) * 100;
             const pvForecast = (typeof msg.pvforecast !== 'undefined') ? msg.pvforecast : (node.pvforecast || minPvRequired);
             const priceDeviation = (typeof msg.deviation !== 'undefined') ? msg.deviation : (node.deviation || 0);
             const priceDifference = (typeof msg.diff !== 'undefined') ? msg.diff : (node.diff || 0);
 
             // Maximum zur Steuerung heranziehen: Glättung des Verbrauches
-            const batteryControlLimit = Math.max(priceLimit, avgPriceWeekly);
+            const batteryControlLimit = msg.batteryControlLimit = Math.max(priceLimit, avgPriceWeekly);
 
             // Logik zur Bestimmung der Steuerung
             if (pvForecast < minPvRequired) {
-                // msg.pvMIN = true;
-                if (priceDifference > minPriceDifference) {
-                    // msg.priceOK = true; msg.priceDIFFERENCE = minPriceDifference;
+                 msg.pvMIN = true;
+                if (Math.round(priceDifference*10) > Math.round(minPriceDifference*10)) {
+                     msg.priceOK = true; msg.priceDIFFERENCE = minPriceDifference;
                     if (pvForecast * 1.6 < minPvRequired) {
                         msg.payload = { optimize: true, gridcharge: true, mode: 'GRID' };
                     } else {
                         msg.payload = { optimize: true, gridcharge: false, mode: 'LIMIT' };
                     }
                 } else {
-                    if (priceDeviation > minPriceDeviation) {
-                        // msg.priceFallback = true; msg.priceDEVIATION = priceDeviation;
+                    if (Math.round(priceDeviation*10) > Math.round(minPriceDeviation*10)) {
+                        msg.priceFallback = true; msg.priceDEVIATION = priceDeviation;
                         msg.payload = { optimize: true, gridcharge: false, mode: 'LIMIT' };
                     } else {
-                        if (avgPrice > batteryControlLimit) {
-                            // msg.averageOK = true;
+                        if (Math.round(avgPrice*100) > Math.round(batteryControlLimit*100)) {
+                            msg.averageHIGH = true;
                             msg.payload = { optimize: true, gridcharge: false, mode: 'LIMIT' };
                         } else {
-                            // msg.evccOK = true;
+                            msg.averageLOW = true;
                             msg.payload = { optimize: false, gridcharge: false, mode: 'evcc' };
                         }
                     }
                 }
             } else {
-                // msg.pvOK = true; msg.pvFORECAST = pvForecast;
+                msg.pvOK = true; msg.pvFORECAST = pvForecast;
                 msg.payload = { optimize: false, gridcharge: false, mode: 'evcc' };
             }
 
@@ -73,7 +73,7 @@ module.exports = function(RED) {
             minPvRequired: { value: 16000 },
             minPriceDeviation: { value: 6 },
             minPriceDifference: { value: 15 },
-            priceLimit: { value: 0.35 },
+            priceLimit: { value: 0.25 },
             avg: { value: 0.24 }
         }
     });
