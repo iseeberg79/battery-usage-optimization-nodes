@@ -1,0 +1,64 @@
+<script type="text/javascript">
+    RED.nodes.registerType('@iseeberg79/DetermineControlMode', {
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: { value: "" },
+            minPvRequired: { value: 16000 },
+            minPriceDeviation: { value: 6 },
+            minPriceDifference: { value: 15 },
+            priceLimit: { value: 0.35 },
+            avg: { value: 0.24 }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file.png",
+        label: function() {
+            return this.name || "Determine Control Mode";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="@iseeberg79/DetermineControlMode">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-minPvRequired"><i class="fa fa-sun"></i> Minimum PV Required</label>
+        <input type="number" id="node-input-minPvRequired" placeholder="16000" step="100">
+    </div>
+    <div class="form-row">
+        <label for="node-input-minPriceDeviation"><i class="fa fa-chart-line"></i> Minimum Price Deviation</label>
+        <input type="number" id="node-input-minPriceDeviation" placeholder="6" step="0.1">
+    </div>
+    <div class="form-row">
+        <label for="node-input-minPriceDifference"><i class="fa fa-chart-line"></i> Minimum Price Difference</label>
+        <input type="number" id="node-input-minPriceDifference" placeholder="15" step="0.1">
+    </div>
+    <div class="form-row">
+        <label for="node-input-priceLimit"><i class="fa fa-euro-sign"></i> Price Limit</label>
+        <input type="number" id="node-input-priceLimit" placeholder="0.35" step="0.01">
+    </div>
+    <div class="form-row">
+        <label for="node-input-avg"><i class="fa fa-chart-bar"></i> Average Price</label>
+        <input type="number" id="node-input-avg" placeholder="0.24" step="0.01">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="@iseeberg79/DetermineControlMode">
+    <p>Dieser Node bestimmt den Steuerungsmodus basierend auf verschiedenen Faktoren.</p>
+    <p><b>Inputs:</b></p>
+    <ul>
+        <li><b>minPvRequired</b> - Minimum erforderliche PV-Leistung</li>
+        <li><b>minPriceDeviation</b> - Mindestpreisdifferenz</li>
+        <li><b>minPriceDifference</b> - Mindestpreisdifferenz</li>
+        <li><b>priceLimit</b> - Preisgrenze</li>
+        <li><b>avg</b> - Durchschnittspreis</li>
+    </ul>
+    <p><b>Outputs:</b></p>
+    <ul>
+        <li><b>payload</b> - Der berechnete Steuerungsmodus</li>
+    </ul>
+</script>
+

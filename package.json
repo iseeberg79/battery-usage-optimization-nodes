@@ -1,38 +1,31 @@
-
 {
-  "name": "@iseeberg79/node-red-contrib-batteryusageoptimization",
-  "version": "1.0.4-rc17",
-  "description": "optimizing home battery usage",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/iseeberg79/node-red-contrib-batteryusageoptimization.git"
-  },
-  "keywords": [
-    "node-red",
-    "homebattery",
-    "optimize"
-  ],
-  "author": "Ingo Seeberg-Hinrichs",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/iseeberg79/node-red-contrib-batteryusageoptimization/issues"
-  },
-  "homepage": "https://github.com/iseeberg79/node-red-contrib-batteryusageoptimization#readme",
-  "node-red": {
-      "nodes": {
-          "node-red-contrib-batteryusageoptimization": "battery-control.js"
-      },
-      "dependencies": [
-          "node-red-contrib-sun-position",
-          "node-red-contrib-special-date"
-      ]
-  },
-  "dependencies": {
-      "node-red-contrib-sun-position": "~2.1.1",
-      "node-red-contrib-special-date": "~1.0.2"
-  }
+    "name": "@iseeberg79/battery-usage-optimization-nodes",
+    "version": "0.1.0-rc2",
+    "description": "A custom Node-RED package for battery usage optimization",
+    "main": "gControlBattery.js",
+    "keywords": [
+        "node-red",
+        "battery-optimization",
+        "solar-energy-control"
+    ],
+    "author": "Ingo Seeberg-Hinrichs",
+    "license": "MIT",
+    "dependencies": {
+        "node-red": "^2.0.0",
+        "axios": "^0.21.1"
+    },
+    "node-red": {
+        "nodes": {
+            "DetermineBatteryMode": "determineBatteryMode.js",
+            "EvaluateSolarForecast": "evaluateSolarForecast.js",
+            "ControlBattery": "controlBattery.js",
+            "DeterminePowerValues": "determinePowerValues.js",
+            "DetermineControlMode": "determineControlMode.js",
+            "EstimateHouseholdConsumption": "estimateHouseholdConsumption.js",
+            "EvaluateGridEnergyPricesAPI": "evaluateGridEnergyPricesAPI.js",
+            "EvaluateGridEnergyPrices": "evaluateGridEnergyPrices.js",
+            "EstimateSolarEnergy": "estimateSolarEnergy.js"
+        }
+    }
 }
+

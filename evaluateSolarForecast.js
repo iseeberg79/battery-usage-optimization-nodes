@@ -1,0 +1,75 @@
+module.exports = function(RED) {
+    const axios = require('axios');
+    function EvaluateSolarForecastNode(config) {
+        RED.nodes.createNode(this, config);
+        const node = this;
+
+        node.on('input', async function(msg) {
+            const rooftopid = config.rooftopid || msg.rooftopid || "invalid";
+            const token = config.token || msg.token || "invalid";
+
+            if (rooftopid === "invalid" || token === "invalid") {
+                node.error('Ungültige Konfiguration: rooftopid/token', msg);
+                return;
+            }
+
+            msg.url = `https://api.solcast.com.au/rooftop_sites/${rooftopid}/forecasts?format=json`;
+            msg.headers = {
+                "Authorization": `Bearer ${token}`
+            };
+
+            try {
+                const response = await axios.get(msg.url, { headers: msg.headers });
+                msg.payload = response.data;
+            } catch (error) {
+                node.error('HTTP-Anfrage Fehler: ' + error, msg);
+                return;
+            }
+
+            msg.payload.lastchange = new Date().getTime();
+
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrow = (new Date((new Date()).getTime() + (24 * 3600000)).toISOString().split('T')[0]);
+            const now = new Date();
+
+            const { todayTotal, tomorrowTotal, remainderToday } = msg.payload.forecasts.reduce((acc, { pv_estimate, pv_estimate10, pv_estimate90, period_end }) => {
+                const periodDate = new Date(period_end);
+                const periodDay = periodDate.toISOString().split('T')[0];
+                if (periodDay === today) {
+                    if (periodDate > now) {
+                        acc.remainderToday.pv_estimate += pv_estimate * 1000 / 2;
+                        acc.remainderToday.pv_estimate10 += pv_estimate10 * 1000 / 2;
+                        acc.remainderToday.pv_estimate90 += pv_estimate90 * 1000 / 2;
+                    }
+                    acc.todayTotal.pv_estimate += pv_estimate * 1000 / 2;
+                    acc.todayTotal.pv_estimate10 += pv_estimate10 * 1000 / 2;
+                    acc.todayTotal.pv_estimate90 += pv_estimate90 * 1000 / 2;
+                } else if (periodDay === tomorrow) {
+                    acc.tomorrowTotal.pv_estimate += pv_estimate * 1000 / 2;
+                    acc.tomorrowTotal.pv_estimate10 += pv_estimate10 * 1000 / 2;
+                    acc.tomorrowTotal.pv_estimate90 += pv_estimate90 * 1000 / 2;
+                }
+                return acc;
+            }, {
+                todayTotal: { pv_estimate: 0, pv_estimate10: 0, pv_estimate90: 0 },
+                tomorrowTotal: { pv_estimate: 0, pv_estimate10: 0, pv_estimate90: 0 },
+                remainderToday: { pv_estimate: 0, pv_estimate10: 0, pv_estimate90: 0 }
+            });
+
+            msg.payload.today = Math.round(todayTotal.pv_estimate);
+            msg.payload.remain = Math.round(remainderToday.pv_estimate);
+            msg.payload.tomorrow = Math.round(tomorrowTotal.pv_estimate);
+
+            delete msg.token;
+            delete msg.rooftopid;
+
+            node.send(msg);
+        });
+    }
+    RED.nodes.registerType("@iseeberg79/EvaluateSolarForecast", EvaluateSolarForecastNode, {
+        defaults: {
+            name: { value: "" }
+        }
+    });
+};
+

@@ -1,0 +1,31 @@
+[
+    {
+        "id": "e67d08b5e7356f27",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "20",
+        "topic": "",
+        "payload": "pvForecast2",
+        "payloadType": "flow",
+        "x": 190,
+        "y": 280,
+        "wires": [
+            [
+                "cd07e27f530f869b"
+            ]
+        ]
+    }
+]

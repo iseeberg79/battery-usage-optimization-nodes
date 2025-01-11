@@ -1,0 +1,44 @@
+# @iseeberg79/control-battery-nodes
+
+## ControlBattery Node
+
+Dieser Node ermöglicht die Steuerung des Batteriemodus.
+
+### Konfigurationsparameter
+
+- **Name**: Der Name des Nodes.
+- **Configured Min SoC (%)**: Konfigurierter Mindestladezustand.
+- **Maximum Grid Price**: Maximale Stromnetzpreis.
+- **Configured Battery Lock**: Konfigurierte Batteriesperre.
+
+### Eingänge und Ausgänge
+
+- **Inputs**: 1
+- **Outputs**: 4
+
+### Verwendung
+
+1. Fügen Sie den Node zu Ihrem Flow hinzu.
+2. Konfigurieren Sie die erforderlichen Parameter (Name, Mindestladezustand, maximaler Netzpreis, Batteriesperre).
+3. Verbinden Sie den Node mit anderen Nodes in Ihrem Flow.
+
+### Beispiel
+
+```json
+[
+    {
+        "id": "d09f6df58df1c555",
+        "type": "@iseeberg79/ControlBattery",
+        "name": "ControlBattery",
+        "configuredMinSoC": 5,
+        "maximumGridprice": 0.35,
+        "configuredBatteryLock": false,
+        "wires": [
+            ["a1c7df7658c158df"],
+            ["5ca5af7eb067158a"],
+            ["02518b11ef345f08"],
+            ["75e92935fdb92674"]
+        ]
+    }
+]
+

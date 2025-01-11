@@ -1,0 +1,40 @@
+<script type="text/javascript">
+    RED.nodes.registerType('@iseeberg79/EvaluateGridEnergyPricesAPI', {
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: { value: "" },
+            url: { value: "http://localhost:7070/api/tariff/grid" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file.png",
+        label: function() {
+            return this.name || "Evaluate Grid Energy Prices API";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="@iseeberg79/EvaluateGridEnergyPricesAPI">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-url"><i class="fa fa-link"></i> URL</label>
+        <input type="text" id="node-input-url" placeholder="http://localhost:7070/api/tariff/grid">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="@iseeberg79/EvaluateGridEnergyPricesAPI">
+    <p>Dieser Node wertet die Strompreise auf Basis der bereitgestellten Daten von der evcc API aus.</p>
+    <p><b>Inputs:</b></p>
+    <ul>
+        <li><b>url</b> - Die URL für die Datenanfrage</li>
+    </ul>
+    <p><b>Outputs:</b></p>
+    <ul>
+        <li><b>payload</b> - Die verarbeiteten Strompreise</li>
+    </ul>
+</script>
+
