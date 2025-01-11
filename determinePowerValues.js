@@ -1,4 +1,5 @@
 module.exports = function(RED) {
+    const axios = require('axios');
     function DeterminePowerValues(config) {
         RED.nodes.createNode(this, config);
         var node = this;
