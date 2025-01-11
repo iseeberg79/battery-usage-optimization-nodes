@@ -34,6 +34,10 @@
         <label for="node-input-configuredBatteryLock">Configured Battery Lock</label>
         <input type="checkbox" id="node-input-configuredBatteryLock" class="input-typed"/>
     </div>
+    <div class="form-row">
+        <label for="node-input-feedin">Feedin</label>
+        <input type="number" id="node-input-maximumGridprice" placeholder="0.079" class="input-typed"/>
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="@iseeberg79/ControlBattery">
@@ -49,7 +53,7 @@
         <li><b>Output 1</b> - Einstellen des konfigurierten Mindestladezustands</li>
         <li><b>Output 2</b> - Steuerungsmodus der Batterie</li>
         <li><b>Output 3</b> - Strompreis für Netzladung</li>
-        <li><b>Output 4</b> - Originalnachricht mit allen Parametern</li>
+        <li><b>Output 4</b> - Originalnachricht mit allen Parametern (debug)</li>
     </ul>
 </script>
 

@@ -23,6 +23,7 @@ module.exports = function(RED) {
 
             if (!msg.batteryLock) {
                 if (msg.evccBatteryMode === 'charge') {
+                    msg.effectiveFeedin = msg.price;
                     if (!msg.optimize) {
                         msg.targetMode = msg.evccBatteryMode;
                         outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };

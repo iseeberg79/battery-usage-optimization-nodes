@@ -40,7 +40,7 @@ module.exports = function(RED) {
                         // msg.priceFallback = true; msg.priceDEVIATION = priceDeviation;
                         msg.payload = { optimize: true, gridcharge: false, mode: 'LIMIT' };
                     } else {
-                        if (avgPrice <= batteryControlLimit) {
+                        if (avgPrice > batteryControlLimit) {
                             // msg.averageOK = true;
                             msg.payload = { optimize: true, gridcharge: false, mode: 'LIMIT' };
                         } else {

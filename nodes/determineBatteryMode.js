@@ -10,7 +10,7 @@ module.exports = function(RED) {
         node.efficiency = config.efficiency;
 
         node.on('input', function(msg) {
-            let outputs = [null, null];
+            let outputs = [null, null, null];
 
             // Standardwerte aus der Konfiguration übernehmen
             const enableGridchargeThreshold = msg.enableGridchargeThreshold = (typeof msg.enableGridchargeThreshold !== 'undefined') ? msg.enableGridchargeThreshold : (node.enableGridchargeThreshold || 50);
