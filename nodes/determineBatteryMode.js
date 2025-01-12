@@ -32,7 +32,7 @@ module.exports = function(RED) {
 			let minPrice = msg.minimum = ((typeof msg.minimum !== 'undefined') ? msg.minimum : feedin * 100);
 			let estimatedHousehold = msg.energy_req = (typeof msg.energy_req !== 'undefined') ? msg.energy_req : 7000;
 			let pvforecast = msg.pvforecast = (typeof msg.pvforecast !== 'undefined') ? msg.pvforecast : 16000;
-			let avgPrice = ((typeof msg.average !== 'undefined') ? msg.average : 0.24) * 100;
+			let avgPrice = ((typeof msg.average !== 'undefined') ? msg.average : 0.25) * 100;
 
 			// auch Ausgabewerte
 			let lastGridchargePrice = msg.lastGridchargePrice = (typeof msg.lastGridchargePrice !== 'undefined') ? msg.lastGridchargePrice : feedin;
