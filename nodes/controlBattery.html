@@ -27,16 +27,12 @@
         <input type="number" id="node-input-configuredMinSoC" placeholder="5" class="input-typed"/>
     </div>
     <div class="form-row">
-        <label for="node-input-maximumGridprice">Maximum Grid Price</label>
+        <label for="node-input-maximumGridprice">Maximum Gridcharge Price</label>
         <input type="number" id="node-input-maximumGridprice" placeholder="0.35" class="input-typed"/>
     </div>
     <div class="form-row">
         <label for="node-input-configuredBatteryLock">Configured Battery Lock</label>
         <input type="checkbox" id="node-input-configuredBatteryLock" class="input-typed"/>
-    </div>
-    <div class="form-row">
-        <label for="node-input-feedin">Feedin</label>
-        <input type="number" id="node-input-maximumGridprice" placeholder="0.079" class="input-typed"/>
     </div>
 </script>
 
@@ -48,12 +44,20 @@
         <li><b>maximumGridprice</b> - Maximale Stromnetzpreis</li>
         <li><b>configuredBatteryLock</b> - Konfigurierte Batteriesperre</li>
     </ul>
+	<ul>
+		<li><b>optimize</b> - Optimierung aktiviert</li>
+		<li><b>evccBatteryMode</b> - evcc-Batteriemodus</li>
+		<li><b>batterymode</b> - Batteriemodus</li>
+		<li><b>price</b> - aktueller Strompreis</li>
+		<li><b>minsoc</b> - aktueller MinSoC der Hausbatterie (zur Kontrolle)</li>
+		<li><b>actualsoc</b> - aktueller SoC der Hausbatterie</li>
+	</ul>
     <p><b>Outputs:</b></p>
     <ul>
         <li><b>Output 1</b> - Einstellen des konfigurierten Mindestladezustands</li>
         <li><b>Output 2</b> - Steuerungsmodus der Batterie</li>
         <li><b>Output 3</b> - Strompreis für Netzladung</li>
-        <li><b>Output 4</b> - Originalnachricht mit allen Parametern (debug)</li>
+        <li><b>Output 4</b> - Protokollausgang</li>
     </ul>
 </script>
 

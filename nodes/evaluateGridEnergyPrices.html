@@ -1,22 +1,29 @@
 <script type="text/javascript">
-    RED.nodes.registerType('@iseeberg79/EvaluateGridEnergyPrices', {
-        category: 'function',
-        color: '#a6bbcf',
-        defaults: {
-            name: { value: "" },
-            bzn: { value: "DE-LU" },
-            url: { value: "https://api.energy-charts.info/price" }
-        },
-        inputs: 1,
-        outputs: 1,
-        icon: "file.png",
-        label: function() {
-            return this.name || "Evaluate Grid Energy Prices";
-        }
-    });
+	RED.nodes.registerType('@iseeberg79/EvaluateGridEnergyPrices', {
+		category : 'function',
+		color : '#a6bbcf',
+		defaults : {
+			name : {
+				value : ""
+			},
+			bzn : {
+				value : "DE-LU"
+			},
+			url : {
+				value : "https://api.energy-charts.info/price"
+			}
+		},
+		inputs : 1,
+		outputs : 1,
+		icon : "file.png",
+		label : function() {
+			return this.name || "Evaluate Grid Energy Prices";
+		}
+	});
 </script>
 
-<script type="text/x-red" data-template-name="@iseeberg79/EvaluateGridEnergyPrices">
+<script type="text/x-red"
+	data-template-name="@iseeberg79/EvaluateGridEnergyPrices">
     <div class="form-row">
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name" placeholder="Name" class="input-typed"/>
@@ -31,7 +38,8 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="@iseeberg79/EvaluateGridEnergyPrices">
+<script type="text/x-red"
+	data-help-name="@iseeberg79/EvaluateGridEnergyPrices">
     <p>Dieser Node ermöglicht den Abruf und die Verarbeitung der aktuellen Netzenergiepreise von Fraunhofer ISE.</p>
     <p><b>Inputs:</b></p>
     <ul>
@@ -40,7 +48,14 @@
     </ul>
     <p><b>Outputs:</b></p>
     <ul>
-        <li><b>Output 1</b> - Die berechneten Netzenergiepreise</li>
+        <li><b>Output 1</b> - die berechneten Preise der Strompreisbörse</li>
+        <li><b>payload</b> - die verarbeiteten Strompreise</li>
+		<li><b>payload.prices</b> - die einzelnen Strompreise (Array)</li>
+        <li><b>payload.maximum</b> - der maximale Strompreis</li>
+        <li><b>payload.minimum</b> - der minimale Strompreis</li>
+        <li><b>payload.average</b> - der durchschnittliche Strompreis</li>
+        <li><b>payload.diff</b> - die Differenz zwischen maximalen und minimalen Strompreis</li>
+        <li><b>payload.deviation</b> - die Abweichung der Strompreise vom Durchschnitt</li>
     </ul>
 </script>
 

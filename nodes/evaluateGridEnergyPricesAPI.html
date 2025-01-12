@@ -1,21 +1,26 @@
 <script type="text/javascript">
-    RED.nodes.registerType('@iseeberg79/EvaluateGridEnergyPricesAPI', {
-        category: 'function',
-        color: '#a6bbcf',
-        defaults: {
-            name: { value: "" },
-            url: { value: "http://localhost:7070/api/tariff/grid" }
-        },
-        inputs: 1,
-        outputs: 1,
-        icon: "file.png",
-        label: function() {
-            return this.name || "Evaluate Grid Energy Prices API";
-        }
-    });
+	RED.nodes.registerType('@iseeberg79/EvaluateGridEnergyPricesAPI', {
+		category : 'function',
+		color : '#a6bbcf',
+		defaults : {
+			name : {
+				value : ""
+			},
+			url : {
+				value : "http://localhost:7070/api/tariff/grid"
+			}
+		},
+		inputs : 1,
+		outputs : 1,
+		icon : "file.png",
+		label : function() {
+			return this.name || "Evaluate Grid Energy Prices API";
+		}
+	});
 </script>
 
-<script type="text/x-red" data-template-name="@iseeberg79/EvaluateGridEnergyPricesAPI">
+<script type="text/x-red"
+	data-template-name="@iseeberg79/EvaluateGridEnergyPricesAPI">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -26,7 +31,8 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="@iseeberg79/EvaluateGridEnergyPricesAPI">
+<script type="text/x-red"
+	data-help-name="@iseeberg79/EvaluateGridEnergyPricesAPI">
     <p>Dieser Node wertet die Strompreise auf Basis der bereitgestellten Daten von der evcc API aus.</p>
     <p><b>Inputs:</b></p>
     <ul>
@@ -34,7 +40,13 @@
     </ul>
     <p><b>Outputs:</b></p>
     <ul>
-        <li><b>payload</b> - Die verarbeiteten Strompreise</li>
+        <li><b>payload</b> - die verarbeiteten Strompreise</li>
+		<li><b>payload.prices</b> - die einzelnen Strompreise (Array)</li>
+        <li><b>payload.maximum</b> - der maximale Strompreis</li>
+        <li><b>payload.minimum</b> - der minimale Strompreis</li>
+        <li><b>payload.average</b> - der durchschnittliche Strompreis</li>
+        <li><b>payload.diff</b> - die Differenz zwischen maximalen und minimalen Strompreis</li>
+        <li><b>payload.deviation</b> - die Abweichung der Strompreise vom Durchschnitt</li>
     </ul>
 </script>
 

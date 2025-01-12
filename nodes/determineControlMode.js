@@ -13,11 +13,11 @@ module.exports = function(RED) {
             const minPvRequired = (typeof msg.minPvRequired !== 'undefined') ? msg.minPvRequired : (node.minPvRequired || 16000);
             const minPriceDeviation = (typeof msg.minPriceDeviation !== 'undefined') ? msg.minPriceDeviation : (node.minPriceDeviation || 6);
             const minPriceDifference = (typeof msg.minPriceDifference !== 'undefined') ? msg.minPriceDifference : (node.minPriceDifference || 15);
-            const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || 0.25)) * 100;
+            const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || node.avg || 0.25)) * 100;
 
             // Werte zur Berechnung, mit sicheren Standards belegt
-            const avgPriceWeekly = ((typeof msg.avgWeekly !== 'undefined') ? msg.avgWeekly : (node.avg || 0.24)) * 100;
-            const avgPrice = ((typeof msg.average !== 'undefined') ? msg.average : 0.24) * 100;
+            const avgPriceWeekly = ((typeof msg.avgWeekly !== 'undefined') ? msg.avgWeekly : (node.avg || priceLimit)) * 100;
+            const avgPrice = ((typeof msg.average !== 'undefined') ? msg.average : node.avg || 0.25) * 100;
             const pvForecast = (typeof msg.pvforecast !== 'undefined') ? msg.pvforecast : (node.pvforecast || minPvRequired);
             const priceDeviation = (typeof msg.deviation !== 'undefined') ? msg.deviation : (node.deviation || 0);
             const priceDifference = (typeof msg.diff !== 'undefined') ? msg.diff : (node.diff || 0);
@@ -74,7 +74,7 @@ module.exports = function(RED) {
             minPriceDeviation: { value: 6 },
             minPriceDifference: { value: 15 },
             priceLimit: { value: 0.25 },
-            avg: { value: 0.24 }
+            avg: { value: 0.25 }
         }
     });
 }

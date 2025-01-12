@@ -1,26 +1,44 @@
 <script type="text/javascript">
-    RED.nodes.registerType('@iseeberg79/DetermineBatteryMode', {
-        category: 'function',
-        color: '#a6bbcf',
-        defaults: {
-            name: { value: "" },
-            enableGridchargeThreshold: { value: 50 },
-            disableGridchargeThreshold: { value: 80 },
-            batteryCapacity: { value: 10000 },
-            minsoc: { value: 10 },
-            maxsoc: { value: 90 },
-            efficiency: { value: 80 }
-        },
-        inputs: 1,
-        outputs: 3,
-        icon: "file.png",
-        label: function() {
-            return this.name || "Determine Battery Mode";
-        }
-    });
+	RED.nodes.registerType('@iseeberg79/DetermineBatteryMode', {
+		category : 'function',
+		color : '#a6bbcf',
+		defaults : {
+			name : {
+				value : ""
+			},
+			enableGridchargeThreshold : {
+				value : 50
+			},
+			disableGridchargeThreshold : {
+				value : 80
+			},
+			batteryCapacity : {
+				value : 10000
+			},
+			minsoc : {
+				value : 10
+			},
+			maxsoc : {
+				value : 90
+			},
+			efficiency : {
+				value : 80
+			},
+			priceLimit : {
+				value : 0.25
+			},
+		},
+		inputs : 1,
+		outputs : 3,
+		icon : "file.png",
+		label : function() {
+			return this.name || "Determine Battery Mode";
+		}
+	});
 </script>
 
-<script type="text/x-red" data-template-name="@iseeberg79/DetermineBatteryMode">
+<script type="text/x-red"
+	data-template-name="@iseeberg79/DetermineBatteryMode">
     <div class="form-row">
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name" placeholder="Name" class="input-typed"/>
@@ -49,24 +67,42 @@
         <label for="node-input-efficiency">Efficiency (%)</label>
         <input type="number" id="node-input-efficiency" placeholder="80" class="input-typed"/>
     </div>
+    <div class="form-row">
+        <label for="node-input-priceLimit">Price Limit</label>
+        <input type="number" id="node-input-priceLimit" placeholder="0.25" class="input-typed"/>
+	</div>
 </script>
 
-<script type="text/x-red" data-help-name="@iseeberg79/DetermineBatteryMode">
-    <p>Dieser Node ermöglicht die Bestimmung des Batteriemodus.</p>
+<script type="text/x-red"
+	data-help-name="@iseeberg79/DetermineBatteryMode">
+    <p>Dieser Node ermöglicht die Bestimmung des Batteriemodus, häufig ausführen (minütlich?)</p>
     <p><b>Inputs:</b></p>
     <ul>
+		<li><b>optimize</b> - Optimierung des Batteriemodus, errechnet</li>
+		<li><b>enableGridcharge</b> - Aktivierung der Netzladung, errechnet</li>
+	</ul>
+	<ul>
         <li><b>enableGridchargeThreshold</b> - Schwellenwert zum Aktivieren der Netzladung</li>
         <li><b>disableGridchargeThreshold</b> - Schwellenwert zum Deaktivieren der Netzladung</li>
         <li><b>batteryCapacity</b> - Batteriekapazität</li>
-        <li><b>minsoc</b> - Mindestladezustand</li>
-        <li><b>maxsoc</b> - Maximaler Ladezustand</li>
         <li><b>efficiency</b> - Effizienz</li>
+		<li><b>feedin</b> - Einspeisevergütung</li>
+        <li><b>minsoc</b> - Batterielevel für Zurücksetzung des Netzladungspreises (min)</li>
+        <li><b>maxsoc</b> - Batterielevel für Zurücksetzung des Netzladungspreises (max)</li>
+	</ul>
+	<ul>
+		<li><b>price</b> - aktueller Strompreis</li>
+		<li><b>average</b> - durchschnittlicher Strompreis</li>
+		<li><b>lastGridchargePrice</b> - letzter Ladepreis des Batteriespeichers</li>
+		<li><b>minimum</b> - minimaler Strompreis</li>
+		<li><b>soc</b> - aktueller Ladestand der Hausbatterie</li>
+		<li><b>energy_req</b> - geschätzter Haushaltsverbrauch</li>
+		<li><b>pvforecast</b> - geschätzte PV-Erzeugung</li>
     </ul>
     <p><b>Outputs:</b></p>
     <ul>
         <li><b>Output 1</b> - der berechnete Batteriemodus</li>
-        <li><b>Output 2</b> - der letzte Ladepreis</li>
+        <li><b>Output 2</b> - der letzte Ladepreis des Batteriespeichers</li>
         <li><b>Output 3</b> - die Originalnachricht mit allen Parametern (debug)</li>
     </ul>
 </script>
-

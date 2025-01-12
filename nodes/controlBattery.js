@@ -7,7 +7,18 @@ module.exports = function(RED) {
         node.configuredBatteryLock = config.configuredBatteryLock;
 
         node.on('input', function(msg) {
+			
+			// Hilfsfunktionen
+			function isWinter(month) {
+				return (month >= 11 || month <= 2); // November bis Februar
+			}
+			
+			// Wintermonate?
+			const winterMode = isWinter((new Date()).getMonth());
+			
             msg.configuredMinSoC = (typeof msg.configuredMinSoC !== 'undefined') ? msg.configuredMinSoC : node.configuredMinSoC || 5;
+			
+			// Sicherheitsbegrenzung zur Netzladung
             msg.maximumGridprice = (typeof msg.maximumGridprice !== 'undefined') ? msg.maximumGridprice : node.maximumGridprice || 0.35;
             msg.batteryLock = (typeof msg.batteryLock !== 'undefined') ? msg.batteryLock : node.configuredBatteryLock || false;
 
@@ -20,6 +31,15 @@ module.exports = function(RED) {
             msg.actualsoc = (typeof msg.actualsoc !== 'undefined') ? msg.actualsoc : 80;
 
             let outputs = [null, null, null, null];
+			
+			if (msg.batteryLock) {
+				node.warn("Sperre: Batterieoptimierung deaktiviert!");
+			}
+			
+			if (winterMode) {
+				// Im Winter die Mindestladung erhöhen
+				msg.configuredMinSoC = Math.min(msg.configuredMinSoC*3, 15);
+			}
 
             if (!msg.batteryLock) {
                 if (msg.evccBatteryMode === 'charge') {
@@ -82,13 +102,6 @@ module.exports = function(RED) {
                     node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
                 }
 
-                if ((msg.evccBatteryMode != "unknown") && (msg.evccBatteryMode != msg.targetMode)) {
-                    outputs[1].ts = msg.changedAt = (new Date()).getTime();
-                    msg.changed = true;
-                } else {
-                    msg.changed = false;
-                }
-
                 outputs[3] = msg;
             } else {
                 node.warn("UI Sperre: forcierte Batteriesperre!");
@@ -100,6 +113,15 @@ module.exports = function(RED) {
                 }
             }
 
+			// Zeitstempel der Änderung vermerken
+			if ((msg.evccBatteryMode != "unknown") && (msg.evccBatteryMode != msg.targetMode)) {
+			    outputs[0].ts = msg.changedAt = (new Date()).getTime();
+				outputs[1].ts = msg.changedAt;
+			    msg.changed = true;
+			} else {
+			    msg.changed = false;
+			}
+			
             msg = outputs;
             node.send(msg);
         });
