@@ -10,6 +10,7 @@ module.exports = function(grunt) {
 				unused: true,
 				globals: {
 					module: true,
+					require: true,
 					msg: true,
 					async: true,
 					await: true,
