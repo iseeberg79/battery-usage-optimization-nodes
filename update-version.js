@@ -9,6 +9,9 @@ const timestamp = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padS
 const oldVersion = packageJson.version; 
 const newVersion = `${oldVersion}-${timestamp}`;
 
+// Setze die neue Versionsnummer 
+packageJson.version = newVersion;
+
 // Schreibe die aktualisierte package.json zurück
 fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 2));
 
