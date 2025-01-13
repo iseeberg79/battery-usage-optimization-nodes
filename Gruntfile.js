@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 		},
 		shell: {
 			npm_pack: {
-				command: 'npm pack --pack-destination ./build'
+				command: 'mkdir -p ./build/ && npm pack --pack-destination ./build'
 			}
 		}
 	});
