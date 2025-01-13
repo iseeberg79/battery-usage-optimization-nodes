@@ -35,7 +35,7 @@ jobs:
       run: cat package.json | grep version
   
     - name: Clean build directory 
-      run: rm -rf ./build; mkdir -p ./build
+      run: rm -rf ./build; mkdir -p ./build/${{ matrix.node-version }}/
     
     - name: Run ESLint
       run: npx eslint nodes/*.js
