@@ -154,4 +154,3 @@ module.exports = function(RED) {
 		outputs: 4
 	});
 };
-

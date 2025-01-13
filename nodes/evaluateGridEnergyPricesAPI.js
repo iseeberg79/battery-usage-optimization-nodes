@@ -1,6 +1,5 @@
+const axios = require('axios');
 module.exports = function(RED) {
-	const axios = require('axios');
-
 	function EvaluateGridEnergyPricesAPINode(config) {
 		RED.nodes.createNode(this, config);
 		const node = this;
@@ -54,5 +53,4 @@ module.exports = function(RED) {
 			url: { value: "http://localhost:7070/api/tariff/grid" }
 		}
 	});
-}
-
+};

@@ -11,7 +11,6 @@ module.exports = function(grunt) {
 				globals: {
 					module: true,
 					msg: true,
-					require: true,
 					async: true,
 					await: true,
 					RED: true

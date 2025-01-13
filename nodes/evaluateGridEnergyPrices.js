@@ -1,3 +1,4 @@
+const axios = require('axios');
 module.exports = function(RED) {
 	function EvaluateGridEnergyPrices(config) {
 		RED.nodes.createNode(this, config);
@@ -78,4 +79,3 @@ module.exports = function(RED) {
 		}
 	});
 };
-

@@ -33,5 +33,4 @@ module.exports = function(RED) {
             name: { value: "" }
         }
     });
-}
-
+};

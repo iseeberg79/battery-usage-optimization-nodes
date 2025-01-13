@@ -90,5 +90,4 @@ module.exports = function(RED) {
 			avg: { value: 0.25 }
 		}
 	});
-}
-
+};

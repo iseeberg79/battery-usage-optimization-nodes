@@ -1,5 +1,5 @@
+const axios = require('axios');
 module.exports = function(RED) {
-	const axios = require('axios');
 	function EvaluateSolarForecastNode(config) {
 		RED.nodes.createNode(this, config);
 		const node = this;
@@ -79,4 +79,3 @@ module.exports = function(RED) {
 		}
 	});
 };
-

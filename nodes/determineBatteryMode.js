@@ -179,5 +179,4 @@ module.exports = function(RED) {
 		},
 		outputs: 3
 	});
-}
-
+};
