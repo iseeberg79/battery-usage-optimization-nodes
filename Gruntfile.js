@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		jshint: {
-			src: ['nodes/*.js', 'nodes/**/*.js'],
+			src: ['nodes/*.js'],
 			options: {
 				esversion: 6
 			}
@@ -14,7 +14,7 @@ module.exports = function(grunt) {
 				destination: 'build/docs'
 			},
 			dist: {
-				src: ['nodes/*.js', 'nodes/**/*.js']
+				src: ['nodes/*.js']
 			}
 		},
 		uglify: {
@@ -22,7 +22,7 @@ module.exports = function(grunt) {
 				banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
 			},
 			build: {
-				src: 'src/<%= pkg.name %>.js',
+				src: 'nodes/<%= pkg.name %>.js',
 				dest: 'build/<%= pkg.name %>.min.js'
 			}
 		}
