@@ -1,9 +1,15 @@
 {
-  "source": {
-    "include": ["nodes"],
-    "exclude": ["node_modules","build", "examples", "doc"]
-  },
-  "opts": {
-    "destination": "build/docs"
-  }
+	"source": {
+		"include": [
+			"nodes"
+		],
+		"includePattern": ".+\\.js(doc|x)?$",
+		"excludePattern": "(^|\\/|\\\\)_"
+	},
+	"opts": {
+		"destination": "./build/docs"
+	},
+	"plugins": [
+		"plugins/markdown"
+	]
 }
