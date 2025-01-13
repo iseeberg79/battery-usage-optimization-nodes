@@ -44,7 +44,7 @@ jobs:
       run: npx jsdoc -c jsdoc.json
 
     - name: Pack project
-      run: npm pack --pack-destination ./build
+      run: npm pack --pack-destination ./build/${{ matrix.node-version }}/
  
     - name: Archive build artifacts 
       uses: actions/upload-artifact@v4 
