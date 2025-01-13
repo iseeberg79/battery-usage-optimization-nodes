@@ -13,8 +13,8 @@ module.exports = new ESLint({
   rules: {
     curly: "error",
     eqeqeq: "warn",
-    no-undef: "error",
-    no-unused-vars: "warn",
+    "no-undef": "error",
+    "no-unused-vars": "warn",
     semi: ["error", "always"]
   },
   globals: {
