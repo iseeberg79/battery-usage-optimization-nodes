@@ -27,9 +27,15 @@ jobs:
 
     - name: Install dependencies
       run: npm install
- 
+
+    - name: Update version 
+      run: node update-version.js 
+      
+    - name: Display version 
+      run: cat package.json | grep version
+  
     - name: Clean build directory 
-      run: rm -rf build/${{ matrix.node-version }}
+      run: rm -rf build; mkdir -p ./build/${{ matrix.node-version }}/
     
     - name: Run ESLint
       run: npx eslint nodes/*.js
@@ -38,7 +44,7 @@ jobs:
       run: npx jsdoc -c jsdoc.json
 
     - name: Pack project
-      run: mkdir -p ./build/${{ matrix.node-version }}/ && npm pack --pack-destination ./build/${{ matrix.node-version }}/
+      run: npm pack --dry-run --pack-destination ./build/${{ matrix.node-version }}/
  
     - name: Archive build artifacts 
       uses: actions/upload-artifact@v4 
