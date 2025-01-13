@@ -2,11 +2,12 @@
 	"name": "@iseeberg79/battery-usage-optimization-nodes",
 	"version": "0.1.1-rc22",
 	"devDependencies": {
-		"grunt": "~0.4.5",
-		"grunt-jsdoc": "~2.2.0",
-		"grunt-contrib-jshint": "~0.10.0",
-		"grunt-contrib-nodeunit": "~0.4.1",
-		"grunt-contrib-uglify": "~0.5.0"
+		"grunt": "~1.6.1",
+		"grunt-cli": "^1.4.3",
+		"grunt-jsdoc": "~2.3.0",
+		"grunt-contrib-jshint": "~0.11.0",
+		"grunt-contrib-nodeunit": "~0.4.2",
+		"grunt-contrib-uglify": "~0.5.1"
 	},
 	"description": "A custom Node-RED package for battery usage optimization",
 	"main": "ControlBattery.js",
@@ -20,6 +21,9 @@
 	"dependencies": {
 		"node-red": "^2.0.0",
 		"axios": "^0.21.1"
+	},
+	"scripts": {
+		"grunt": "grunt"
 	},
 	"node-red": {
 		"nodes": {
