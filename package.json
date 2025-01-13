@@ -3,6 +3,7 @@
 	"version": "0.1.1-rc22",
 	"devDependencies": {
 		"grunt": "~0.4.5",
+		"grund-cli": "^0.1.13",
 		"grunt-jsdoc": "~2.2.0",
 		"grunt-contrib-jshint": "~0.10.0",
 		"grunt-contrib-nodeunit": "~0.4.1",
