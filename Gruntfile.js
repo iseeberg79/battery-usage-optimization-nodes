@@ -1,22 +1,8 @@
 module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		jshint: {
-			src: ['nodes/*.js'],
-			options: {
-				esversion: 6,
-				curly: true,
-				undef: true,
-				unused: true,
-				globals: {
-					module: true,
-					require: true,
-					msg: true,
-					async: true,
-					await: true,
-					RED: true
-				}
-			}
+		eslint: {
+			target: ['nodes/*.js'] // Pfad zu den JavaScript-Dateien
 		},
 		jsdoc: {
 			dist: {
@@ -33,10 +19,12 @@ module.exports = function(grunt) {
 		}
 	});
 
-	grunt.loadNpmTasks('grunt-contrib-jshint');
+	//grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-eslint');
 	grunt.loadNpmTasks('grunt-jsdoc');
 	grunt.loadNpmTasks('grunt-shell');
 
 	// Default task(s).
-	grunt.registerTask('default', ['jshint', 'jsdoc', 'shell:npm_pack']);
+	//grunt.registerTask('default', ['jshint', 'jsdoc', 'shell:npm_pack']);
+	grunt.registerTask('default', ['eslint', 'jsdoc', 'shell:npm_pack']);
 };
