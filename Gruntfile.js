@@ -2,6 +2,9 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		eslint: {
+			options: {
+				configFile: 'eslint.config.cjs' // Pfad zur ESLint-Konfigurationsdatei 
+			},
 			target: ['nodes/*.js'] // Pfad zu den JavaScript-Dateien
 		},
 		jsdoc: {
