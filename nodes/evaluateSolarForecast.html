@@ -1,22 +1,32 @@
 <script type="text/javascript">
-    RED.nodes.registerType('@iseeberg79/EvaluateSolarForecast', {
-        category: 'function',
-        color: '#a6bbcf',
-        defaults: {
-            name: { value: "" },
-            rooftopid: { value: "" },
-            token: { value: "" }
-        },
-        inputs: 1,
-        outputs: 1,
-        icon: "file.png",
-        label: function() {
-            return this.name || "Evaluate Solar Forecast";
-        }
-    });
+	RED.nodes.registerType('@iseeberg79/EvaluateSolarForecast', {
+		category : 'function',
+		color : '#a6bbcf',
+		defaults : {
+			name : {
+				value : ""
+			},
+			rooftopid : {
+				value : ""
+			},
+			token : {
+				value : ""
+			},
+			url : {
+				value : "https://api.solcast.com.au/rooftop_sites/"
+			}
+		},
+		inputs : 1,
+		outputs : 1,
+		icon : "file.png",
+		label : function() {
+			return this.name || "Evaluate Solar Forecast";
+		}
+	});
 </script>
 
-<script type="text/x-red" data-template-name="@iseeberg79/EvaluateSolarForecast">
+<script type="text/x-red"
+	data-template-name="@iseeberg79/EvaluateSolarForecast">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -29,20 +39,26 @@
         <label for="node-input-token"><i class="fa fa-lock"></i> Token</label>
         <input type="text" id="node-input-token" placeholder="Token">
     </div>
+	<div class="form-row">
+        <label for="node-input-url"><i class="fa fa-link"></i> URL</label>
+        <input type="text" id="node-input-url" placeholder="https://api.solcast.com.au/rooftop_sites/">
+    </div>
 </script>
 
-<script type="text/x-red" data-help-name="@iseeberg79/EvaluateSolarForecast">
-    <p>Dieser Node berechnet die Solarprognosen basierend auf den bereitgestellten Daten.</p>
+<script type="text/x-red"
+	data-help-name="@iseeberg79/EvaluateSolarForecast">
+    <p>Dieser Node berechnet die Solarprognosen basierend auf den bereitgestellten Daten, täglich<br>(maximale Anzahl der API Aufrufe beachten!)</p>
     <p><b>Inputs:</b></p>
     <ul>
-        <li><b>rooftopid</b> - ID des Solardachs</li>
+        <li><b>rooftopid</b> - Rooftop-ID bei Solcast (https://solcast.com/free-rooftop-solar-forecasting)</li>
         <li><b>token</b> - Authentifizierungs-Token</li>
+        <li><b>url</b> - URL des freien Solcast API</li>
     </ul>
     <p><b>Outputs:</b></p>
     <ul>
-        <li><b>payload.today</b> - Geschätzte Solarenergie für heute</li>
-        <li><b>payload.remain</b> - Verbleibende Solarenergie für heute</li>
-        <li><b>payload.tomorrow</b> - Geschätzte Solarenergie für morgen</li>
+        <li><b>payload.today</b> - geschätzte Solarenergie für heute</li>
+        <li><b>payload.remain</b> - verbleibende Solarenergie für heute, ab jettz</li>
+        <li><b>payload.tomorrow</b> - geschätzte Solarenergie für morgen</li>
     </ul>
 </script>
 

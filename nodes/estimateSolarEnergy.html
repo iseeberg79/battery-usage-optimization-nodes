@@ -1,37 +1,41 @@
 <script type="text/javascript">
-    RED.nodes.registerType('@iseeberg79/EstimateSolarEnergy', {
-        category: 'function',
-        color: '#a6bbcf',
-        defaults: {
-            name: { value: "" }
-        },
-        inputs: 1,
-        outputs: 1,
-        icon: "file.png",
-        label: function() {
-            return this.name || "Estimate Solar Energy";
-        }
-    });
+	RED.nodes.registerType('@iseeberg79/EstimateSolarEnergy', {
+		category : 'function',
+		color : '#a6bbcf',
+		defaults : {
+			name : {
+				value : ""
+			}
+		},
+		inputs : 1,
+		outputs : 1,
+		icon : "file.png",
+		label : function() {
+			return this.name || "Estimate Solar Energy";
+		}
+	});
 </script>
 
-<script type="text/x-red" data-template-name="@iseeberg79/EstimateSolarEnergy">
+<script type="text/x-red"
+	data-template-name="@iseeberg79/EstimateSolarEnergy">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="@iseeberg79/EstimateSolarEnergy">
-    <p>Dieser Node schätzt die Solarenergie basierend auf den bereitgestellten Prognosen.</p>
+<script type="text/x-red"
+	data-help-name="@iseeberg79/EstimateSolarEnergy">
+    <p>Dieser Node schätzt die Solarenergie basierend auf den bereitgestellten Prognosen, stündlich</p>
     <p><b>Inputs:</b></p>
     <ul>
         <li><b>payload.forecasts</b> - Array der Solarprognosen</li>
     </ul>
     <p><b>Outputs:</b></p>
     <ul>
-        <li><b>payload.today</b> - Geschätzte Solarenergie für heute</li>
-        <li><b>payload.remain</b> - Verbleibende Solarenergie für heute</li>
-        <li><b>payload.tomorrow</b> - Geschätzte Solarenergie für morgen</li>
+        <li><b>payload.today</b> - geschätzte Solarenergie für heute</li>
+        <li><b>payload.remain</b> - verbleibende Solarenergie für heute</li>
+        <li><b>payload.tomorrow</b> - geschätzte Solarenergie für morgen</li>
     </ul>
 </script>
 

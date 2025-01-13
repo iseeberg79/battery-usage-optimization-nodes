@@ -5,7 +5,6 @@ module.exports = function(RED) {
 
         node.on('input', function(msg) {
             const current = (new Date()).getHours();
-            const offset = ((new Date()).getTimezoneOffset()) / 60;
             const n = 24 - current;
             const h = current;
             const t = 8;
@@ -34,5 +33,4 @@ module.exports = function(RED) {
             name: { value: "" }
         }
     });
-}
-
+};

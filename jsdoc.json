@@ -1,0 +1,15 @@
+{
+	"source": {
+		"include": [
+			"nodes"
+		],
+		"includePattern": ".+\\.js(doc|x)?$",
+		"excludePattern": "(^|\\/|\\\\)_"
+	},
+	"opts": {
+		"destination": "./build/docs"
+	},
+	"plugins": [
+		"plugins/markdown"
+	]
+}

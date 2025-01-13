@@ -1,25 +1,38 @@
 <script type="text/javascript">
-    RED.nodes.registerType('@iseeberg79/DetermineControlMode', {
-        category: 'function',
-        color: '#a6bbcf',
-        defaults: {
-            name: { value: "" },
-            minPvRequired: { value: 16000 },
-            minPriceDeviation: { value: 6 },
-            minPriceDifference: { value: 15 },
-            priceLimit: { value: 0.25 },
-            avg: { value: 0.24 }
-        },
-        inputs: 1,
-        outputs: 1,
-        icon: "file.png",
-        label: function() {
-            return this.name || "Determine Control Mode";
-        }
-    });
+	RED.nodes.registerType('@iseeberg79/DetermineControlMode', {
+		category : 'function',
+		color : '#a6bbcf',
+		defaults : {
+			name : {
+				value : ""
+			},
+			minPvRequired : {
+				value : 16000
+			},
+			minPriceDeviation : {
+				value : 6
+			},
+			minPriceDifference : {
+				value : 15
+			},
+			priceLimit : {
+				value : 0.25
+			},
+			avg : {
+				value : 0.25
+			}
+		},
+		inputs : 1,
+		outputs : 1,
+		icon : "file.png",
+		label : function() {
+			return this.name || "Determine Control Mode";
+		}
+	});
 </script>
 
-<script type="text/x-red" data-template-name="@iseeberg79/DetermineControlMode">
+<script type="text/x-red"
+	data-template-name="@iseeberg79/DetermineControlMode">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -38,27 +51,37 @@
     </div>
     <div class="form-row">
         <label for="node-input-priceLimit"><i class="fa fa-euro-sign"></i> Price Limit</label>
-        <input type="number" id="node-input-priceLimit" placeholder="0.35" step="0.01">
+        <input type="number" id="node-input-priceLimit" placeholder="0.25" step="0.01">
     </div>
     <div class="form-row">
         <label for="node-input-avg"><i class="fa fa-chart-bar"></i> Average Price</label>
-        <input type="number" id="node-input-avg" placeholder="0.24" step="0.01">
+        <input type="number" id="node-input-avg" placeholder="0.25" step="0.01">
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="@iseeberg79/DetermineControlMode">
+<script type="text/x-red"
+	data-help-name="@iseeberg79/DetermineControlMode">
     <p>Dieser Node bestimmt den Steuerungsmodus basierend auf verschiedenen Faktoren.</p>
     <p><b>Inputs:</b></p>
     <ul>
         <li><b>minPvRequired</b> - Minimum erforderliche PV-Leistung</li>
         <li><b>minPriceDeviation</b> - Mindestpreisdifferenz</li>
         <li><b>minPriceDifference</b> - Mindestpreisdifferenz</li>
-        <li><b>priceLimit</b> - Preisgrenze, z.B. letzte Speicherladungskosten</li>
-        <li><b>avg</b> - Durchschnittspreis</li>
+		<li><b>priceLimit</b> - min. Preisgrenze, übersteuert den Durchschnittspreis (optional)</li>
     </ul>
+	<ul>
+        <li><b>avg</b> - Durchschnittspreis, berechnet</li>
+		<li><b>avgPriceWeekly</b> - Durchschnittspreis der Woche (optional)</li>
+    	<li><b>pvForecast</b> - PV-Prognose, berechnet</li>
+    	<li><b>priceDeviation</b> - Preisabweichung, berechnet</li>
+    	<li><b>priceDifference</b> - Preisunterschied, berechnet</li>
+	</ul>
     <p><b>Outputs:</b></p>
     <ul>
         <li><b>payload</b> - Der berechnete Steuerungsmodus</li>
+		<li><b>payload.optimize</b> - Optimierungsmodus</li>
+        <li><b>payload.gridcharge</b> - Netzlademodus</li>
+        <li><b>payload.mode</b> - evcc-Batteriemodus (lesend)</li>
     </ul>
 </script>
 
