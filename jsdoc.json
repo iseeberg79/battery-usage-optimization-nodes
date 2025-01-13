@@ -4,6 +4,6 @@
     "exclude": ["node_modules","build", "examples", "doc"]
   },
   "opts": {
-    "destination": "build/docs"
+    "destination": "build/${NODE_VERSION}/docs"
   }
 }
