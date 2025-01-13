@@ -10,7 +10,9 @@ module.exports = function(grunt) {
 				undef: true,
 				unused: true,
 				globals: {
-					jQuery: true
+					jQuery: true,
+					module: true,
+					RED: true
 				}
 			}
 		},
