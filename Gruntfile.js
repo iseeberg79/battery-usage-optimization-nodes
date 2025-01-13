@@ -12,6 +12,7 @@ module.exports = function(grunt) {
 				globals: {
 					jQuery: true,
 					module: true,
+					msg: true,
 					RED: true
 				}
 			}
