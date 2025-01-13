@@ -35,7 +35,7 @@ jobs:
       run: cat package.json | grep version
   
     - name: Clean build directory 
-      run: rm -rf build; mkdir -p ./build/${{ matrix.node-version }}/
+      run: rm -rf ./build; mkdir -p ./build
     
     - name: Run ESLint
       run: npx eslint nodes/*.js
@@ -44,10 +44,10 @@ jobs:
       run: npx jsdoc -c jsdoc.json
 
     - name: Pack project
-      run: npm pack --dry-run --pack-destination ./build/${{ matrix.node-version }}/
+      run: npm pack --dry-run --pack-destination ./build
  
     - name: Archive build artifacts 
       uses: actions/upload-artifact@v4 
       with: 
-        name: build-${{ matrix.node-version }}
-        path: build/${{ matrix.node-version }}/
+        name: build
+        path: build/
