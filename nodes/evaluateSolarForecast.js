@@ -34,12 +34,11 @@ module.exports = function(RED) {
 
 			msg.payload.lastchange = new Date().getTime();
 
-			const now = new Date();
-			const timezoneOffset = today.getTimezoneOffset() * 60000; // offset in milliseconds
-			const today = new Date(now.getTime() - timezoneOffset).toISOString().split('T')[0];
+			const now = new Date().getTime();	
+			const timezoneOffset = (new Date()).getTimezoneOffset() * 60000; // offset in milliseconds
+			const today = new Date(now - timezoneOffset).toISOString().split('T')[0];
+			const tomorrow = (new Date(now - timezoneOffset + (24 * 3600000)).toISOString().split('T')[0]);
 			
-			const tomorrow = (new Date((new Date()).getTime() + (24 * 3600000)).toISOString().split('T')[0]);
-
 			const { todayTotal, tomorrowTotal, remainderToday } = msg.payload.forecasts.reduce((acc, { pv_estimate, pv_estimate10, pv_estimate90, period_end }) => {
 				const periodDate = new Date(period_end);
 				const periodDay = periodDate.toISOString().split('T')[0];
