@@ -4,13 +4,11 @@ module.exports = function(grunt) {
 		jshint: {
 			src: ['nodes/*.js'],
 			options: {
-				esversion: 8,
+				esversion: 6,
 				curly: true,
-				eqeqeq: true,
 				undef: true,
 				unused: true,
 				globals: {
-					jQuery: true,
 					module: true,
 					msg: true,
 					RED: true
