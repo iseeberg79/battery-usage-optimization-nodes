@@ -1,6 +1,6 @@
-import { ESLint } from "eslint";
+const { ESLint } = require("eslint");
 
-export default new ESLint({
+module.exports = new ESLint({
   env: {
     es2021: true,
     node: true
