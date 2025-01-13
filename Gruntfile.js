@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 		jshint: {
 			src: ['nodes/*.js'],
 			options: {
-				esversion: 6,
+				esversion: 8,
 				curly: true,
 				eqeqeq: true,
 				undef: true,
