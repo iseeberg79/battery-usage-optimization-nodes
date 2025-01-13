@@ -2,12 +2,12 @@
 	"name": "@iseeberg79/battery-usage-optimization-nodes",
 	"version": "0.1.1-rc22",
 	"devDependencies": {
+		"eslint": "^7.32.0",
 		"grunt": "~0.4.5",
 		"grunt-cli": "^0.1.13",
 		"grunt-jsdoc": "~2.2.0",
-		"grunt-contrib-jshint": "^1.1.0",
+		"grund-eslint": "^23.0.0",
 		"grunt-contrib-nodeunit": "~0.4.1",
-		"grunt-contrib-uglify": "~0.5.0",
 		"grunt-shell": "~1.3.0"
 		},
 	"description": "A custom Node-RED package for battery usage optimization",
