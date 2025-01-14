@@ -9,7 +9,7 @@ Die optimierte Batteriesteuerung ist nur aktiv, wenn die PV Erzeugungsleistung d
 
 Eine Standardlastverteilung des Bedarfs, für einen 4 Personen-Haushalt (24h, berufstätig mit Schulkindern) und einem Stromverbrauch von etwa 15kWh / Tag ist vordefiniert. Der Strombedarf wird dabei grundsätzlich vom aktuellen Zeitpunkt bis zum nächsten Morgen (8 Uhr) bestimmt und berücksichtigt dabei den stündlichen Strombedarf der Lastverteilung.
 
-Im Verlauf des Tages wird der noch zu erwartende PV-Ertrag bei der Steuerung berücksichtigt.
+Im Verlauf des Tages wird der noch zu erwartende PV-Ertrag bei der Steuerung berücksichtigt. Die Daten können von [SOLCAST](https://solcast.com/free-rooftop-solar-forecasting) über eine persönliche home-use API bezogen werden.
 Bei Verfügbarkeit des Strompreises für den kommenden Tag, sowie der entsprechenden PV-Prognose wird dies ebenfalls berücksichtigt.
 
 Es wird der benötigte Zustand für die Batterie ermittelt. Eine Steuerung eines (hybriden) Wechselrichters muss, aufgrund der möglichen Komplexität und der Hardwareabhängigkeit, separat implementiert werden:
