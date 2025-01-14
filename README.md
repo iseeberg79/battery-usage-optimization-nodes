@@ -28,7 +28,8 @@ Dieses Node-RED-Paket bietet eine Reihe von Nodes zur Optimierung der Batterienu
 
 Flowbeispiel
 
-![image](https://github.com/user-attachments/assets/1c4a369d-64c1-418e-a78a-64b8db0d65cb)
+![image](https://github.com/user-attachments/assets/90dec152-1f59-4d89-aa5f-c28893201788)
+
 
 Kontextdaten des Flows
 
