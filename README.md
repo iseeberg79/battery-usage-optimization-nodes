@@ -12,6 +12,7 @@ Eine Standardlastverteilung des Bedarfs, für einen 4 Personen-Haushalt (24h, be
 Im Verlauf des Tages wird der noch zu erwartende PV-Ertrag bei der Steuerung berücksichtigt.
 Bei Verfügbarkeit des Strompreises für den kommenden Tag, sowie der entsprechenden PV-Prognose wird dies ebenfalls berücksichtigt.
 
+Es wird der benötigte Zustand für die Batterie ermittelt. Eine Steuerung eines (hybriden) Wechselrichters muss, aufgrund der möglichen Komplexität und der Hardwareabhängigkeit, separat implementiert werden.
 
 <h1>@iseeberg79/battery-usage-optimization-nodes</h1>
 <h2>Einführung</h2>
