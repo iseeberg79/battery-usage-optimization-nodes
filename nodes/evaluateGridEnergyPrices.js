@@ -51,13 +51,26 @@ module.exports = function(RED) {
 			const charges = msg.charges;
 			const tax_percent = (typeof msg.tax !== 'undefined') ? msg.tax : (node.tax || 19);
 			const tax = msg.tax = 1 + (tax_percent / 100);
-			msg.payload.minimum = Math.round((minimum + charges) * tax * 1000) / 1000;
+			msg.payload.absMinimum = Math.round((minimum + charges) * tax * 1000) / 1000;
 			msg.payload.maximum = Math.round((maximum + charges) * tax * 1000) / 1000;
 			msg.payload.average = Math.round((average + charges) * tax * 1000) / 1000;
 
 			msg.payload.diff = Math.round((msg.payload.maximum - msg.payload.minimum) * 1000) / 1000;
 			msg.payload.deviation = Math.round(Math.max((msg.payload.average - msg.payload.minimum), (msg.payload.maximum - msg.payload.average)) * 1000) / 1000;
 
+			// Datenübernahme
+			data = msg.payload.prices;
+
+			// Das Intervall mit dem maximalen Preis finden
+			const maxPriceInterval = data.reduce((max, interval) => interval.price > max.price ? interval : max, data[0]);
+			const maxPriceStartTime = new Date(maxPriceInterval.start);
+
+			// Die Intervalle vor dem maximalen Preis filtern
+			const validIntervals = data.filter(interval => new Date(interval.start) < maxPriceStartTime);
+
+			// Das günstigste Intervall aus den gültigen Intervallen finden, und übergeben
+			msg.payload.minimum = validIntervals.reduce((min, interval) => interval.price < min.price ? interval : min, validIntervals[0]);
+			
 			delete msg.payload.unix_seconds;
 			delete msg.payload.price;
 			delete msg.payload.unit;

@@ -37,13 +37,27 @@ module.exports = function(RED) {
 			msg.payload = {
 				prices: msg.response.result.rates,
 				maximum: maximal,
-				minimum: minimal,
+				absMinimum: minimal,
 				average: average,
 				diff: diff,
 				deviation: deviation
 			};
-			delete msg.response;
 
+			// Datenübernahme
+			data = msg.payload.prices; 
+
+			// Das Intervall mit dem maximalen Preis finden
+			const maxPriceInterval = data.reduce((max, interval) => interval.price > max.price ? interval : max, data[0]);
+			const maxPriceStartTime = new Date(maxPriceInterval.start);
+
+			// Die Intervalle vor dem maximalen Preis filtern
+			const validIntervals = data.filter(interval => new Date(interval.start) < maxPriceStartTime);
+
+			// Das günstigste Intervall aus den gültigen Intervallen finden, und übergeben
+			msg.payload.minimum = validIntervals.reduce((min, interval) => interval.price < min.price ? interval : min, validIntervals[0]);
+
+			delete msg.response;
+			
 			node.send(msg);
 		});
 	}
