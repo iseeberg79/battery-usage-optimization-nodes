@@ -12,13 +12,13 @@ Eine Standardlastverteilung des Bedarfs, für einen 4 Personen-Haushalt (24h, be
 Im Verlauf des Tages wird der noch zu erwartende PV-Ertrag bei der Steuerung berücksichtigt.
 Bei Verfügbarkeit des Strompreises für den kommenden Tag, sowie der entsprechenden PV-Prognose wird dies ebenfalls berücksichtigt.
 
-Es wird der benötigte Zustand für die Batterie ermittelt. Eine Steuerung eines (hybriden) Wechselrichters muss, aufgrund der möglichen Komplexität und der Hardwareabhängigkeit, separat implementiert werden.
+Es wird der benötigte Zustand für die Batterie ermittelt. Eine Steuerung eines (hybriden) Wechselrichters muss, aufgrund der möglichen Komplexität und der Hardwareabhängigkeit, separat implementiert werden:
 
 - eine geschickte Implementierung für die Netzladung kann die Übergabe des ermittelten Netzladungspreises an eine evcc Instanz per MQTT/HTTP API sein.
 - eine Batteriesperre ist, wenn die aktive Batteriesteuerung von evcc unterstützt wird, z.B. aus dem evcc-Wiki ableitbar [WIKI](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren). Der konfigurierte Ladepunkt kann entweder mit dem ermittelten Preis konfiguriert, oder per MQTT/HTTP API der Modus vorgegeben werden (Ladungsmodus: aus/schnell).
 
 
-Bereitgestellt ohne Gewähr.
+Bereitgestellt ohne Gewähr, der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung.
 
 
 <h1>@iseeberg79/battery-usage-optimization-nodes</h1>
@@ -61,4 +61,5 @@ npm install @iseeberg79/battery-usage-optimization-nodes
 [iobroker.net](https://www.iobroker.net) 
 
 [node-red](https://nodered.org) 
+
 
