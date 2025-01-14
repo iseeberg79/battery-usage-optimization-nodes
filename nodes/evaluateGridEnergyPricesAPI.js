@@ -54,7 +54,7 @@ module.exports = function(RED) {
 			const validIntervals = data.filter(interval => new Date(interval.start) < maxPriceStartTime);
 
 			// Das günstigste Intervall aus den gültigen Intervallen finden, und übergeben
-			msg.payload.minimum = validIntervals.reduce((min, interval) => interval.price < min.price ? interval : min, validIntervals[0]);
+			msg.payload.minimum = (validIntervals.reduce((min, interval) => interval.price < min.price ? interval : min, validIntervals[0])).price;
 
 			delete msg.response;
 			
