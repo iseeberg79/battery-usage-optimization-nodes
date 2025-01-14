@@ -1,6 +1,6 @@
 [![92C08093-CA7B-463E-8BE3-9F03C6622BD6_klein](https://github.com/user-attachments/assets/7716fdb4-b872-445b-ae45-9caabe0a44a3)](## "generated using a public AI image generator")
 
-<h1>Optimierung der Verwendung des Hausspeichers im Zusammenspiel von ioBroker, evcc und einem dynamischen Stromtarif</h1>
+<h1>Optimierung der Verwendung des Hausspeichers im Zusammenspiel von ioBroker, node-red, evcc und einem dynamischen Stromtarif</h1>
 
 <h2>Funktionsweise:</h2>
 Der Batteriespeicher soll bei überschüssigem PV-Strom geladen, aber nicht in Zeiten günstigen Netzstromes entladen werden. Ist die Preisdifferenz ausreichend hoch (>15ct) wird eine Netzladung zum günstigsten Zeitpunkt des Tages erwogen und die Batterie bis zum Füllstand von 80% geladen. Um die Batterie nicht ungünstig zu entladen, wird der Netzladungspreis bei der weiteren Steuerung der Batteriesperre berücksichtigt, und die Freigabe der Batterie erfolgt nur bei einem Netzstrompreis, der ausreichend über dem Netzladungspreis liegt (~130%). Die Batterie wird außerdem nur geladen, wenn Stand des Batteriespeichers ausreichend gering (<30%) ist, auch um ein Pendeln von Laden/Entladen zu vermeiden.
@@ -11,7 +11,6 @@ Eine Standardlastverteilung des Bedarfs, für einen 4 Personen-Haushalt (24h, be
 
 Im Verlauf des Tages wird der noch zu erwartende PV-Ertrag bei der Steuerung berücksichtigt.
 Bei Verfügbarkeit des Strompreises für den kommenden Tag, sowie der entsprechenden PV-Prognose wird dies ebenfalls berücksichtigt.
-
 
 
 <h1>@iseeberg79/battery-usage-optimization-nodes</h1>
@@ -30,4 +29,17 @@ Kontextdaten des Flows
 
 Installation
 
+Zum Beispiel als Upload im Palettenmanager von node-red in ioBroker, bzw.:
 npm install @iseeberg79/battery-usage-optimization-nodes
+
+
+## Links 
+
+[evcc](https://evcc.io) 
+
+[solcast](https://solcast.com.au) 
+
+[iobroker.net](https://www.iobroker.net) 
+
+[node-red](https://nodered.org) 
+
