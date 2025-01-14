@@ -40,7 +40,7 @@ module.exports = function(RED) {
 			if (winterMode) {
 				node.debug(`Winter mode is active`);
 				// Im Winter die Mindestladung erhöhen
-				msg.configuredMinSoC = Math.min(msg.configuredMinSoC * 3, 15);
+				msg.configuredMinSoC = (typeof msg.forcedMinSoC !== 'undefined') ? msg.forcedMinSoC :  Math.min(msg.configuredMinSoC * 3, 15);
 				node.debug(`Configured MinSoC increased to ${msg.configuredMinSoC}`);
 			}
 
