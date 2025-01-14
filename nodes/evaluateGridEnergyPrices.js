@@ -29,7 +29,7 @@ module.exports = function(RED) {
 				return;
 			}
 
-			const data = msg.payload;
+			let data = msg.payload;
 			const result = data.unix_seconds.map((timestamp, index) => {
 				return { start: timestamp, end: (timestamp + 3600), price: data.price[index] / 10 };
 			});
