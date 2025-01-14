@@ -27,13 +27,15 @@ Kontextdaten des Flows
 ![image](https://github.com/user-attachments/assets/68014f67-9ed2-49fe-8f56-b0fb2f8dc44f)
 
 
-Installation
+<h2>Installation</h2>
+
 
 Zum Beispiel als Upload im Palettenmanager von node-red in ioBroker, bzw.:
+
 npm install @iseeberg79/battery-usage-optimization-nodes
 
 
-## Links 
+<h2>Links</h2>
 
 [evcc](https://evcc.io) 
 
