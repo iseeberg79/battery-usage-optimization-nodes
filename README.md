@@ -18,7 +18,7 @@ Es wird der benötigte Zustand für die Batterie ermittelt. Eine Steuerung eines
 - eine Batteriesperre ist, wenn die aktive Batteriesteuerung von evcc unterstützt wird, z.B. aus dem evcc-Wiki ableitbar [WIKI](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren). Der konfigurierte Ladepunkt kann entweder mit dem ermittelten Preis konfiguriert, oder per MQTT/HTTP API der Modus vorgegeben werden (Ladungsmodus: aus/schnell).
 
 
-Bereitgestellt ohne Gewähr, der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung.
+Bereitgestellt ohne Gewähr. Der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung.
 
 
 <h1>@iseeberg79/battery-usage-optimization-nodes</h1>
