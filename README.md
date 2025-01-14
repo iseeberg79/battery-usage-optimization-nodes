@@ -5,17 +5,16 @@
 <h2>Funktionsweise:</h2>
 Der Batteriespeicher soll bei überschüssigem PV-Strom geladen, aber nicht in Zeiten günstigen Netzstromes entladen werden. Ist die Preisdifferenz ausreichend hoch (>15ct) wird eine Netzladung zum günstigsten Zeitpunkt des Tages erwogen und die Batterie bis zum Füllstand von 80% geladen. Um die Batterie nicht ungünstig zu entladen, wird der Netzladungspreis bei der weiteren Steuerung der Batteriesperre berücksichtigt, und die Freigabe der Batterie erfolgt nur bei einem Netzstrompreis, der ausreichend über dem Netzladungspreis liegt (~130%). Die Batterie wird außerdem nur geladen, wenn Stand des Batteriespeichers ausreichend gering (<30%) ist, auch um ein Pendeln von Laden/Entladen zu vermeiden.
 
-Die optimierte Batteriesteuerung ist nur aktiv, wenn die PV Erzeugungsleistung des aktuellen Tages geringer als der Tagesstrombedarf ist (PVgesamt prognostiziert < 17.5kWh).
+Die optimierte Batteriesteuerung ist nur aktiv, wenn die PV Erzeugungsleistung des aktuellen Tages geringer als der Tagesstrombedarf ist (PVgesamt prognostiziert < 17.5kWh). Die Daten können von [SOLCAST](https://solcast.com/free-rooftop-solar-forecasting) über eine persönliche home-use API bezogen werden. Im Verlauf des Tages wird der noch zu erwartende PV-Ertrag bei der Steuerung berücksichtigt. 
 
 Eine Standardlastverteilung des Bedarfs, für einen 4 Personen-Haushalt (24h, berufstätig mit Schulkindern) und einem Stromverbrauch von etwa 15kWh / Tag ist vordefiniert. Der Strombedarf wird dabei grundsätzlich vom aktuellen Zeitpunkt bis zum nächsten Morgen (8 Uhr) bestimmt und berücksichtigt dabei den stündlichen Strombedarf der Lastverteilung.
 
-Im Verlauf des Tages wird der noch zu erwartende PV-Ertrag bei der Steuerung berücksichtigt. Die Daten können von [SOLCAST](https://solcast.com/free-rooftop-solar-forecasting) über eine persönliche home-use API bezogen werden.
-Bei Verfügbarkeit des Strompreises für den kommenden Tag, sowie der entsprechenden PV-Prognose wird dies ebenfalls berücksichtigt.
+Bei Verfügbarkeit des Strompreises für den aktuellen und den kommenden Tag wird  ebenfalls berücksichtigt, die Daten können von [evcc](https://evcc.io/) über die HTTP-API, oder alternativ von einer API der Fraunhofer ISE [Energy-Charts](https://www.energy-charts.info/) bezogen werden.
 
 Es wird der benötigte Zustand für die Batterie ermittelt. Eine Steuerung eines (hybriden) Wechselrichters muss, aufgrund der möglichen Komplexität und der Hardwareabhängigkeit, separat implementiert werden:
 
-- eine geschickte Implementierung für die Netzladung kann die Übergabe des ermittelten Netzladungspreises an eine evcc Instanz per MQTT/HTTP API sein.
-- eine Batteriesperre ist, wenn die aktive Batteriesteuerung von evcc unterstützt wird, z.B. aus dem evcc-Wiki ableitbar [WIKI](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren). Der konfigurierte Ladepunkt kann entweder mit dem ermittelten Preis konfiguriert, oder per MQTT/HTTP API der Modus vorgegeben werden (Ladungsmodus: aus/schnell).
+- eine geschickte Implementierung für die Netzladung kann die Übergabe des ermittelten Netzladungspreises an eine [evcc](https://evcc.io/) Instanz per MQTT/HTTP API sein.
+- eine Batteriesperre ist, wenn die aktive Batteriesteuerung von evcc unterstützt wird, z.B. aus dem [evcc](https://evcc.io/)-Wiki ableitbar [WIKI](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren). Der konfigurierte Ladepunkt kann entweder mit dem ermittelten Preis konfiguriert, oder per MQTT/HTTP API der Modus vorgegeben werden (Ladungsmodus: aus/schnell).
 
 
 Bereitgestellt ohne Gewähr. Der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung.
@@ -57,6 +56,8 @@ npm install @iseeberg79/battery-usage-optimization-nodes
 [evcc](https://evcc.io) 
 
 [solcast](https://solcast.com.au) 
+
+[Energy-Charts](https://www.energy-charts.info/)
 
 [iobroker.net](https://www.iobroker.net) 
 
