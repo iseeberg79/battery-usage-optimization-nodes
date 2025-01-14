@@ -43,6 +43,14 @@ Zum Beispiel als Upload im Palettenmanager von node-red in ioBroker, bzw.:
 npm install @iseeberg79/battery-usage-optimization-nodes
 
 
+![image](https://github.com/user-attachments/assets/9afcea44-369a-4fdb-aa09-dfb67c39c39e)
+
+![image](https://github.com/user-attachments/assets/3f2a643e-9f1b-456b-8e06-8c512cbb9ee5)
+
+![image](https://github.com/user-attachments/assets/2c84af6d-33d7-43c3-afb8-75ec90aca0e8)
+
+
+
 <h2>Links</h2>
 
 [evcc](https://evcc.io) 
