@@ -19,9 +19,9 @@ Es wird der benötigte Zustand für die Batterie ermittelt. Eine Steuerung eines
 
 Das Node-RED-Paket bietet eine Reihe von Nodes zur Optimierung der Batterienutzung. Es umfasst Nodes zur Bestimmung des Batteriemodus, zur Bewertung von Solarprognosen, zur Steuerung des Batteriemodus und mehr.
 
-Die Nodes können eigenständig mit Daten versorgt werden. Bei Bedarf können eigene hinzugefügt werden, die Daten bereitstellen, die aus anderen Quellen bezogen werden. So kann z.B. mit evcc - aber auch ohne, ein eigener Flow mit ausgewählten Nodes aufgebaut werden. Die Nodes sind mit Standards vorbelegt, ergänzend überschreiben die Nachrichteneingänge  die Konfiguration, bzw. sichere Vorbelegungen. Ein modularer Aufbau der Funktionen soll eine gute Weiterverwendung ermöglichen, ohne dabei zu sehr auf spezifische Anforderungen einer Installation einzugehen.
+Die Nodes können eigenständig mit Daten versorgt werden. Bei Bedarf können eigene hinzugefügt werden, die Daten bereitstellen, die aus anderen Quellen bezogen werden. So kann z.B. mit evcc - aber auch ohne, ein eigener Flow mit ausgewählten Nodes aufgebaut werden. Die Nodes sind mit Standards vorbelegt, ergänzend überschreiben die Nachrichteneingänge  die Konfiguration, bzw. sichere Vorbelegungen. Ein modularer Aufbau der Funktionen soll eine gute Weiterverwendung ermöglichen, ohne dabei zu sehr auf spezifische Anforderungen einer Installation einzugehen. Die Funktionen und Implementierung hat Beobachtungen und eigene Erfahrungswerte als Grundlage.
 
-Eine Publizierung des Paketes ist aktuell noch nicht erfolgt, dafür sind Erfahrungswerte und weitere Optimierungen notwendig.
+Eine Publizierung des Paketes ist aktuell noch nicht erfolgt, dafür sind Erfahrungswerte und weitere Optimierungen notwendig. 
 
 
 Bereitgestellt ohne Gewähr. Der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung.
