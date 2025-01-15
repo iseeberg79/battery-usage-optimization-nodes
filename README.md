@@ -24,7 +24,7 @@ Die Nodes können eigenständig mit Daten versorgt werden. Bei Bedarf können ei
 Eine Publizierung des Paketes ist aktuell noch nicht erfolgt, dafür sind Erfahrungswerte und weitere Optimierungen notwendig. 
 
 
-Bereitgestellt ohne Gewähr. Der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung.
+*Bereitgestellt ohne Gewähr. Der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung!*
 
 
 <h1>@iseeberg79/battery-usage-optimization-nodes</h1>
