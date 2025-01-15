@@ -39,32 +39,32 @@ module.exports = function(RED) {
 
 
 			if (winterMode) {
-				if (debug) node.warn(`Winter mode is active`);
+				if (debug) { node.warn(`Winter mode is active`); };
 				// Im Winter die Mindestladung erhöhen
-				msg.configuredMinSoC = (typeof msg.forcedMinSoC !== 'undefined') ? msg.forcedMinSoC :  Math.min(msg.configuredMinSoC * 3, 15);
-				if (debug) node.warn(`Configured MinSoC increased to ${msg.configuredMinSoC}`);
+				msg.configuredMinSoC = (typeof msg.forcedMinSoC !== 'undefined') ? msg.forcedMinSoC : Math.min(msg.configuredMinSoC * 3, 15);
+				if (debug) { node.warn(`Configured MinSoC increased to ${msg.configuredMinSoC}`); };
 			}
 
 			if (!msg.batteryLock) {
-				if (debug) node.warn(`Battery lock is not active`);
+				if (debug) { node.warn(`Battery lock is not active`); };
 				if (msg.evccBatteryMode === 'charge') {
-					if (debug) node.warn(`EVCC Battery Mode is charge`);
+					if (debug) { node.warn(`EVCC Battery Mode is charge`); };
 					msg.effectiveFeedin = msg.price;
 					if (!msg.optimize) {
-						if (debug) node.warn(`Optimize is false`);
+						if (debug) { node.warn(`Optimize is false`); };
 						msg.targetMode = msg.evccBatteryMode;
 						outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
 						node.status({ fill: "red", shape: "dot", text: msg.targetMode });
 					} else {
-						if (debug) node.warn(`Optimize is true`);
+						if (debug) { node.warn(`Optimize is true`); };
 						msg.targetMode = msg.batterymode;
 						if (msg.batterymode === 'charge') {
-							if (debug) node.warn(`Battery mode is charge`);
+							if (debug) { node.warn(`Battery mode is charge`); };
 							outputs[0] = { payload: 100 };
 							outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
 							node.status({ fill: "red", shape: "dot", text: msg.targetMode });
 						} else {
-							if (debug) node.warn(`Battery mode is not charge`);
+							if (debug) { node.warn(`Battery mode is not charge`); };
 							outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
 							outputs[2] = { payload: 0.00 };
 							node.status({ fill: "red", shape: "dot", text: msg.targetMode });
@@ -73,9 +73,9 @@ module.exports = function(RED) {
 				}
 
 				if ((msg.evccBatteryMode === 'unknown') || (msg.evccBatteryMode === 'normal')) {
-					if (debug) node.warn(`EVCC Battery Mode is ${msg.evccBatteryMode}`);
+					if (debug) { node.warn(`EVCC Battery Mode is ${msg.evccBatteryMode}`); };
 					if (!msg.optimize) {
-						if (debug) node.warn(`Optimize is false`);
+						if (debug) { node.warn(`Optimize is false`); };
 						msg.targetMode = msg.evccBatteryMode;
 						if (msg.targetMode != "unknown") {
 							outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
@@ -85,23 +85,23 @@ module.exports = function(RED) {
 						}
 						node.status({ fill: "green", shape: "dot", text: msg.targetMode });
 					} else {
-						if (debug) node.warn(`Optimize is true`);
+						if (debug) { node.warn(`Optimize is true`); };
 						if ((msg.batterymode === 'hold') || ((msg.batterymode === 'charge') && (msg.price > msg.maximumGridprice))) {
-							if (debug) node.warn(`Battery mode is hold or charge with price > maximumGridprice`);
+							if (debug) { node.warn(`Battery mode is hold or charge with price > maximumGridprice`); };
 							msg.targetMode = 'hold';
 							outputs[0] = { payload: 100 };
 							outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
 							node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
 						}
 						if ((msg.batterymode === 'charge') && (msg.price <= msg.maximumGridprice)) {
-							if (debug) node.warn(`Battery mode is charge with price <= maximumGridprice`);
+							if (debug) { node.warn(`Battery mode is charge with price <= maximumGridprice`); };
 							msg.targetMode = msg.batterymode;
 							outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
 							outputs[2] = { payload: msg.price };
 							node.status({ fill: "red", shape: "dot", text: msg.targetMode });
 						}
 						if ((msg.batterymode === 'normal') || (msg.batterymode === 'unknown')) {
-							if (debug) node.warn(`Battery mode is normal or unknown`);
+							if (debug) { node.warn(`Battery mode is normal or unknown`); };
 							msg.targetMode = 'normal';
 							if ((msg.minsoc > 20) && (msg.minsoc != msg.configuredMinSoC)) {
 								outputs[0] = { payload: msg.configuredMinSoC };
@@ -113,7 +113,7 @@ module.exports = function(RED) {
 				}
 
 				if (msg.evccBatteryMode === 'hold') {
-					if (debug) node.warn(`EVCC Battery Mode is hold`);
+					if (debug) { node.warn(`EVCC Battery Mode is hold`); };
 					msg.targetMode = 'hold';
 					outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
 					node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
@@ -123,7 +123,7 @@ module.exports = function(RED) {
 			} else {
 				node.warn("UI Sperre: forcierte Batteriesperre!");
 				if (msg.optimize) {
-					if (debug) node.warn(`Optimize is true with battery lock`);
+					if (debug) { node.warn(`Optimize is true with battery lock`); };
 					msg.targetMode = 'hold';
 					outputs[0] = { payload: 100 };
 					outputs[1] = { payload: msg.targetMode, optimize: false };
@@ -142,8 +142,10 @@ module.exports = function(RED) {
 
 			msg = outputs;
 			node.send(msg);
+
 		});
 	}
+
 	RED.nodes.registerType('@iseeberg79/ControlBattery', ControlBattery, {
 		defaults: {
 			name: { value: "" },
