@@ -18,9 +18,11 @@ Es wird der benötigte Zustand für die Batterie ermittelt. Eine Steuerung eines
 - eine Batteriesperre ist, wenn die aktive Batteriesteuerung von evcc unterstützt wird, z.B. aus dem [evcc](https://evcc.io/)-Wiki ableitbar [WIKI](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren). Der konfigurierte Ladepunkt kann entweder mit dem ermittelten Preis konfiguriert, oder per MQTT/HTTP API der Modus vorgegeben werden (Ladungsmodus: aus/schnell).
 
 Das Node-RED-Paket bietet eine Reihe von Nodes zur Optimierung der Batterienutzung. Es umfasst Nodes zur Bestimmung des Batteriemodus, zur Bewertung von Solarprognosen, zur Steuerung des Batteriemodus und mehr.
+
 Die Nodes können eigenständig mit Daten versorgt werden. Bei Bedarf können eigene hinzugefügt werden, die Daten bereitstellen, die aus anderen Quellen bezogen werden. So kann z.B. mit evcc - aber auch ohne, ein eigener Flow mit ausgewählten Nodes aufgebaut werden. Die Nodes sind mit Standards vorbelegt, ergänzend überschreiben die Nachrichteneingänge  die Konfiguration, bzw. sichere Vorbelegungen. Ein modularer Aufbau der Funktionen soll eine gute Weiterverwendung ermöglichen, ohne dabei zu sehr auf spezifische Anforderungen einer Installation einzugehen.
 
 Eine Publizierung des Paketes ist aktuell noch nicht erfolgt, dafür sind Erfahrungswerte und weitere Optimierungen notwendig.
+
 
 Bereitgestellt ohne Gewähr. Der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung.
 
