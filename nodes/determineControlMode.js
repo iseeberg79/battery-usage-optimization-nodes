@@ -28,41 +28,41 @@ module.exports = function(RED) {
 
 			// Logik zur Bestimmung der Steuerung
 			if (pvForecast < minPvRequired) {
-				if (debug) { node.warn(`pvForecast (${pvForecast}) < minPvRequired (${minPvRequired})`); };
+				if (debug) { node.warn(`pvForecast (${pvForecast}) < minPvRequired (${minPvRequired})`); }
 				msg.pvMIN = true;
 				if (Math.round(priceDifference * 10) > Math.round(minPriceDifference * 10)) {
-					if (debug) { node.warn(`priceDifference (${priceDifference}) > minPriceDifference (${minPriceDifference})`); };
+					if (debug) { node.warn(`priceDifference (${priceDifference}) > minPriceDifference (${minPriceDifference})`); }
 					msg.priceOK = true;
 					msg.priceDIFFERENCE = minPriceDifference;
 					if (pvForecast * 1.6 < minPvRequired) {
-						if (debug) { node.warn(`pvForecast * 1.6 (${pvForecast * 1.6}) < minPvRequired (${minPvRequired})`); };
+						if (debug) { node.warn(`pvForecast * 1.6 (${pvForecast * 1.6}) < minPvRequired (${minPvRequired})`); }
 						msg.payload = { optimize: true, gridcharge: true, mode: 'GRID' };
 					} else {
-						if (debug) { node.warn(`pvForecast * 1.6 (${pvForecast * 1.6}) >= minPvRequired (${minPvRequired})`); };
+						if (debug) { node.warn(`pvForecast * 1.6 (${pvForecast * 1.6}) >= minPvRequired (${minPvRequired})`); }
 						msg.payload = { optimize: true, gridcharge: false, mode: 'LIMIT' };
 					}
 				} else {
-					if (debug) { node.warn(`priceDifference (${priceDifference}) <= minPriceDifference (${minPriceDifference})`); };
+					if (debug) { node.warn(`priceDifference (${priceDifference}) <= minPriceDifference (${minPriceDifference})`); }
 					if (Math.round(priceDeviation * 10) > Math.round(minPriceDeviation * 10)) {
-						if (debug) { node.warn(`priceDeviation (${priceDeviation}) > minPriceDeviation (${minPriceDeviation})`); };
+						if (debug) { node.warn(`priceDeviation (${priceDeviation}) > minPriceDeviation (${minPriceDeviation})`); }
 						msg.priceFallback = true;
 						msg.priceDEVIATION = priceDeviation;
 						msg.payload = { optimize: true, gridcharge: false, mode: 'LIMIT' };
 					} else {
-						if (debug) { node.warn(`priceDeviation (${priceDeviation}) <= minPriceDeviation (${minPriceDeviation})`); };
+						if (debug) { node.warn(`priceDeviation (${priceDeviation}) <= minPriceDeviation (${minPriceDeviation})`); }
 						if (Math.round(avgPrice * 100) > Math.round(batteryControlLimit * 100)) {
-							if (debug) { node.warn(`avgPrice (${avgPrice}) > batteryControlLimit (${batteryControlLimit})`); };
+							if (debug) { node.warn(`avgPrice (${avgPrice}) > batteryControlLimit (${batteryControlLimit})`); }
 							msg.averageHIGH = true;
 							msg.payload = { optimize: true, gridcharge: false, mode: 'LIMIT' };
 						} else {
-							if (debug) { node.warn(`avgPrice (${avgPrice}) <= batteryControlLimit (${batteryControlLimit})`); };
+							if (debug) { node.warn(`avgPrice (${avgPrice}) <= batteryControlLimit (${batteryControlLimit})`); }
 							msg.averageLOW = true;
 							msg.payload = { optimize: false, gridcharge: false, mode: 'evcc' };
 						}
 					}
 				}
 			} else {
-				if (debug) { node.warn(`pvForecast (${pvForecast}) >= minPvRequired (${minPvRequired})`); };
+				if (debug) { node.warn(`pvForecast (${pvForecast}) >= minPvRequired (${minPvRequired})`); }
 				msg.pvOK = true;
 				msg.pvFORECAST = pvForecast;
 				msg.payload = { optimize: false, gridcharge: false, mode: 'evcc' };

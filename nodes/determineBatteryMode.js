@@ -50,7 +50,7 @@ module.exports = function(RED) {
 
 			function mayChargeBattery(price, minTotal, avgPrice) {
 				let ret = price <= minTotal && (price * loss) < avgPrice;
-				if (debug) { node.warn(`loss is ${loss}; return is ${ret}`); };
+				if (debug) { node.warn(`loss is ${loss}; return is ${ret}`); }
 				return ret;
 			}
 
@@ -62,17 +62,17 @@ module.exports = function(RED) {
 			// wenn Optimierung der Batterienutzung wirtschaftlich bzw. erlaubt
 
 			if (optimize) {
-				if (debug) { node.warn(`optimize is true`); };
+				if (debug) { node.warn(`optimize is true`); }
 				// Bewertung des Batteriestandes
 				let socControlMode;
 				if (soc > disableGridchargeThreshold) {
-					if (debug) { node.warn(`soc (${soc}) > disableGridchargeThreshold (${disableGridchargeThreshold})`); };
+					if (debug) { node.warn(`soc (${soc}) > disableGridchargeThreshold (${disableGridchargeThreshold})`); }
 					socControlMode = "highSOC";
 				} else if (soc <= enableGridchargeThreshold) {
-					if (debug) { node.warn(`soc (${soc}) <= enableGridchargeThreshold (${enableGridchargeThreshold})`); };
+					if (debug) { node.warn(`soc (${soc}) <= enableGridchargeThreshold (${enableGridchargeThreshold})`); }
 					socControlMode = "lowSOC";
 				} else {
-					if (debug) { node.warn(`soc (${soc}) is between enableGridchargeThreshold (${enableGridchargeThreshold}) and disableGridchargeThreshold (${disableGridchargeThreshold})`); };
+					if (debug) { node.warn(`soc (${soc}) is between enableGridchargeThreshold (${enableGridchargeThreshold}) and disableGridchargeThreshold (${disableGridchargeThreshold})`); }
 					socControlMode = "mediumSOC";
 				}
 
@@ -80,74 +80,74 @@ module.exports = function(RED) {
 					// Zurücksetzen des letzten Ladepreises bei geringem/hohem Füllstand
 					switch (socControlMode) {
 						case "highSOC":
-							if (debug) { node.warn(`socControlMode is highSOC`); };
+							if (debug) { node.warn(`socControlMode is highSOC`); }
 							if (soc > resetmaxsoc) {
-								if (debug) { node.warn(`soc (${soc}) > resetmaxsoc (${resetmaxsoc})`); };
+								if (debug) { node.warn(`soc (${soc}) > resetmaxsoc (${resetmaxsoc})`); }
 								lastGridchargePrice = feedin * loss;
 							}
 							break;
 						case "lowSOC":
-							if (debug) { node.warn(`socControlMode is lowSOC`); };
+							if (debug) { node.warn(`socControlMode is lowSOC`); }
 							if (soc < resetminsoc) {
-								if (debug) { node.warn(`soc (${soc}) < resetminsoc (${resetminsoc})`); };
+								if (debug) { node.warn(`soc (${soc}) < resetminsoc (${resetminsoc})`); }
 								lastGridchargePrice = feedin * loss;
 							}
 							break;
 						case "mediumSOC":
-							if (debug) { node.warn(`socControlMode is mediumSOC`); };
+							if (debug) { node.warn(`socControlMode is mediumSOC`); }
 							break;
 					}
 				}
 
 				// Wintermonate?
 				let winterMode = isWinter((new Date()).getMonth());
-				if (debug) { node.warn(`winterMode is ${winterMode}`); };
+				if (debug) { node.warn(`winterMode is ${winterMode}`); }
 
 				// Bestimmung von pvControlMode
 				let pvControlMode;
 				if (winterMode) {
 					msg.estimatedConsumption = (batteryCapacity - (msg.soc / 100 * batteryCapacity) + estimatedHousehold);
-					if (debug) { node.warn(`estimatedConsumption is ${msg.estimatedConsumption}`); };
+					if (debug) { node.warn(`estimatedConsumption is ${msg.estimatedConsumption}`); }
 					pvControlMode = (pvforecast < msg.estimatedConsumption) ? "insufficientPV" : "sufficientPV";
 				} else {
 					pvControlMode = "sufficientPV";
 				}
-				if (debug) { node.warn(`pvControlMode is ${pvControlMode}`); };
+				if (debug) { node.warn(`pvControlMode is ${pvControlMode}`); }
 
 				// Logik für Netzladung bei günstigem Strompreis
 				if (pvControlMode === "insufficientPV" && pvControlMode !== "highSOC") {
-					if (debug) { node.warn(`pvControlMode is insufficientPV and not highSOC`); };
+					if (debug) { node.warn(`pvControlMode is insufficientPV and not highSOC`); }
 					msg.targetMode = "hold";
 					// Netzladung erlauben?
 					if ((socControlMode === "lowSOC") || (socControlMode === "mediumSOC") && (msg.batterymode === "charge")) {
-						if (debug) { node.warn(`socControlMode is ${socControlMode} and batterymode is ${msg.batterymode}`); };
+						if (debug) { node.warn(`socControlMode is ${socControlMode} and batterymode is ${msg.batterymode}`); }
 						let minTotal = minPrice ? parseFloat((minPrice * 1.02).toFixed(3)) : 0;
-						if (debug) { node.warn(`minTotal is ${minTotal} and enableGridcharge is ${enableGridcharge}, price is ${price}, avgPrice is ${avgPrice}`); };
+						if (debug) { node.warn(`minTotal is ${minTotal} and enableGridcharge is ${enableGridcharge}, price is ${price}, avgPrice is ${avgPrice}`); }
 						if (enableGridcharge && mayChargeBattery(price, minTotal, avgPrice)) {
-							if (debug) { node.warn(`gridcharge, enableGridcharge is true and mayChargeBattery returns true`); };
+							if (debug) { node.warn(`gridcharge, enableGridcharge is true and mayChargeBattery returns true`); }
 							msg.targetMode = "charge";
 							let gridchargePrice = (price * loss);
-							if (debug) { node.warn(`gridchargePrice is ${gridchargePrice}`); };
+							if (debug) { node.warn(`gridchargePrice is ${gridchargePrice}`); }
 							// teuersten Preis speichern
 							if (gridchargePrice > lastGridchargePrice) {
-								if (debug) { node.warn(`gridchargePrice (${gridchargePrice}) > lastGridchargePrice (${lastGridchargePrice})`); };
+								if (debug) { node.warn(`gridchargePrice (${gridchargePrice}) > lastGridchargePrice (${lastGridchargePrice})`); }
 								lastGridchargePrice = gridchargePrice;
 							}
 						}
-						if (debug) { node.warn(`no gridcharge, targetMode evaluates to ${msg.targetMode}`); };
+						if (debug) { node.warn(`no gridcharge, targetMode evaluates to ${msg.targetMode}`); }
 					}
 					// Batterie darf entladen, wenn Strompreis hoch und Batterie nicht teuer geladen wurde
 					if (price > batteryControlLimit && price > lastGridchargePrice) {
-						if (debug) { node.warn(`price (${price}) > batteryControlLimit (${batteryControlLimit}) and price > lastGridchargePrice (${lastGridchargePrice})`); };
+						if (debug) { node.warn(`price (${price}) > batteryControlLimit (${batteryControlLimit}) and price > lastGridchargePrice (${lastGridchargePrice})`); }
 						msg.targetMode = "normal";
 					}
 				} else {
 					// Batterie darf entladen, wenn PV Leistung des Tages ausreicht
-					if (debug) { node.warn(`pvControlMode is sufficientPV or highSOC`); };
+					if (debug) { node.warn(`pvControlMode is sufficientPV or highSOC`); }
 					msg.targetMode = "normal";
 				}
 			} else {
-				if (debug) { node.warn(`optimize is false`); };
+				if (debug) { node.warn(`optimize is false`); }
 				// Batterie darf entladen, wenn Opti
 				msg.targetMode = "normal";
 			}
