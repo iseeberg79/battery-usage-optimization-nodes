@@ -10,9 +10,9 @@ Die optimierte Batteriesteuerung ist nur aktiv, wenn die PV Erzeugungsleistung d
 
 Eine Standardlastverteilung des Bedarfs, für einen 4 Personen-Haushalt (24h, berufstätig mit Schulkindern) und einem Stromverbrauch von etwa 15kWh / Tag ist vordefiniert. Der Strombedarf wird dabei grundsätzlich vom aktuellen Zeitpunkt bis zum nächsten Morgen (8 Uhr) bestimmt und berücksichtigt dabei den stündlichen Strombedarf der Lastverteilung.
 
-Bei Verfügbarkeit des Strompreises für den aktuellen und den kommenden Tag wird  ebenfalls berücksichtigt, die Daten können von [evcc](https://evcc.io/) über die HTTP-API, oder alternativ von einer API der Fraunhofer ISE [Energy-Charts](https://www.energy-charts.info/) bezogen werden.
+Bei Verfügbarkeit des Strompreises für den aktuellen und den kommenden Tag wird dieser ebenfalls berücksichtigt. Die Daten können dabei von [evcc](https://evcc.io/) über die HTTP-API, oder alternativ von einer API der Fraunhofer ISE [Energy-Charts](https://www.energy-charts.info/) bezogen werden.
 
-Es wird der benötigte Zustand für die Batterie ermittelt. Eine Steuerung eines (hybriden) Wechselrichters muss, aufgrund der möglichen Komplexität und der Hardwareabhängigkeit, separat implementiert werden:
+Es wird der benötigte Zustand für die Batteriesteuerung ermittelt. Eine Steuerung eines (hybriden) Wechselrichters muss, aufgrund der möglichen Komplexität und der Hardwareabhängigkeit, separat implementiert werden:
 
 - eine geschickte Implementierung für die Netzladung kann die Übergabe des ermittelten Netzladungspreises an eine [evcc](https://evcc.io/) Instanz per MQTT/HTTP API sein.
 - eine Batteriesperre ist, wenn die aktive Batteriesteuerung von evcc unterstützt wird, z.B. aus dem [evcc](https://evcc.io/)-Wiki ableitbar [WIKI](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren). Der konfigurierte Ladepunkt kann entweder mit dem ermittelten Preis konfiguriert, oder per MQTT/HTTP API der Modus vorgegeben werden (Ladungsmodus: aus/schnell).
