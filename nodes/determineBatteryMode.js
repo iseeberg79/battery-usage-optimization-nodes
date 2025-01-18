@@ -180,7 +180,11 @@ module.exports = function(RED) {
 				msg.targetModeInternal = msg.targetMode;
 				switch (mode) {
 					case "grid":
-						msg.targetMode = "hold";
+						if (soc > minsoc) {
+							msg.targetMode = "hold";
+						} else {
+							msg.targetMode = "normal";
+						}
 						break;
 					case "charging":
 						msg.targetMode = "hold";
