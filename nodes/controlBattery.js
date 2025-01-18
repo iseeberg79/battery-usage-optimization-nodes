@@ -36,7 +36,7 @@ module.exports = function(RED) {
 				// Modus für die aktuelle Zeit ermitteln
 				let returnValue = 'undefined';
 				const mode = getCurrentMode(currentTime, estimator);
-				if (debug) node.warn("Der Modus für die aktuelle Zeit ist: " + mode);
+				if (debug) { node.warn("Der Modus für die aktuelle Zeit ist: " + mode); }
 
 				//msg.targetModeInternal = msg.targetMode;
 				if (mode !== 'undefined') {

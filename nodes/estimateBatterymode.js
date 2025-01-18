@@ -55,7 +55,7 @@ module.exports = function(RED) {
 					timestamp: hour + ':00:00.0000000Z', // Stundenformat zurück in vollständigen Zeitstempel
 					value: summary[hour]
 				}));
-			}
+			};
 
 			function getMaximumSoC(data) {
 				return data.reduce((maxEntry, entry) => {
@@ -140,7 +140,7 @@ module.exports = function(RED) {
 
 			// Preisermittlung
 			const totalCost = energyNeeded.reduce((sum, entry) => sum + entry.cost, 0);
-			const totalCostOptimized = batteryStatus.reduce((sum, entry) => sum + entry.cost, 0); 
+			const totalCostOptimized = batteryStatus.reduce((sum, entry) => sum + entry.cost, 0);
 
 			msg.payload.batteryStatus = batteryStatus;
 			msg.payload.totalCost = totalCost;
