@@ -16,14 +16,46 @@ module.exports = function(RED) {
 				return;
 			}
 
-			let batteryPower = msg.response.result.batteryPower;
-			let homePower = msg.response.result.homePower;
-			let gridPower = msg.response.result.gridPower;
+			// Überprüfe, ob die Nachricht die alte oder neue API-Struktur (01/2025) von evcc hat
+			let gridPower;
+			if (msgPayload.gridPower !== undefined) {
+				gridPower = msg.response.result.gridPower;
+			} else {
+				gridPower = msg.response.result.grid.power;
+			}
+			
+			let batteryPower;
+			if (msgPayload.batteryPower !== undefined) {
+				batteryPower = msg.response.result.batteryPower;
+			} else {
+				batteryPower = msg.response.result.battery.power;
+			}			
+
+			let homePower;
+			if (msgPayload.homePower !== undefined) {
+				batteryPower = msg.response.result.homePower;
+			} else {
+				batteryPower = msg.response.result.home.power;
+			}	
+
+			let pvPower;
+			if (msgPayload.pvPower !== undefined) {
+				pvPower = msg.response.result.pvPower;
+			} else {
+				pvPower = msg.response.result.pv.power;
+			}	
+
+			let batterySoc;
+			if (msgPayload.pvPower !== undefined) {
+				batterySoc = msg.response.result.batterySoc;
+			} else {
+				batterySoc = msg.response.result.battery.soc;
+			}
+									
 			let tariffGrid = msg.response.result.tariffGrid;
-			let pvPower = msg.response.result.pvPower;
-			let batterySoc = msg.response.result.batterySoc;
 			let batteryMode = msg.response.result.batteryMode;
 			let interval = msg.response.result.interval;
+			
 			const sumPower = msg.response.result.loadpoints.reduce((sum, lp) => sum + lp.chargePower, 0);
 
 			msg.payload = {

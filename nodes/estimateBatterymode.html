@@ -1,0 +1,71 @@
+<script type="text/javascript">
+    RED.nodes.registerType('@iseeberg79/estimateBatterymode', {
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: {
+                value: ""
+            },
+            batteryBuffer: {
+                value: 5,
+                validate: RED.validators.number()
+            },
+            batteryCapacity: {
+                value: 10,
+                validate: RED.validators.number()
+            },
+            maxCharge: {
+                value: 5,
+                validate: RED.validators.number()
+            },
+            feedin: {
+                value: 0.079,
+                validate: RED.validators.number()
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file.png",
+        label: function() {
+            return this.name || "Estimate Battery Mode";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="@iseeberg79/estimateBatterymode">
+    <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-batteryBuffer">Battery Buffer (%)</label>
+        <input type="text" id="node-input-batteryBuffer" placeholder="5" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-batteryCapacity">Battery Capacity (kWh)</label>
+        <input type="text" id="node-input-batteryCapacity" placeholder="10" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-maxCharge">Max Charge (kWh)</label>
+        <input type="text" id="node-input-maxCharge" placeholder="5" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-feedin">Feed-in Tariff (€)</label>
+        <input type="text" id="node-input-feedin" placeholder="0.079" class="input-typed"/>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="@iseeberg79/estimateBatterymode">
+    <p>Dieser Node ermöglicht die Schätzung des Batteriemodus basierend auf den aktuellen Preis- und Prognosedaten.</p>
+    <p><b>Inputs:</b></p>
+    <ul>
+        <li><b>Battery Buffer (%):</b> - der Mindest-SoC der Hausbatterie</li>
+        <li><b>Battery Capacity (kWh):</b> - die Gesamtkapazität der Batterie</li>
+        <li><b>Max Charge (kWh):</b> - die maximale Ladeleistung</li>
+        <li><b>Feed-in Tariff (€):</b> - Einspeiseverfügung</li>
+    </ul>
+    <p><b>Outpus</b></p>
+    <ul>
+        <li><b>Output 1:</b> - die erwartete Energieverteilugn</li>
+    </ul>
+</script>
