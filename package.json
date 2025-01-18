@@ -1,6 +1,6 @@
 {
 	"name": "@iseeberg79/battery-usage-optimization-nodes",
-	"version": "0.1.1-rc29.1",
+	"version": "0.1.1-rc29.7",
 	"devDependencies": {
 		"eslint": "^7.32.0",
 		"grunt": "~0.4.5",
@@ -36,7 +36,8 @@
 			"EstimateHouseholdConsumption": "nodes/estimateHouseholdConsumption.js",
 			"EvaluateGridEnergyPricesAPI": "nodes/evaluateGridEnergyPricesAPI.js",
 			"EvaluateGridEnergyPrices": "nodes/evaluateGridEnergyPrices.js",
-			"EstimateSolarEnergy": "nodes/estimateSolarEnergy.js"
+			"EstimateSolarEnergy": "nodes/estimateSolarEnergy.js",
+			"EstimateBatterymode": "nodes/estimateBatterymode.js"
 		}
 	}
 }

@@ -18,35 +18,35 @@ module.exports = function(RED) {
 
 			// Überprüfe, ob die Nachricht die alte oder neue API-Struktur (01/2025) von evcc hat
 			let gridPower;
-			if (msgPayload.gridPower !== undefined) {
+			if (typeof msg.response.result.gridPower !== undefined) {
 				gridPower = msg.response.result.gridPower;
 			} else {
 				gridPower = msg.response.result.grid.power;
 			}
 			
 			let batteryPower;
-			if (msgPayload.batteryPower !== undefined) {
+			if (typeof msg.response.result.batteryPower !== undefined) {
 				batteryPower = msg.response.result.batteryPower;
 			} else {
 				batteryPower = msg.response.result.battery.power;
 			}			
 
 			let homePower;
-			if (msgPayload.homePower !== undefined) {
-				batteryPower = msg.response.result.homePower;
+			if (typeof msg.response.result.homePower !== undefined) {
+				homePower = msg.response.result.homePower;
 			} else {
-				batteryPower = msg.response.result.home.power;
+				homePower = msg.response.result.home.power;
 			}	
 
 			let pvPower;
-			if (msgPayload.pvPower !== undefined) {
+			if (typeof msg.response.result.pvPower !== undefined) {
 				pvPower = msg.response.result.pvPower;
 			} else {
 				pvPower = msg.response.result.pv.power;
 			}	
 
 			let batterySoc;
-			if (msgPayload.pvPower !== undefined) {
+			if (typeof msg.response.result.batterySoc !== undefined) {
 				batterySoc = msg.response.result.batterySoc;
 			} else {
 				batterySoc = msg.response.result.battery.soc;

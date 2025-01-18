@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('@iseeberg79/estimateBatterymode', {
+    RED.nodes.registerType('@iseeberg79/EstimateBatterymode', {
         category: 'function',
         color: '#a6bbcf',
         defaults: {
@@ -32,7 +32,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="@iseeberg79/estimateBatterymode">
+<script type="text/x-red" data-template-name="@iseeberg79/EstimateBatterymode">
     <div class="form-row">
         <label for="node-input-name">Name</label>
         <input type="text" id="node-input-name" placeholder="Name" class="input-typed"/>
@@ -55,7 +55,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="@iseeberg79/estimateBatterymode">
+<script type="text/x-red" data-help-name="@iseeberg79/EstimateBatterymode">
     <p>Dieser Node ermöglicht die Schätzung des Batteriemodus basierend auf den aktuellen Preis- und Prognosedaten.</p>
     <p><b>Inputs:</b></p>
     <ul>
@@ -64,7 +64,7 @@
         <li><b>Max Charge (kWh):</b> - die maximale Ladeleistung</li>
         <li><b>Feed-in Tariff (€):</b> - Einspeiseverfügung</li>
     </ul>
-    <p><b>Outpus</b></p>
+    <p><b>Outputs:</b></p>
     <ul>
         <li><b>Output 1:</b> - die erwartete Energieverteilugn</li>
     </ul>

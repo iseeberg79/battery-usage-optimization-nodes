@@ -127,7 +127,7 @@ module.exports = function(RED) {
             node.send(msg);
         });
     }
-    RED.nodes.registerType("@iseeberg79/estimateBatterymode", EstimateBatteryMode, {
+    RED.nodes.registerType("@iseeberg79/EstimateBatterymode", EstimateBatteryMode, {
         defaults: {
             batteryBuffer: { value: 5, exportable: true },
             batteryCapacity: { value: 10, exportable: true },
