@@ -15,8 +15,8 @@ module.exports = function(RED) {
 			let outputs = [null, null, null];
 
 			// aus anderem Knoten berechnet
-			const enableGridcharge = msg.enableGridcharge = msg.enableGridcharge || false;
-			const optimize = msg.optimize = msg.optimize || false;
+			const enableGridcharge = (typeof msg.enableGridcharge !== "undefined") ? msg.enableGridcharge : false;
+			const optimize = (typeof msg.optimize !== "undefined") ? msg.optimize : false;
 
 			// Standardwerte aus der Konfiguration übernehmen
 			const enableGridchargeThreshold = msg.enableGridchargeThreshold = (typeof msg.enableGridchargeThreshold !== 'undefined') ? msg.enableGridchargeThreshold : (node.enableGridchargeThreshold || 50);
