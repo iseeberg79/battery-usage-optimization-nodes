@@ -5,7 +5,7 @@ module.exports = function(RED) {
 		node.configuredMinSoC = config.configuredMinSoC;
 		node.maximumGridprice = config.maximumGridprice;
 		node.configuredBatteryLock = config.configuredBatteryLock;
-		const debug = true;
+		const debug = false;
 
 		node.on('input', function(msg) {
 
