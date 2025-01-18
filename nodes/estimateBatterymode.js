@@ -138,7 +138,13 @@ module.exports = function(RED) {
 			// Sortierung nach Zeitstempeln
 			batteryStatus.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
+			// Preisermittlung
+			const totalCost = energyNeeded.reduce((sum, entry) => sum + entry.cost, 0);
+			const totalCostOptimized = batteryStatus.reduce((sum, entry) => sum + entry.cost, 0); 
+
 			msg.payload.batteryStatus = batteryStatus;
+			msg.payload.totalCost = totalCost;
+			msg.payload.totalCostOptimized = totalCostOptimized;
 
 			node.send(msg);
 		});

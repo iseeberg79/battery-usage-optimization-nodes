@@ -8,7 +8,7 @@ module.exports = function(RED) {
 		node.minsoc = config.minsoc;
 		node.maxsoc = config.maxsoc;
 		node.efficiency = config.efficiency;
-		const debug = true;
+		const debug = false;
 
 		// dieser Knoten verarbeitet die Preise in Cent!
 		node.on('input', function(msg) {

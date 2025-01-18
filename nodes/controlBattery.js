@@ -5,7 +5,7 @@ module.exports = function(RED) {
 		node.configuredMinSoC = config.configuredMinSoC;
 		node.maximumGridprice = config.maximumGridprice;
 		node.configuredBatteryLock = config.configuredBatteryLock;
-		const debug = false;
+		const debug = true;
 
 		node.on('input', function(msg) {
 
@@ -15,9 +15,8 @@ module.exports = function(RED) {
 			}
 
 			function evaluateEstimator(estimator) {
-				if (debug) node.warn("externe Prognose aktiv");
-
-				let returnValue = "undefined";
+				//if (debug) node.warn("externe Prognose aktiv");
+				node.warn("externe Prognose aktiv");
 
 				// Aktuelle Zeit
 				const currentTime = new Date();
@@ -31,30 +30,33 @@ module.exports = function(RED) {
 							currentMode = entry.mode;
 						}
 						return currentMode;
-					}, "undefined");
+					}, 'undefined');
 				}
 
 				// Modus für die aktuelle Zeit ermitteln
+				let returnValue = 'undefined';
 				const mode = getCurrentMode(currentTime, estimator);
 				if (debug) node.warn("Der Modus für die aktuelle Zeit ist: " + mode);
 
 				//msg.targetModeInternal = msg.targetMode;
-				switch (mode) {
-					case "grid":
-						if (msg.actualsoc > msg.configuredMinSoC) {
-							returnValue = "hold";
-						} else {
-							returnValue = "normal";
-						}
-						break;
-					case "charging":
-						returnValue = "hold";
-						break;
-					case "battery":
-						returnValue = "normal";
-						break;
+				if (mode !== 'undefined') {
+					switch (mode) {
+						case "grid":
+							if (msg.actualsoc > msg.configuredMinSoC) {
+								returnValue = 'hold';
+							} else {
+								returnValue = 'normal';
+							}
+							break;
+						case "charging":
+							returnValue = 'hold';
+							break;
+						case "battery":
+							returnValue = 'normal';
+							break;
+					}
 				}
-				return returnValue
+				return returnValue;
 			}
 
 			// Wintermonate?
