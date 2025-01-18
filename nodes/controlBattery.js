@@ -41,7 +41,7 @@ module.exports = function(RED) {
 				//msg.targetModeInternal = msg.targetMode;
 				switch (mode) {
 					case "grid":
-						if (msg.actualsoc > configuredMinSoC) {
+						if (msg.actualsoc > msg.configuredMinSoC) {
 							returnValue = "hold";
 						} else {
 							returnValue = "normal";
