@@ -15,8 +15,10 @@ module.exports = function(RED) {
 			let outputs = [null, null, null];
 
 			// aus anderem Knoten berechnet
-			const enableGridcharge = msg.enableGridcharge = msg.enableGridcharge || false;
-			const optimize = msg.optimize = msg.optimize || false;
+			const enableGridcharge = (typeof msg.enableGridcharge !== "undefined") ? msg.enableGridcharge : false;
+			const optimize = (typeof msg.optimize !== "undefined") ? msg.optimize : false;
+
+			const estimator = (typeof msg.estimator !== "undefined") ? msg.estimator : null;
 
 			// Standardwerte aus der Konfiguration übernehmen
 			const enableGridchargeThreshold = msg.enableGridchargeThreshold = (typeof msg.enableGridchargeThreshold !== 'undefined') ? msg.enableGridchargeThreshold : (node.enableGridchargeThreshold || 50);
@@ -150,6 +152,42 @@ module.exports = function(RED) {
 				if (debug) { node.warn(`optimize is false`); }
 				// Batterie darf entladen, wenn Opti
 				msg.targetMode = "normal";
+			}
+
+			// interne Berechnung überschreiben, wenn es einen externen Schätzer gibt
+			if ((msg.targetMode != "charge") && (estimator != null)) {
+
+				// Aktuelle Zeit
+				const currentTime = new Date();
+
+				// Funktion, um den Modus effizient zu ermitteln
+				function getCurrentMode(currentTime, data) {
+					return data.reduce((currentMode, entry) => {
+						const startTime = new Date(entry.start);
+						const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 Stunde hinzufügen
+						if (currentTime >= startTime && currentTime < endTime) {
+							currentMode = entry.mode;
+						}
+						return currentMode;
+					}, "Modus nicht gefunden");
+				}
+
+				// Modus für die aktuelle Zeit ermitteln
+				const mode = getCurrentMode(currentTime, data);
+				if (debug) node.warn("Der Modus für die aktuelle Zeit ist:", mode);
+
+				msg.targetModeInternal = msg.targetMode;
+				switch (mode) {
+					case "grid":
+						msg.targetMode = "hold";
+						break;
+					case "charging":
+						msg.targetMode = "hold";
+						break;
+					case "battery":
+						msg.targetMode = "normal";
+						break;
+				}
 			}
 
 			if (msg.batterymode !== msg.targetMode) {
