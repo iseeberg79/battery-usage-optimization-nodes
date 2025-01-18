@@ -16,7 +16,8 @@ module.exports = function(RED) {
 			let startBatteryPower = (msg.payload.soc - batteryBuffer) / 100 * battery_capacity;  // batteryPower aus dem Nachrichtenfluss (Energiemenge des Batteriespeichers)
 			const priceData = msg.payload.priceData;
 
-			const now = (new Date()).getTime();
+			//const now = (new Date()).getTime();
+			const recent = new Date((new Date()).getTime() - 60 * 60 * 1000).getTime();
 
 			// Zeitverschiebung der Verbrauchsprognose um 24 Stunden und Erweiterung auf 48 Felder
 			function extendForecast(forecast) {
@@ -72,7 +73,7 @@ module.exports = function(RED) {
 
 			const energyNeeded = priceData.reduce((result, price, i) => {
 				const timestamp = new Date(price.start).getTime();
-				if (timestamp > now) {
+				if (timestamp > recent) {
 					let mode = "grid";
 					const consumption = consumptionForecast[i].value;
 					const production = productionForecast[i].value;

@@ -8,7 +8,7 @@ module.exports = function(RED) {
 		node.minsoc = config.minsoc;
 		node.maxsoc = config.maxsoc;
 		node.efficiency = config.efficiency;
-		const debug = false;
+		const debug = true;
 
 		// dieser Knoten verarbeitet die Preise in Cent!
 		node.on('input', function(msg) {
@@ -156,6 +156,7 @@ module.exports = function(RED) {
 
 			// interne Berechnung überschreiben, wenn es einen externen Schätzer gibt
 			if ((msg.targetMode != "charge") && (estimator != null)) {
+				node.warn("externe Prognose aktiv");
 
 				// Aktuelle Zeit
 				const currentTime = new Date();
@@ -169,12 +170,12 @@ module.exports = function(RED) {
 							currentMode = entry.mode;
 						}
 						return currentMode;
-					}, "Modus nicht gefunden");
+					}, "undefined");
 				}
 
 				// Modus für die aktuelle Zeit ermitteln
-				const mode = getCurrentMode(currentTime, data);
-				if (debug) node.warn("Der Modus für die aktuelle Zeit ist:", mode);
+				const mode = getCurrentMode(currentTime, estimator);
+				if (debug) node.warn("Der Modus für die aktuelle Zeit ist: " + mode);
 
 				msg.targetModeInternal = msg.targetMode;
 				switch (mode) {
