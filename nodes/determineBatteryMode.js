@@ -192,24 +192,29 @@ module.exports = function(RED) {
 					msg.targetMode = "normal";
 				}
 			} else {
-				// externe Ermittlung berücktsichtigen, überschreibt alle Berechnungen
-				msg.targetMode = evaluateEstimator(msg.estimator);
-				if (socControlMode == "highSOC") {
-					if (debug) { node.warn(`Batteriestand ist hoch, keine Netzladung.`); }
-					msg.targetMode = "hold";
-				}
-				if (msg.targetMode === "charge") {
-					let gridchargePrice = (price * loss);
-					if (debug) { node.warn(`gridchargePrice is ${gridchargePrice}`); }
-					// teuersten Preis speichern
-					if (gridchargePrice > lastGridchargePrice) {
-						if (debug) { node.warn(`gridchargePrice (${gridchargePrice}) > lastGridchargePrice (${lastGridchargePrice})`); }
-						lastGridchargePrice = gridchargePrice;
+				if (optimize) {
+					// externe Ermittlung berücktsichtigen, überschreibt alle Berechnungen
+					msg.targetMode = evaluateEstimator(msg.estimator);
+					if (socControlMode == "highSOC") {
+						if (debug) { node.warn(`Batteriestand ist hoch, keine Netzladung.`); }
+						msg.targetMode = "hold";
 					}
+					if (msg.targetMode === "charge") {
+						let gridchargePrice = (price * loss);
+						if (debug) { node.warn(`gridchargePrice is ${gridchargePrice}`); }
+						// teuersten Preis speichern
+						if (gridchargePrice > lastGridchargePrice) {
+							if (debug) { node.warn(`gridchargePrice (${gridchargePrice}) > lastGridchargePrice (${lastGridchargePrice})`); }
+							lastGridchargePrice = gridchargePrice;
+						}
+					} else {
+						checkGrichargeReset();
+					}
+					if (debug) { node.warn(`externe Berechnung vorgegeben, targetMode is ${msg.targetMode}`); }
 				} else {
-					checkGrichargeReset();
+					if (debug) { node.warn(`optimize is false`); }
+					msg.targetMode = "normal";
 				}
-				if (debug) { node.warn(`externe Berechnung vorgegeben, targetMode is ${msg.targetMode}`); }
 			}
 
 			if (msg.batterymode !== msg.targetMode) {
