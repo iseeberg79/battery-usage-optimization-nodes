@@ -60,7 +60,7 @@ module.exports = function(RED) {
 			}
 
 			function evaluateEstimator(estimator) {
-				if (debug) node.warn("externe Prognose aktiv");
+				if (debug) { node.warn("externe Prognose aktiv"); }
 
 				// Aktuelle Zeit
 				const currentTime = new Date();

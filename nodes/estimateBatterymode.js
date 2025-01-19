@@ -170,7 +170,7 @@ module.exports = function(RED) {
 
 			// Prognose verwerfen und Startwert annehmen
 			let currentbatteryPower = startBatteryPower;
-			let breakevenPoint = estimatedMaximumSoc.start
+			let breakevenPoint = estimatedMaximumSoc.start;
 			let estimatedbatteryPower = batteryCapacity / 100 * estimatedMaximumSoc.soc; // erwartete, maximale Batterieleistung
 			if (gridchargePerformance) {
 				if (debug) { node.warn("Optimierungszeitpunkt: " + breakevenPoint); }
