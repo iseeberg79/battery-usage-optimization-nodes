@@ -21,6 +21,14 @@
             feedin: {
                 value: 0.079,
                 validate: RED.validators.number()
+            },
+            efficiency: {
+                value: 80,
+                validate: RED.validators.number()
+            },
+            performance: {
+                value: 20,
+                validate: RED.validators.number()
             }
         },
         inputs: 1,
@@ -53,6 +61,14 @@
         <label for="node-input-feedin">Feed-in Tariff (€)</label>
         <input type="text" id="node-input-feedin" placeholder="0.079" class="input-typed"/>
     </div>
+    <div class="form-row">
+        <label for="node-input-efficiency">Efficiency (%)</label>
+        <input type="text" id="node-input-efficiency" placeholder="80" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-performance">Performance (%)</label>
+        <input type="text" id="node-input-performance" placeholder="20" class="input-typed"/>
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="@iseeberg79/EstimateBatterymode">
@@ -63,9 +79,13 @@
         <li><b>Battery Capacity (kWh):</b> - die Gesamtkapazität der Batterie</li>
         <li><b>Max Charge (kWh):</b> - die maximale Ladeleistung</li>
         <li><b>Feed-in Tariff (€):</b> - Einspeiseverfügung</li>
+        <li><b>Efficiency (%):</b> - Wirkungsgrad der Batterie</li>
+        <li><b>Performance (%):</b> - Preisvorteil</li>
+		<li><b>lastGridchargePrice (€):</b> - letzter Preis für Netzladung, optional</li>
     </ul>
     <p><b>Outputs:</b></p>
     <ul>
-        <li><b>msg.paylod.batteryStatus</b> - ein Array der erwarteten Energieverteilung</li>
+        <li><b>msg.paylod.batteryModes</b> - ein Array der erwarteten Energieverteilung (Attribute: start, mode)</li>
+        <li><b>msg.paylod.stats</b> - Statistiken</li>
     </ul>
 </script>

@@ -5,58 +5,14 @@ module.exports = function(RED) {
 		node.configuredMinSoC = config.configuredMinSoC;
 		node.maximumGridprice = config.maximumGridprice;
 		node.configuredBatteryLock = config.configuredBatteryLock;
-		const debug = false;
+		let debug = false;
 
 		node.on('input', function(msg) {
+			if (typeof msg.debug !== 'undefined') { debug = msg.debug; }
 
 			// Hilfsfunktionen
 			function isWinter(month) {
 				return (month >= 11 || month <= 2); // November bis Februar
-			}
-
-			function evaluateEstimator(estimator) {
-				//if (debug) node.warn("externe Prognose aktiv");
-				node.warn("externe Prognose aktiv");
-
-				// Aktuelle Zeit
-				const currentTime = new Date();
-
-				// Funktion, um den Modus effizient zu ermitteln
-				function getCurrentMode(currentTime, data) {
-					return data.reduce((currentMode, entry) => {
-						const startTime = new Date(entry.start);
-						const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 Stunde hinzufügen
-						if (currentTime >= startTime && currentTime < endTime) {
-							currentMode = entry.mode;
-						}
-						return currentMode;
-					}, 'undefined');
-				}
-
-				// Modus für die aktuelle Zeit ermitteln
-				let returnValue = 'undefined';
-				const mode = getCurrentMode(currentTime, estimator);
-				if (debug) { node.warn("Der Modus für die aktuelle Zeit ist: " + mode); }
-
-				//msg.targetModeInternal = msg.targetMode;
-				if (mode !== 'undefined') {
-					switch (mode) {
-						case "grid":
-							if (msg.actualsoc > msg.configuredMinSoC) {
-								returnValue = 'hold';
-							} else {
-								returnValue = 'normal';
-							}
-							break;
-						case "charging":
-							returnValue = 'hold';
-							break;
-						case "battery":
-							returnValue = 'normal';
-							break;
-					}
-				}
-				return returnValue;
 			}
 
 			// Wintermonate?
@@ -82,19 +38,11 @@ module.exports = function(RED) {
 				node.warn("Sperre: Batterieoptimierung deaktiviert!");
 			}
 
-
 			if (winterMode) {
 				if (debug) { node.warn(`Winter mode is active`); }
 				// Im Winter die Mindestladung erhöhen
 				msg.configuredMinSoC = (typeof msg.forcedMinSoC !== 'undefined') ? msg.forcedMinSoC : Math.min(msg.configuredMinSoC * 3, 15);
 				if (debug) { node.warn(`Configured MinSoC increased to ${msg.configuredMinSoC}`); }
-			}
-
-			// interne Berechnung überschreiben, wenn es einen externen Schätzer gibt
-			const estimator = (typeof msg.estimator !== "undefined") ? msg.estimator : null;
-			if ((msg.batterymode != "charge") && (estimator != null)) {
-				msg.batterymodeInternal = msg.batterymode;
-				msg.batterymode = evaluateEstimator(estimator);
 			}
 
 			if (!msg.batteryLock) {
