@@ -21,6 +21,8 @@ Das Node-RED-Paket bietet eine Reihe von Nodes zur Optimierung der Batterienutzu
 
 Die Nodes können eigenständig mit Daten versorgt werden. Bei Bedarf können eigene hinzugefügt werden, die Daten bereitstellen, die aus anderen Quellen bezogen werden. So kann z.B. mit evcc - aber auch ohne, ein eigener Flow mit ausgewählten Nodes aufgebaut werden. Die Nodes sind mit Standards vorbelegt, ergänzend überschreiben die Nachrichteneingänge  die Konfiguration, bzw. sichere Vorbelegungen. Ein modularer Aufbau der Funktionen soll eine gute Weiterverwendung ermöglichen, ohne dabei zu sehr auf spezifische Anforderungen einer Installation einzugehen. Die Funktionen und Implementierung hat Beobachtungen und eigene Erfahrungswerte als Grundlage.
 
+Inzwischen gibt es zusätzlich die Möglichkeit eine externe Vorgabe der Batteriesteuerung zu integrieren. Diese berücksichtigt dann den Status der Laderegelung der evcc-Instanz und die aktuellen Energiewerte.
+
 Eine Publizierung des Paketes ist aktuell noch nicht erfolgt, dafür sind Erfahrungswerte und weitere Optimierungen notwendig. 
 
 
