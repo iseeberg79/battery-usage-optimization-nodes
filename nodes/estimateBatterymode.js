@@ -173,11 +173,15 @@ module.exports = function(RED) {
 			let breakevenPoint = estimatedMaximumSoc.start;
 			let estimatedbatteryPower = batteryCapacity / 100 * estimatedMaximumSoc.soc; // erwartete, maximale Batterieleistung
 			if (gridchargePerformance) {
-				if (debug) { node.warn("Optimierungszeitpunkt: " + breakevenPoint); }
-				breakevenPoint = minimumPriceEntry.start;
-				estimatedbatteryPower = batteryCapacity * 0.75; // Netzladung wird für eine volle Batterie sorgen
+				if (minimumPriceEntry.start < estimatedMaximumSoc.start) {
+					breakevenPoint = minimumPriceEntry.start;
+					estimatedbatteryPower = batteryCapacity * 0.75; // Netzladung wird für eine volle Batterie sorgen
+				}
 			}
-			if (debug) { node.warn("erwartete verfügbare batteryPower: " + currentbatteryPower); }
+			if (debug) { node.warn("Optimierungszeitpunkt: " + breakevenPoint); }
+
+			if (debug) { node.warn("aktuell verfügbare batteryPower: " + currentbatteryPower); }
+			if (debug) { node.warn("erwartete verfügbare batteryPower: " + estimatedbatteryPower); }
 
 			energyAvailable.sort((a, b) => b.importPrice - a.importPrice);
 
@@ -213,12 +217,22 @@ module.exports = function(RED) {
 
 			if (debug) { node.warn("working-min: " + JSON.stringify(batteryModes[0])); }
 			if (debug) { node.warn("working-min-2nd: " + JSON.stringify(batteryModes[1])); }
+			if (debug) { node.warn("working-min-3rd: " + JSON.stringify(batteryModes[2])); }
+
+			let hours = 0;
 			if (gridchargePerformance) {
 				if (debug) { node.warn("Calculated efficient grid charge option, 1st hour"); }
 				batteryModes[0].mode = "charge";
+				hours += 1;
 				if (calcPerformance(batteryModes[1], factor) * rate < avg) {
 					if (debug) { node.warn("Calculated efficient grid charge option, 2nd hour"); }
 					batteryModes[1].mode = "charge";
+					hours += 1;
+					if (calcPerformance(batteryModes[2], factor) * rate < avg) {
+						if (debug) { node.warn("Calculated efficient grid charge option, 3rd hour"); }
+						batteryModes[2].mode = "charge";
+						hours += 1;
+					}
 				}
 			}
 
@@ -230,7 +244,7 @@ module.exports = function(RED) {
 			const totalCostOptimized = batteryModes.reduce((sum, entry) => sum + entry.cost, 0);
 
 			msg.payload.batteryModes = batteryModes;
-			msg.payload.stats = { totalCost: totalCost, totalCostOptimized: totalCostOptimized, minimumEntry: minimumPriceEntry, maximumEntry: maximumPriceEntry, diff: diff, avg: avg };
+			msg.payload.stats = { totalCost: totalCost, totalCostOptimized: totalCostOptimized, minimumEntry: minimumPriceEntry, maximumEntry: maximumPriceEntry, diff: diff, avg: avg, chargeHours: hours };
 
 			node.send(msg);
 		});
