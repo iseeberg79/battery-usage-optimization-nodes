@@ -117,8 +117,8 @@ module.exports = function(RED) {
 				return diff;
 			}
 
-			function calcPerformance(min, factor) {
-				return ((min.importPrice * factor) - min.importPrice);
+			function calcPerformance(min) {
+				return ((min.importPrice * factor) * rate);
 			}
 
 			const consumptionForecast = extendForecast(msg.payload.consumptionForecast);
@@ -166,7 +166,7 @@ module.exports = function(RED) {
 			if (debug) { node.warn("min-abs:" + JSON.stringify(getMinimumPriceAbs(energyNeeded))); }
 			if (debug) { node.warn("max:" + JSON.stringify(maximumPriceEntry)); }
 
-			const gridchargePerformance = (calcPerformance(minimumPriceEntry, factor) * rate < avg);
+			const gridchargePerformance = (calcPerformance(minimumPriceEntry) < avg);
 
 			// Prognose verwerfen und Startwert annehmen
 			let currentbatteryPower = startBatteryPower;
@@ -224,11 +224,11 @@ module.exports = function(RED) {
 				if (debug) { node.warn("Calculated efficient grid charge option, 1st hour"); }
 				batteryModes[0].mode = "charge";
 				hours += 1;
-				if (calcPerformance(batteryModes[1], factor) * rate < avg) {
+				if (calcPerformance(batteryModes[1]) < avg) {
 					if (debug) { node.warn("Calculated efficient grid charge option, 2nd hour"); }
 					batteryModes[1].mode = "charge";
 					hours += 1;
-					if (calcPerformance(batteryModes[2], factor) * rate < avg) {
+					if (calcPerformance(batteryModes[2]) < avg) {
 						if (debug) { node.warn("Calculated efficient grid charge option, 3rd hour"); }
 						batteryModes[2].mode = "charge";
 						hours += 1;
