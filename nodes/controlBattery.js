@@ -131,6 +131,15 @@ module.exports = function(RED) {
 				}
 			}
 
+			// wenn der Ladungsstand niedrig ist, den Status auf "normal" setzen
+			if ((mgs.targetMode == "hold") && (msg.actualsoc < msg.configuredMinSoC)) {
+				if (debug) { node.warn(`Actual SoC is lower than configured MinSoC, overwrite`); }
+				msg.targetMode = 'normal';
+				outputs[0] = null;
+				outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
+				node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
+			}
+
 			// Zeitstempel der Änderung vermerken
 			if ((msg.evccBatteryMode != "unknown") && (msg.evccBatteryMode != msg.targetMode)) {
 				if (outputs[0] !== null) { outputs[0].ts = msg.changedAt = (new Date()).getTime(); }
