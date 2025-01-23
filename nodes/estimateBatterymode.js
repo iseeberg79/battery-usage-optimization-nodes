@@ -30,6 +30,35 @@ module.exports = function(RED) {
 			//const now = (new Date()).getTime();
 			const recent = new Date((new Date()).getTime() - 60 * 60 * 1000).getTime();
 
+			function calculateLoadableHours(data, threshold) {
+			    const currentTime = new Date().toISOString();
+			    let maxPrice = -Infinity;
+			    let maxPriceIndex = -1;
+
+			    // Schritt 1: Den Index des höchsten Importpreises finden, ohne das Array zu verändern
+			    for (let i = 0; i < data.length; i++) {
+			        if (data[i].importPrice > maxPrice) {
+			            maxPrice = data[i].importPrice;
+			            maxPriceIndex = i;
+			        }
+			    }
+
+			    // Schritt 2: Daten nach dem aktuellen Zeitpunkt und vor dem höchsten Importpreis filtern
+			    let loadableHours = 0;
+			    for (let i = 0; i < maxPriceIndex; i++) {
+			        if (data[i].start > currentTime && data[i].importPrice < threshold) {
+			            loadableHours++;
+			        }
+			    }
+
+			    // Mögliche Netzladungsmenge berechnen (pro Stunde maximal maxCharge kWh)
+			    const loadableEnergy = (Math.min(loadableHours * maxCharge, battery_capacity) * 0.9); // Annahme etwas reduzieren!
+				if (debug) { node.warn("Loadable Energy: " + loadableEnergy + ", Hours: " + loadableHours + ", Threshold: " + threshold); }
+				
+			    return { loadableHours, loadableEnergy };
+			}
+
+			
 			// Zeitverschiebung der Verbrauchsprognose um 24 Stunden und Erweiterung auf 48 Felder
 			function extendForecast(forecast) {
 				const extendedForecast = [...forecast];
@@ -193,7 +222,8 @@ module.exports = function(RED) {
 			if (gridchargePerformance) {
 				if (minimumPriceEntry.start < estimatedMaximumSoc.start) {
 					breakevenPoint = minimumPriceEntry.start;
-					estimatedbatteryPower = batteryCapacity * 0.75; // Netzladung wird für eine volle Batterie sorgen
+					const energy = calculateLoadableHours(energyNeeded, (avg / rate / factor)).loadableEnergy; 
+					estimatedbatteryPower = batteryCapacity * Math.min(1,(energy/battery_capacity)); // Netzladung wird für eine volle Batterie sorgen
 				}
 			}
 			if (debug) { node.warn("Optimierungszeitpunkt: " + breakevenPoint); }
@@ -227,7 +257,8 @@ module.exports = function(RED) {
 					}
 				}
 				// interne Steuerung der Batterie, wenn niedriger Ladungszustand
-				if ((hour.value > 0) && (hour.start < breakevenPoint) && (currentbatteryPower <= 0)) {
+				if ((hour.mode != "normal") && (hour.value > 0) && (hour.start < breakevenPoint) && (currentbatteryPower <= 0)) {
+					if (debug) { node.warn(hour.start + ": Batterieladungszustand zu gering, interne Steuerung zulassen."); }
 					hour.mode = "normal";
 				}
 				delete hour.soc;
