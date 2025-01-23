@@ -21,7 +21,7 @@ module.exports = function(RED) {
 			const rate = (1 + (performance / 100));
 
 			const batteryEnergyPrice = feedin * factor; // Einspeisetarif inkl. Wandlungsverluste
-			const lastGridchargePrice = (typeof msg.lastGridchargePrice !== 'undefined') ? msg.lastGridchargePrice : batteryEnergyPrice; // Netzladungspreis pro kWh
+			let lastGridchargePrice = (typeof msg.lastGridchargePrice !== 'undefined') ? msg.lastGridchargePrice : batteryEnergyPrice; // Netzladungspreis pro kWh
 			const battery_capacity = batteryCapacity - (batteryCapacity / 100 * batteryBuffer); // available energy kWh
 
 			let startBatteryPower = (msg.payload.soc - batteryBuffer) / 100 * battery_capacity;  // batteryPower aus dem Nachrichtenfluss (Energiemenge des Batteriespeichers)
@@ -80,7 +80,15 @@ module.exports = function(RED) {
 				});
 			}
 
-			function getMaximumPrice(data) {
+
+			function getCurrentHourIndex(data) {
+				const currentTime = new Date().toISOString();
+				return data.findIndex(entry => {
+					return entry.start.substring(0, 13) === currentTime.substring(0, 13);
+				});
+			}
+
+			function getMaximumAbs(data) {
 				return data.reduce((maxEntry, currentEntry) => {
 					return (currentEntry.importPrice > maxEntry.importPrice) ? currentEntry : maxEntry;
 				});
@@ -93,20 +101,26 @@ module.exports = function(RED) {
 			}
 
 			function getMinimumPrice(data) {
-				// Maximalen importPrice und den zugehörigen Index finden
 				const maxImportIndex = data.reduce((maxIdx, current, idx, array) => {
 					return current.importPrice > array[maxIdx].importPrice ? idx : maxIdx;
 				}, 0);
 
-				// Daten bis zu diesem Index filtern
 				const dataBeforeMaxImport = data.slice(0, maxImportIndex);
 
-				// Günstigsten importPrice in den gefilterten Daten finden
 				const cheapestEntry = dataBeforeMaxImport.reduce((prev, curr) => {
 					return (prev.importPrice < curr.importPrice) ? prev : curr;
 				}, dataBeforeMaxImport[0]);
 
 				return cheapestEntry;
+			}
+
+			function getMaximumPrice(data) {
+				const startIndex = getCurrentHourIndex(data);
+				const dataFromStart = data.slice(startIndex);
+
+				return dataFromStart.reduce((maxEntry, currentEntry) => {
+					return (currentEntry.importPrice > maxEntry.importPrice) ? currentEntry : maxEntry;
+				});
 			}
 
 			function getMaximumPriceGap(data) {
@@ -162,11 +176,15 @@ module.exports = function(RED) {
 			const maximumPriceEntry = getMaximumPrice(energyNeeded);
 			const energyAvailable = JSON.parse(JSON.stringify(energyNeeded));
 
+			// hier wird die Batterienutzungsoptimierung/-glättung durchgeführt
+			lastGridchargePrice = Math.max(lastGridchargePrice, avg);
+
 			if (debug) { node.warn("min:" + JSON.stringify(minimumPriceEntry)); }
 			if (debug) { node.warn("min-abs:" + JSON.stringify(getMinimumPriceAbs(energyNeeded))); }
 			if (debug) { node.warn("max:" + JSON.stringify(maximumPriceEntry)); }
 
 			const gridchargePerformance = (calcPerformance(minimumPriceEntry) < avg);
+			if (debug) { node.warn("Preisgrenze: " + lastGridchargePrice); }
 
 			// Prognose verwerfen und Startwert annehmen
 			let currentbatteryPower = startBatteryPower;
@@ -188,8 +206,8 @@ module.exports = function(RED) {
 			const batteryModes = energyAvailable.map(hour => {
 				// Verwendung des aktuellen Batteriespeichers bis zum Entscheidungszeitpunkt
 				if ((hour.value > 0) && (hour.start < breakevenPoint)) {
-					//if (debug) { node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc); }
-					if ((currentbatteryPower > 0) && (lastGridchargePrice < hour.importPrice)) {
+					if (debug) { node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc); }
+					if ((currentbatteryPower >= 0) && (lastGridchargePrice < hour.importPrice)) {
 						const dischargeAmount = Math.min(hour.value, currentbatteryPower);
 						currentbatteryPower -= dischargeAmount;
 						hour.value -= dischargeAmount;
@@ -199,7 +217,7 @@ module.exports = function(RED) {
 				}
 				// prognostizierte Verwendung, nachdem PV geladen wurde
 				if ((hour.value > 0) && (hour.start >= breakevenPoint)) {
-					//if (debug) { node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc); }
+					if (debug) { node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc); }
 					if ((estimatedbatteryPower > 0) && (lastGridchargePrice < hour.importPrice)) {
 						const dischargeAmount = Math.min(hour.value, estimatedbatteryPower);
 						estimatedbatteryPower -= dischargeAmount;
@@ -207,6 +225,10 @@ module.exports = function(RED) {
 						hour.cost = dischargeAmount * batteryEnergyPrice;
 						hour.mode = "normal";
 					}
+				}
+				// interne Steuerung der Batterie, wenn niedriger Ladungszustand
+				if ((hour.value > 0) && (hour.start < breakevenPoint) && (currentbatteryPower <= 0)) {
+					hour.mode = "normal";
 				}
 				delete hour.soc;
 				return hour;

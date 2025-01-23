@@ -132,8 +132,8 @@ module.exports = function(RED) {
 			}
 
 //			// wenn der Ladungsstand niedrig ist, den Status auf "normal" setzen
-//			if ((mgs.targetMode == "hold") && (msg.actualsoc < msg.minsoc)) {
-//			if ((mgs.targetMode == "hold") && (msg.actualsoc < msg.configuredMinSoC)) {
+//			//if ((msg.targetMode == "hold") && (msg.actualsoc < msg.minsoc)) {
+//			if ((msg.targetMode == "hold") && (msg.actualsoc < msg.configuredMinSoC)) {
 //				if (debug) { node.warn(`Actual SoC is lower than configured MinSoC, overwrite`); }
 //				msg.targetMode = 'normal';
 //				outputs[0] = null;
