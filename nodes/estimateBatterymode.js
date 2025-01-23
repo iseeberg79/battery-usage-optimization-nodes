@@ -201,6 +201,8 @@ module.exports = function(RED) {
 				}
 				return result;
 			}, []);
+			
+			const totalCost = energyNeeded.reduce((sum, entry) => sum + entry.cost, 0);
 
 			const estimatedMaximumSoc = getMaximumSoC(energyNeeded);
 			const diff = getMaximumPriceGap(energyNeeded);
@@ -308,7 +310,7 @@ module.exports = function(RED) {
 			const totalCostOptimized = batteryModes.reduce((sum, entry) => sum + entry.cost, 0);
 
 			msg.payload.batteryModes = batteryModes;
-			msg.payload.stats = { totalCostOptimized: totalCostOptimized, minimumEntry: minimumPriceEntry, maximumEntry: maximumPriceEntry, diff: diff, avg: avg, chargeHours: hours };
+			msg.payload.stats = { totalCosts: totalCost, totalCostOptimized: totalCostOptimized, minimumEntry: minimumPriceEntry, maximumEntry: maximumPriceEntry, diff: diff, avg: avg, chargeHours: hours };
 
 			node.send(msg);
 		});
