@@ -1,6 +1,6 @@
 {
 	"name": "@iseeberg79/battery-usage-optimization-nodes",
-	"version": "0.1.1-rc31.18",
+	"version": "0.1.1-rc31.23",
 	"devDependencies": {
 		"eslint": "^7.32.0",
 		"grunt": "~0.4.5",

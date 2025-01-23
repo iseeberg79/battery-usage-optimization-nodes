@@ -13,10 +13,12 @@ module.exports = function(RED) {
 		const feedin = config.feedin || 0.079; // Einspeisetarif pro kWh
 		const efficiency = config.efficiency || 80; // Wirkungsgrad %
 		const performance = config.performance || 20; // Vorteil %
+		let charge = true; // Netzladung aktivieren
 
 		node.on('input', function(msg) {
 			if (typeof msg.debug !== 'undefined') { debug = msg.debug; }
-
+			if (typeof msg.charge !== 'undefined') { charge = msg.charge; }
+			
 			const factor = (1 + ((100 - efficiency) / 100));
 			const rate = (1 + (performance / 100));
 
@@ -34,6 +36,7 @@ module.exports = function(RED) {
 			    const currentTime = new Date().toISOString();
 			    let maxPrice = -Infinity;
 			    let maxPriceIndex = -1;
+				let avgPrice = 0;
 
 			    // Schritt 1: Den Index des höchsten Importpreises finden, ohne das Array zu verändern
 			    for (let i = 0; i < data.length; i++) {
@@ -48,6 +51,7 @@ module.exports = function(RED) {
 			    for (let i = 0; i < maxPriceIndex; i++) {
 			        if (data[i].start > currentTime && data[i].importPrice < threshold) {
 			            loadableHours++;
+						avgPrice += data[i].importPrice;
 			        }
 			    }
 
@@ -55,7 +59,7 @@ module.exports = function(RED) {
 			    const loadableEnergy = (Math.min(loadableHours * maxCharge, battery_capacity) * 0.9); // Annahme etwas reduzieren!
 				if (debug) { node.warn("Loadable Energy: " + loadableEnergy + ", Hours: " + loadableHours + ", Threshold: " + threshold); }
 				
-			    return { loadableHours, loadableEnergy };
+			    return { loadableHours, loadableEnergy, avgPrice: (avgPrice / loadableHours * factor) };
 			}
 
 			
@@ -218,12 +222,14 @@ module.exports = function(RED) {
 			// Prognose verwerfen und Startwert annehmen
 			let currentbatteryPower = startBatteryPower;
 			let breakevenPoint = estimatedMaximumSoc.start;
+			let chargedEnergyPrice = batteryEnergyPrice;
 			let estimatedbatteryPower = batteryCapacity / 100 * estimatedMaximumSoc.soc; // erwartete, maximale Batterieleistung
-			if (gridchargePerformance) {
+			if (gridchargePerformance && charge) { 
 				if (minimumPriceEntry.start < estimatedMaximumSoc.start) {
 					breakevenPoint = minimumPriceEntry.start;
-					const energy = calculateLoadableHours(energyNeeded, (avg / rate / factor)).loadableEnergy; 
-					estimatedbatteryPower = batteryCapacity * Math.min(1,(energy/battery_capacity)); // Netzladung wird für eine volle Batterie sorgen
+					const energy = calculateLoadableHours(energyNeeded, (avg / rate / factor)); 
+					estimatedbatteryPower = batteryCapacity * Math.min(1,(energy.loadableEnergy/battery_capacity)); // Netzladung wird für eine volle Batterie sorgen
+					chargedEnergyPrice = energy.avgPrice;
 				}
 			}
 			if (debug) { node.warn("Optimierungszeitpunkt: " + breakevenPoint); }
@@ -245,20 +251,21 @@ module.exports = function(RED) {
 						hour.mode = "normal";
 					}
 				}
-				// prognostizierte Verwendung, nachdem PV geladen wurde
+				// prognostizierte Verwendung, nachdem PV/Netz geladen wurde
 				if ((hour.value > 0) && (hour.start >= breakevenPoint)) {
 					if (debug) { node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc); }
 					if ((estimatedbatteryPower > 0) && (lastGridchargePrice < hour.importPrice)) {
 						const dischargeAmount = Math.min(hour.value, estimatedbatteryPower);
 						estimatedbatteryPower -= dischargeAmount;
 						hour.value -= dischargeAmount;
-						hour.cost = dischargeAmount * batteryEnergyPrice;
+						hour.cost = dischargeAmount * chargedEnergyPrice;
 						hour.mode = "normal";
 					}
 				}
 				// interne Steuerung der Batterie, wenn niedriger Ladungszustand
-				if ((hour.mode != "normal") && (hour.value > 0) && (hour.start < breakevenPoint) && (currentbatteryPower <= 0)) {
+				if ((hour.mode == "hold") && (hour.value > 0) && (hour.start < breakevenPoint) && (currentbatteryPower <= 0)) {
 					if (debug) { node.warn(hour.start + ": Batterieladungszustand zu gering, interne Steuerung zulassen."); }
+					hour.cost = hour.value * hour.importPrice;
 					hour.mode = "normal";
 				}
 				delete hour.soc;
@@ -273,17 +280,21 @@ module.exports = function(RED) {
 			if (debug) { node.warn("working-min-3rd: " + JSON.stringify(batteryModes[2])); }
 
 			let hours = 0;
-			if (gridchargePerformance) {
+			// maximale drei Stunden Netzladung - es wird nicht immer mit maximaler Ladeleistung geladen
+			if (gridchargePerformance && charge) {
 				if (debug) { node.warn("Calculated efficient grid charge option, 1st hour"); }
 				batteryModes[0].mode = "charge";
+				batteryModes[0].cost = batteryModes[0].cost + (batteryModes[0].importPrice * maxCharge); // worst-case
 				hours += 1;
 				if (calcPerformance(batteryModes[1]) < avg) {
 					if (debug) { node.warn("Calculated efficient grid charge option, 2nd hour"); }
 					batteryModes[1].mode = "charge";
+					batteryModes[1].cost = batteryModes[1].cost + (batteryModes[1].importPrice * maxCharge); // worst-case
 					hours += 1;
 					if (calcPerformance(batteryModes[2]) < avg) {
 						if (debug) { node.warn("Calculated efficient grid charge option, 3rd hour"); }
 						batteryModes[2].mode = "charge";
+						batteryModes[2].cost = batteryModes[2].cost + (batteryModes[2].importPrice * maxCharge); // worst-case
 						hours += 1;
 					}
 				}
