@@ -241,24 +241,24 @@ module.exports = function(RED) {
 
 			const batteryModes = energyAvailable.map(hour => {
 				// Verwendung des aktuellen Batteriespeichers bis zum Entscheidungszeitpunkt
-				if ((hour.value > 0) && (hour.start < breakevenPoint)) {
-					if (debug) { node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc); }
+				if ((hour.value > 0) && (hour.start < breakevenPoint)) {					
 					if ((currentbatteryPower >= 0) && (lastGridchargePrice < hour.importPrice)) {
+						if (debug) { node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc); }
 						const dischargeAmount = Math.min(hour.value, currentbatteryPower);
 						currentbatteryPower -= dischargeAmount;
 						hour.value -= dischargeAmount;
-						hour.cost = dischargeAmount * batteryEnergyPrice;
+						hour.cost = (dischargeAmount * batteryEnergyPrice) + (hour.value * hour.importPrice);
 						hour.mode = "normal";
 					}
 				}
 				// prognostizierte Verwendung, nachdem PV/Netz geladen wurde
 				if ((hour.value > 0) && (hour.start >= breakevenPoint)) {
-					if (debug) { node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc); }
 					if ((estimatedbatteryPower > 0) && (lastGridchargePrice < hour.importPrice)) {
+						if (debug) { node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc); }
 						const dischargeAmount = Math.min(hour.value, estimatedbatteryPower);
 						estimatedbatteryPower -= dischargeAmount;
 						hour.value -= dischargeAmount;
-						hour.cost = dischargeAmount * chargedEnergyPrice;
+						hour.cost = (dischargeAmount * chargedEnergyPrice) + (hour.value * hour.importPrice);
 						hour.mode = "normal";
 					}
 				}
@@ -304,11 +304,11 @@ module.exports = function(RED) {
 			batteryModes.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
 			// Preisermittlung
-			const totalCost = energyNeeded.reduce((sum, entry) => sum + entry.cost, 0);
+			//const totalCost = energyNeeded.reduce((sum, entry) => sum + entry.cost, 0);
 			const totalCostOptimized = batteryModes.reduce((sum, entry) => sum + entry.cost, 0);
 
 			msg.payload.batteryModes = batteryModes;
-			msg.payload.stats = { totalCost: totalCost, totalCostOptimized: totalCostOptimized, minimumEntry: minimumPriceEntry, maximumEntry: maximumPriceEntry, diff: diff, avg: avg, chargeHours: hours };
+			msg.payload.stats = { totalCostOptimized: totalCostOptimized, minimumEntry: minimumPriceEntry, maximumEntry: maximumPriceEntry, diff: diff, avg: avg, chargeHours: hours };
 
 			node.send(msg);
 		});
