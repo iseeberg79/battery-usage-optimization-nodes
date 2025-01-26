@@ -1,0 +1,40 @@
+<script type="text/javascript">
+    RED.nodes.registerType('tibber-api-prices', {
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: { value: "" },
+            accessToken: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file.png",
+        label: function () {
+            return this.name || "Tibber API Prices";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="tibber-api-prices">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Node Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-accessToken"><i class="fa fa-lock"></i> Access Token</label>
+        <input type="text" id="node-input-accessToken" placeholder="Tibber Access Token">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="tibber-api-prices">
+    <p>Dieser Node fragt die Tibber-API ab, um die aktuellen und zukünftigen Strompreise abzurufen.</p>
+    <p><b>Inputs:</b></p>
+    <ul>
+        <li><b>accessToken</b> - Das Zugriffstoken für die Tibber-API.</li>
+    </ul>
+    <p><b>Outputs:</b></p>
+    <ul>
+        <li><b>payload</b> - Ein Array mit Preisen für die Zeitintervalle (inkl. Start- und Endzeit).</li>
+    </ul>
+    <p>Stelle sicher, dass du einen gültigen Zugriffstoken und eine Home-ID besitzt, um auf die Tibber-API zuzugreifen.</p>
+</script>

@@ -68,7 +68,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -120,7 +120,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -226,6 +226,13 @@
                 "pt": "flow",
                 "to": "payload",
                 "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "energy.priceData",
+                "pt": "global",
+                "to": "gridPrices.prices",
+                "tot": "flow"
             }
         ],
         "action": "",
@@ -246,7 +253,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -297,7 +304,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -321,6 +328,13 @@
                 "pt": "flow",
                 "to": "payload",
                 "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "energy.priceData",
+                "pt": "global",
+                "to": "gridPrices.prices",
+                "tot": "flow"
             }
         ],
         "action": "",
@@ -377,6 +391,13 @@
                 "pt": "flow",
                 "to": "payload",
                 "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "energy.household",
+                "pt": "global",
+                "to": "household.profile",
+                "tot": "flow"
             }
         ],
         "action": "",
@@ -397,7 +418,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -519,9 +540,19 @@
                 "vt": "flow"
             },
             {
+                "p": "optimize",
+                "v": "true",
+                "vt": "bool"
+            },
+            {
                 "p": "enableGridcharge",
                 "v": "control.gridcharge",
                 "vt": "flow"
+            },
+            {
+                "p": "enableGridcharge",
+                "v": "true",
+                "vt": "bool"
             },
             {
                 "p": "batterymode",
@@ -557,12 +588,22 @@
                 "p": "average",
                 "v": "gridPrices.average",
                 "vt": "flow"
+            },
+            {
+                "p": "avgGridPriceWeekly",
+                "v": "avgGridPriceWeekly",
+                "vt": "flow"
+            },
+            {
+                "p": "estimator",
+                "v": "estimator",
+                "vt": "flow"
             }
         ],
         "repeat": "60",
         "crontab": "",
         "once": true,
-        "onceDelay": "30",
+        "onceDelay": "40",
         "topic": "",
         "x": 130,
         "y": 820,
@@ -580,8 +621,8 @@
         "props": [
             {
                 "p": "optimize",
-                "v": "control.optimize",
-                "vt": "flow"
+                "v": "true",
+                "vt": "bool"
             },
             {
                 "p": "batterymode",
@@ -602,6 +643,11 @@
                 "p": "minsoc",
                 "v": "minsoc",
                 "vt": "flow"
+            },
+            {
+                "p": "price",
+                "v": "0.2895",
+                "vt": "num"
             },
             {
                 "p": "price",
@@ -631,7 +677,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -648,7 +694,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -665,7 +711,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -682,7 +728,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -699,7 +745,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -716,7 +762,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -750,7 +796,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -906,6 +952,13 @@
                 "pt": "flow",
                 "to": "payload",
                 "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "energy.soc",
+                "pt": "global",
+                "to": "evcc.batterySoc",
+                "tot": "flow"
             }
         ],
         "action": "",
@@ -1079,10 +1132,10 @@
         "z": "cd9dc0e3193f2e03",
         "name": "",
         "minPvRequired": "10000",
-        "minPriceDeviation": 6,
-        "minPriceDifference": 15,
-        "priceLimit": "0.25",
-        "avg": "0.25",
+        "minPriceDeviation": "",
+        "minPriceDifference": "",
+        "priceLimit": "",
+        "avg": "",
         "x": 510,
         "y": 680,
         "wires": [
@@ -1096,12 +1149,12 @@
         "type": "@iseeberg79/DetermineBatteryMode",
         "z": "cd9dc0e3193f2e03",
         "name": "",
-        "enableGridchargeThreshold": 50,
-        "disableGridchargeThreshold": 80,
-        "batteryCapacity": 10000,
-        "minsoc": 10,
-        "maxsoc": 90,
-        "efficiency": 80,
+        "enableGridchargeThreshold": "",
+        "disableGridchargeThreshold": "",
+        "batteryCapacity": "",
+        "minsoc": "",
+        "maxsoc": "",
+        "efficiency": "",
         "x": 390,
         "y": 820,
         "wires": [
@@ -1121,8 +1174,8 @@
         "type": "@iseeberg79/ControlBattery",
         "z": "cd9dc0e3193f2e03",
         "name": "",
-        "configuredMinSoC": 5,
-        "maximumGridprice": 0.35,
+        "configuredMinSoC": "",
+        "maximumGridprice": "",
         "configuredBatteryLock": false,
         "x": 360,
         "y": 960,
@@ -1307,6 +1360,13 @@
                 "pt": "flow",
                 "to": "payload",
                 "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "energy.pvforecast",
+                "pt": "global",
+                "to": "pvForecast2.forecasts",
+                "tot": "flow"
             }
         ],
         "action": "",
@@ -1327,7 +1387,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -1412,7 +1472,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -1635,7 +1695,7 @@
         "type": "debug",
         "z": "cd9dc0e3193f2e03",
         "name": "Ergebnis",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": true,
@@ -1700,5 +1760,244 @@
                 "a5429b6a24458fef"
             ]
         ]
+    },
+    {
+        "id": "9f09354c95ed3ea4",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "force charge",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 1480,
+        "wires": [
+            [
+                "086a7a5d5266c7d9"
+            ]
+        ]
+    },
+    {
+        "id": "086a7a5d5266c7d9",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "control",
+                "pt": "flow",
+                "to": "{\"optimize\":true,\"gridcharge\":true,\"mode\":\"GRID\"}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 330,
+        "y": 1480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d6508994230062e5",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Bereitstellung",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "input.household",
+                "v": "energy.household",
+                "vt": "global"
+            },
+            {
+                "p": "input.priceData",
+                "v": "energy.priceData",
+                "vt": "global"
+            },
+            {
+                "p": "input.pvforecast",
+                "v": "energy.pvforecast",
+                "vt": "global"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "35",
+        "topic": "",
+        "x": 160,
+        "y": 1380,
+        "wires": [
+            [
+                "9d24aaad53466e37"
+            ]
+        ]
+    },
+    {
+        "id": "9d24aaad53466e37",
+        "type": "function",
+        "z": "cd9dc0e3193f2e03",
+        "name": "transformieren",
+        "func": "const startTimestamp = (new Date()).setHours(0,0,0,0);\nconst interval = 60 * 60 * 1000;\n\n// Transformation priceData\nconst transformPriceData = (data) => {\n    return data.map(item => ({\n        value: item.price,\n        start: item.start,\n        exportPrice: 0.079, // Bei Bedarf anpassen\n        importPrice: item.price\n    }));\n};\n\n// Transformation productionForecast\nconst transformProductionForecast = (data) => {\n    return data.map(item => ({\n        start: item.period_end,\n        value: item.pv_estimate\n    }));\n};\n\n// Transformation consumptionForecast\nconst transformConsumptionForecast = (data, startTimestamp, interval) => {\n    return data.map((value, index) => ({\n        start: (new Date(startTimestamp + index * interval)).toISOString(),\n        value: value\n    }));\n};\n\nconst priceData = msg.input.priceData;\nconst productionForecast = msg.input.pvforecast;\nconst consumptionForecast = msg.input.household;\n\nconst transformedData = {\n    priceData: transformPriceData(priceData),\n    productionForecast: transformProductionForecast(productionForecast),\n    consumptionForecast: transformConsumptionForecast(consumptionForecast, startTimestamp, interval),\n    soc: msg.input.soc\n};\n\ndelete msg.input;\n\nmsg.payload = transformedData;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 1380,
+        "wires": [
+            [
+                "1665cd6c922d3ee6"
+            ]
+        ]
+    },
+    {
+        "id": "1665cd6c922d3ee6",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "energy",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 1380,
+        "wires": [
+            [
+                "e6d82ba020b5c8ea"
+            ]
+        ]
+    },
+    {
+        "id": "7ed67deeba4a952d",
+        "type": "inject",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "energy",
+        "payloadType": "flow",
+        "x": 510,
+        "y": 1420,
+        "wires": [
+            [
+                "e6d82ba020b5c8ea"
+            ]
+        ]
+    },
+    {
+        "id": "e6d82ba020b5c8ea",
+        "type": "@iseeberg79/EstimateBatterymode",
+        "z": "cd9dc0e3193f2e03",
+        "name": "",
+        "batteryBuffer": "",
+        "batteryCapacity": "",
+        "maxCharge": "",
+        "feedin": "",
+        "efficiency": "",
+        "performance": "",
+        "x": 720,
+        "y": 1380,
+        "wires": [
+            [
+                "41afce905c17a456"
+            ]
+        ]
+    },
+    {
+        "id": "41afce905c17a456",
+        "type": "change",
+        "z": "cd9dc0e3193f2e03",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "calculatedEnergyFlow",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "estimator",
+                "pt": "flow",
+                "to": "payload.batteryModes",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 1380,
+        "wires": [
+            [
+                "1eb77f7021550823"
+            ]
+        ]
+    },
+    {
+        "id": "1eb77f7021550823",
+        "type": "debug",
+        "z": "cd9dc0e3193f2e03",
+        "name": "Ergebnis",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "msg",
+        "x": 1040,
+        "y": 1380,
+        "wires": []
     }
 ]

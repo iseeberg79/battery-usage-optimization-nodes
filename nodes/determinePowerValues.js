@@ -17,44 +17,17 @@ module.exports = function(RED) {
 			}
 
 			// Überprüfe, ob die Nachricht die alte oder neue API-Struktur (01/2025) von evcc hat
-			let gridPower;
-			if (typeof msg.response.result.gridPower !== undefined) {
-				gridPower = msg.response.result.gridPower;
-			} else {
-				gridPower = msg.response.result.grid.power;
-			}
-			
-			let batteryPower;
-			if (typeof msg.response.result.batteryPower !== undefined) {
-				batteryPower = msg.response.result.batteryPower;
-			} else {
-				batteryPower = msg.response.result.battery.power;
-			}			
+			let gridPower = msg.response.result.gridPower || msg.response.result.grid.power || 0;
+					
+			let homePower = msg.response.result.homePower || 0;
+			let pvPower = msg.response.result.pv.power || 0;
 
-			let homePower;
-			if (typeof msg.response.result.homePower !== undefined) {
-				homePower = msg.response.result.homePower;
-			} else {
-				homePower = msg.response.result.home.power;
-			}	
-
-			let pvPower;
-			if (typeof msg.response.result.pvPower !== undefined) {
-				pvPower = msg.response.result.pvPower;
-			} else {
-				pvPower = msg.response.result.pv.power;
-			}	
-
-			let batterySoc;
-			if (typeof msg.response.result.batterySoc !== undefined) {
-				batterySoc = msg.response.result.batterySoc;
-			} else {
-				batterySoc = msg.response.result.battery.soc;
-			}
+			let batteryPower = msg.response.result.batteryPower || 0;
+			let batterySoc = msg.response.result.batterySoc || 0;
 									
-			let tariffGrid = msg.response.result.tariffGrid;
-			let batteryMode = msg.response.result.batteryMode;
-			let interval = msg.response.result.interval;
+			let tariffGrid = msg.response.result.tariffGrid || 0.00;
+			let batteryMode = msg.response.result.batteryMode || "unknown";
+			let interval = msg.response.result.interval || 60;
 			
 			const sumPower = msg.response.result.loadpoints.reduce((sum, lp) => sum + lp.chargePower, 0);
 
