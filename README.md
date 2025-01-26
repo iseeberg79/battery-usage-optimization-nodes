@@ -23,7 +23,9 @@ Die Nodes können eigenständig mit Daten versorgt werden. Bei Bedarf können ei
 
 Inzwischen gibt es zusätzlich die Möglichkeit eine externe Vorgabe der Batteriesteuerung zu integrieren. Diese Verwendung der externen Steuerung berücksichtigt dann weiterhin den Status der Laderegelung der evcc-Instanz und die aktuellen Energiewerte.
 
-Eine Publizierung des Paketes ist aktuell noch nicht erfolgt, dafür sind Erfahrungswerte und weitere Optimierungen notwendig. Ich setze die npm-Bausteine in einer Node-Red Instanz innerhalb einer ioBroker-Installation ein, sie sollten aber auch anderweitig, z.B. in homeassistant nutzbar sein.
+Ich setze die npm-Bausteine in einer Node-Red Instanz innerhalb einer ioBroker-Installation ein, sie sollten aber auch anderweitig, z.B. in homeassistant nutzbar sein.
+
+Eine Publizierung des Paketes ist aktuell noch nicht erfolgt, dafür sind Erfahrungswerte und weitere Optimierungen notwendig. 
 
 
 *Bereitgestellt ohne Gewähr. Der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung!*
