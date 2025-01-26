@@ -17,7 +17,7 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) {
 			if (typeof msg.debug !== 'undefined') { debug = msg.debug; }
-			if (typeof msg.charge !== 'undefined') { charge = msg.charge; }
+			if (typeof msg.charge !== 'undefined') { charge = charge && msg.charge; }
 			
 			const factor = (1 + ((100 - efficiency) / 100));
 			const rate = (1 + (performance / 100));
@@ -38,6 +38,7 @@ module.exports = function(RED) {
 			    let maxPriceIndex = -1;
 				let avgPrice = 0;
 
+				if (debug) { node.warn("importPrice #19"); }
 			    // Schritt 1: Den Index des höchsten Importpreises finden, ohne das Array zu verändern
 			    for (let i = 0; i < data.length; i++) {
 			        if (data[i].importPrice > maxPrice) {
@@ -48,6 +49,7 @@ module.exports = function(RED) {
 
 			    // Schritt 2: Daten nach dem aktuellen Zeitpunkt und vor dem höchsten Importpreis filtern
 			    let loadableHours = 0;
+				if (debug) { node.warn("importPrice #20"); }
 			    for (let i = 0; i < maxPriceIndex; i++) {
 			        if (data[i].start > currentTime && data[i].importPrice < threshold) {
 			            loadableHours++;
@@ -102,6 +104,7 @@ module.exports = function(RED) {
 			};
 
 			function calculateAverage(data) {
+				if (debug) { node.warn("importPrice #1"); }
 				const sum = data.reduce((total, entry) => total + entry.importPrice, 0);
 				const average = sum / data.length;
 				return average;
@@ -122,35 +125,46 @@ module.exports = function(RED) {
 			}
 
 			function getMaximumAbs(data) {
+				if (debug) { node.warn("importPrice #2"); }
 				return data.reduce((maxEntry, currentEntry) => {
 					return (currentEntry.importPrice > maxEntry.importPrice) ? currentEntry : maxEntry;
 				});
 			}
 
 			function getMinimumPriceAbs(data) {
+				if (debug) { node.warn("importPrice #3"); }
 				return data.reduce((prev, curr) => {
 					return (prev.importPrice < curr.importPrice) ? prev : curr;
 				});
 			}
 
 			function getMinimumPrice(data) {
+				if (debug) { node.warn("importPrice #4"); }
 				const maxImportIndex = data.reduce((maxIdx, current, idx, array) => {
 					return current.importPrice > array[maxIdx].importPrice ? idx : maxIdx;
 				}, 0);
 
 				const dataBeforeMaxImport = data.slice(0, maxImportIndex);
 
+				if (debug) { node.warn("importPrice #5"); }
 				const cheapestEntry = dataBeforeMaxImport.reduce((prev, curr) => {
 					return (prev.importPrice < curr.importPrice) ? prev : curr;
 				}, dataBeforeMaxImport[0]);
 
-				return cheapestEntry;
+				// Wenn kein günstigerer Eintrag gefunden wurde, wird der günstigste Eintrag des gesamten Arrays zurückgegeben
+				if (cheapestEntry === undefined) {
+					if (debug) { node.warn("aktuell maximaler Wert, Fallback auf absolutes Minimum"); }
+					return getMinimumPriceAbs(data);
+				} else {
+					return cheapestEntry;
+				}
 			}
 
 			function getMaximumPrice(data) {
 				const startIndex = getCurrentHourIndex(data);
 				const dataFromStart = data.slice(startIndex);
 
+				if (debug) { node.warn("importPrice #6"); }
 				return dataFromStart.reduce((maxEntry, currentEntry) => {
 					return (currentEntry.importPrice > maxEntry.importPrice) ? currentEntry : maxEntry;
 				});
@@ -158,13 +172,17 @@ module.exports = function(RED) {
 
 			function getMaximumPriceGap(data) {
 				const max = getMaximumPrice(data);
-				const min = getMinimumPrice(data);
+				const min = getMinimumPriceAbs(data);
+				if (debug) { node.warn("Max: " + JSON.stringify(max)); }
+				if (debug) { node.warn("Min: " + JSON.stringify(min)); }
+				if (debug) { node.warn("importPrice #7"); }
 				const diff = Math.floor((max.importPrice - min.importPrice) * 1000) / 1000;
 				if (debug) { node.warn("Diff: " + diff); }
 				return diff;
 			}
 
 			function calcPerformance(min) {
+				if (debug) { node.warn("importPrice #8"); }
 				return ((min.importPrice * factor) * rate);
 			}
 
@@ -184,6 +202,7 @@ module.exports = function(RED) {
 					const production = productionForecast[i].value;
 					const netEnergy = consumption - production;
 					let energyCost = 0;
+					if (debug) { node.warn("importPrice #9"); }
 					if (netEnergy > 0) {
 						energyCost = netEnergy * price.importPrice;
 					}
@@ -197,6 +216,7 @@ module.exports = function(RED) {
 						}
 					}
 					let batterySoc = Math.floor(Math.min(batteryBuffer + (batteryPower / battery_capacity * 100), 100)); // mehr als 100 geht nicht
+					if (debug) { node.warn("importPrice #10"); }
 					result.push({ start: price.start, value: netEnergy, importPrice: price.importPrice, cost: energyCost, soc: batterySoc, mode: mode });
 				}
 				return result;
@@ -227,6 +247,7 @@ module.exports = function(RED) {
 			let chargedEnergyPrice = batteryEnergyPrice;
 			let estimatedbatteryPower = batteryCapacity / 100 * estimatedMaximumSoc.soc; // erwartete, maximale Batterieleistung
 			if (gridchargePerformance && charge) { 
+				// wichtige Prüfung, ob das Maximum nach dem Minimum liegt
 				if (minimumPriceEntry.start < estimatedMaximumSoc.start) {
 					breakevenPoint = minimumPriceEntry.start;
 					const energy = calculateLoadableHours(energyNeeded, (avg / rate / factor)); 
@@ -239,8 +260,10 @@ module.exports = function(RED) {
 			if (debug) { node.warn("aktuell verfügbare batteryPower: " + currentbatteryPower); }
 			if (debug) { node.warn("erwartete verfügbare batteryPower: " + estimatedbatteryPower); }
 
+			if (debug) { node.warn("importPrice #11"); }
 			energyAvailable.sort((a, b) => b.importPrice - a.importPrice);
 
+			if (debug) { node.warn("importPrice #12"); }
 			const batteryModes = energyAvailable.map(hour => {
 				// Verwendung des aktuellen Batteriespeichers bis zum Entscheidungszeitpunkt
 				if ((hour.value > 0) && (hour.start < breakevenPoint)) {					
@@ -253,6 +276,7 @@ module.exports = function(RED) {
 						hour.mode = "normal";
 					}
 				}
+				if (debug) { node.warn("importPrice #13"); }
 				// prognostizierte Verwendung, nachdem PV/Netz geladen wurde
 				if ((hour.value > 0) && (hour.start >= breakevenPoint)) {
 					if ((estimatedbatteryPower > 0) && (lastGridchargePrice < hour.importPrice)) {
@@ -264,6 +288,7 @@ module.exports = function(RED) {
 						hour.mode = "normal";
 					}
 				}
+				if (debug) { node.warn("importPrice #14"); }
 				// interne Steuerung der Batterie, wenn niedriger Ladungszustand
 				if ((hour.mode == "hold") && (hour.value > 0) && (hour.start < breakevenPoint) && (currentbatteryPower <= 0)) {
 					if (debug) { node.warn(hour.start + ": Batterieladungszustand zu gering, interne Steuerung zulassen."); }
@@ -274,6 +299,7 @@ module.exports = function(RED) {
 				return hour;
 			});
 
+			if (debug) { node.warn("importPrice #15"); }
 			// mögliche Netzladung berechnen, wenn effektiv - Sortierung nach günstigstem Preis
 			batteryModes.sort((a, b) => a.importPrice - b.importPrice);
 
@@ -286,16 +312,19 @@ module.exports = function(RED) {
 			if (gridchargePerformance && charge) {
 				if (debug) { node.warn("Calculated efficient grid charge option, 1st hour"); }
 				batteryModes[0].mode = "charge";
+				if (debug) { node.warn("importPrice #16"); }
 				batteryModes[0].cost = batteryModes[0].cost + (batteryModes[0].importPrice * maxCharge); // worst-case
 				hours += 1;
 				if (calcPerformance(batteryModes[1]) < avg) {
 					if (debug) { node.warn("Calculated efficient grid charge option, 2nd hour"); }
 					batteryModes[1].mode = "charge";
+					if (debug) { node.warn("importPrice #17"); }
 					batteryModes[1].cost = batteryModes[1].cost + (batteryModes[1].importPrice * maxCharge); // worst-case
 					hours += 1;
 					if (calcPerformance(batteryModes[2]) < avg) {
 						if (debug) { node.warn("Calculated efficient grid charge option, 3rd hour"); }
 						batteryModes[2].mode = "charge";
+						if (debug) { node.warn("importPrice #18"); }
 						batteryModes[2].cost = batteryModes[2].cost + (batteryModes[2].importPrice * maxCharge); // worst-case
 						hours += 1;
 					}
