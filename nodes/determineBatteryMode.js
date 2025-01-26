@@ -88,7 +88,7 @@ module.exports = function(RED) {
 				return batteryMode;
 			}
 
-			function checkGrichargeReset() {
+			function checkGridchargeReset() {
 				// Zurücksetzen des letzten Ladepreises bei geringem/hohem Füllstand
 				switch (socControlMode) {
 					case "highSOC":
@@ -136,7 +136,7 @@ module.exports = function(RED) {
 
 					// Prüfung, ob Netzladungspreis zurückgesetzt werden muss
 					if (msg.batterymode != "charge") {
-						checkGrichargeReset();
+						checkGridchargeReset();
 					}
 
 					// Wintermonate?
@@ -195,8 +195,14 @@ module.exports = function(RED) {
 				if (optimize) {
 					// externe Ermittlung berücktsichtigen, überschreibt alle Berechnungen
 					msg.targetMode = evaluateEstimator(msg.estimator);
-					if (socControlMode == "highSOC") {
+					// Entladung vermeiden, wenn Batteriestand hoch und eigentlich geladen werden soll
+					if ((msg.targetMode === "charge") && (socControlMode == "highSOC")) {
 						if (debug) { node.warn(`Batteriestand ist hoch, keine Netzladung.`); }
+						msg.targetMode = "hold";
+					}
+					// Netzladung vermeiden, wenn nicht innerhalb der Schwellenwerte					
+					if ((msg.targetMode === "charge") && (socControlMode == "mediumSOC")) {
+						if (debug) { node.warn(`Batteriestand ist mittel, keine Netzladung vorgesehen - Threshold nicht erreicht.`); }
 						msg.targetMode = "hold";
 					}
 					if (msg.targetMode === "charge") {
@@ -208,7 +214,7 @@ module.exports = function(RED) {
 							lastGridchargePrice = gridchargePrice;
 						}
 					} else {
-						checkGrichargeReset();
+						checkGridchargeReset();
 					}
 					if (debug) { node.warn(`externe Berechnung vorgegeben, targetMode is ${msg.targetMode}`); }
 				} else {
