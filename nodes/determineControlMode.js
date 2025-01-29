@@ -7,17 +7,21 @@ module.exports = function(RED) {
 		node.minPriceDifference = config.minPriceDifference;
 		node.priceLimit = config.priceLimit;
 		node.avg = config.avg;
-		const debug = false;
+		let debug = false;
 
 		node.on('input', function(msg) {
+			// debugging
+			if (typeof msg.debug !== 'undefined') { debug = msg.debug; }
+			
 			// Konfiguration
 			const minPvRequired = (typeof msg.minPvRequired !== 'undefined') ? msg.minPvRequired : (node.minPvRequired || 10000);
 			const minPriceDeviation = (typeof msg.minPriceDeviation !== 'undefined') ? msg.minPriceDeviation : (node.minPriceDeviation || 6);
 			const minPriceDifference = (typeof msg.minPriceDifference !== 'undefined') ? msg.minPriceDifference : (node.minPriceDifference || 15);
-			const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || node.avg || 0.25)) * 100;
+			//const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || node.avg || 0.25)) * 100;
+			const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || 0.25)) * 100;
 
 			// Werte zur Berechnung, mit sicheren Standards belegt
-			const avgPriceWeekly = ((typeof msg.avgWeekly !== 'undefined') ? msg.avgWeekly : (node.avg || priceLimit)) * 100;
+			const avgPriceWeekly = ((typeof msg.avgWeekly !== 'undefined') ? msg.avgWeekly : (node.avg * 100) || priceLimit) ;
 			const avgPrice = ((typeof msg.average !== 'undefined') ? msg.average : node.avg || 0.25) * 100;
 			const pvForecast = (typeof msg.pvforecast !== 'undefined') ? msg.pvforecast : (node.pvforecast || minPvRequired);
 			const priceDeviation = (typeof msg.deviation !== 'undefined') ? msg.deviation : (node.deviation || 0);
