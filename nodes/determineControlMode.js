@@ -17,7 +17,6 @@ module.exports = function(RED) {
 			const minPvRequired = (typeof msg.minPvRequired !== 'undefined') ? msg.minPvRequired : (node.minPvRequired || 10000);
 			const minPriceDeviation = (typeof msg.minPriceDeviation !== 'undefined') ? msg.minPriceDeviation : (node.minPriceDeviation || 6);
 			const minPriceDifference = (typeof msg.minPriceDifference !== 'undefined') ? msg.minPriceDifference : (node.minPriceDifference || 15);
-			//const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || node.avg || 0.25)) * 100;
 			const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || 0.25)) * 100;
 
 			// Werte zur Berechnung, mit sicheren Standards belegt
