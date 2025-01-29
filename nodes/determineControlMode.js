@@ -21,7 +21,7 @@ module.exports = function(RED) {
 			const priceLimit = ((typeof msg.priceLimit !== 'undefined') ? msg.priceLimit : (node.priceLimit || 0.25)) * 100;
 
 			// Werte zur Berechnung, mit sicheren Standards belegt
-			const avgPriceWeekly = ((typeof msg.avgWeekly !== 'undefined') ? msg.avgWeekly : (node.avg * 100) || priceLimit) ;
+			const avgPriceWeekly = ((typeof msg.avgWeekly !== 'undefined') ? (msg.avgWeekly * 100) : (node.avg * 100) || priceLimit) ;
 			const avgPrice = ((typeof msg.average !== 'undefined') ? msg.average : node.avg || 0.25) * 100;
 			const pvForecast = (typeof msg.pvforecast !== 'undefined') ? msg.pvforecast : (node.pvforecast || minPvRequired);
 			const priceDeviation = (typeof msg.deviation !== 'undefined') ? msg.deviation : (node.deviation || 0);
