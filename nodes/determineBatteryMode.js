@@ -188,7 +188,7 @@ module.exports = function(RED) {
 					}
 				} else {
 					if (debug) { node.warn(`optimize is false`); }
-					// Batterie darf entladen, wenn Opti
+					// Batterie darf entladen, wenn nicht optimiert
 					msg.targetMode = "normal";
 				}
 			} else {
@@ -218,6 +218,7 @@ module.exports = function(RED) {
 					}
 					if (debug) { node.warn(`externe Berechnung vorgegeben, targetMode is ${msg.targetMode}`); }
 				} else {
+					// Batterie darf entladen, wenn nicht optimiert
 					if (debug) { node.warn(`optimize is false`); }
 					msg.targetMode = "normal";
 				}
