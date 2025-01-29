@@ -1,7 +1,7 @@
 
 [![92C08093-CA7B-463E-8BE3-9F03C6622BD6_klein](https://github.com/user-attachments/assets/7716fdb4-b872-445b-ae45-9caabe0a44a3)](## "generated using a public AI image generator")
 
-<h1>Optimierung der Verwendung des Hausspeichers im Zusammenspiel von ioBroker, node-red, evcc und einem dynamischen Stromtarif</h1>
+<h1>Optimierung der Verwendung des Hausspeichers im Zusammenspiel von node-red, evcc und einem dynamischen Stromtarif</h1>
 
 <h2>Funktionsweise:</h2>
 Der Batteriespeicher soll bei überschüssigem PV-Strom geladen, aber nicht in Zeiten günstigen Netzstromes entladen werden. Ist die Preisdifferenz ausreichend hoch (>15ct) wird eine Netzladung zum günstigsten Zeitpunkt des Tages erwogen und die Batterie bis zum Füllstand von 80% geladen. Um die Batterie nicht ungünstig zu entladen, wird der Netzladungspreis bei der weiteren Steuerung der Batteriesperre berücksichtigt, und die Freigabe der Batterie erfolgt nur bei einem Netzstrompreis, der ausreichend über dem Netzladungspreis liegt (~130%). Die Batterie wird außerdem nur geladen, wenn Stand des Batteriespeichers ausreichend gering (<30%) ist, auch um ein Pendeln von Laden/Entladen zu vermeiden. Der Schwerpunkt der Steuerung liegt auf der Verschiebung der Nutzung gespeicherter Energie.
@@ -20,6 +20,10 @@ Es wird der benötigte Zustand für die Batteriesteuerung ermittelt. Eine Steuer
 Das Node-RED-Paket bietet eine Reihe von Nodes zur Optimierung der Batterienutzung. Es umfasst Nodes zur Bestimmung des Batteriemodus, zur Bewertung von Solarprognosen, zur Steuerung des Batteriemodus und mehr.
 
 Die Nodes können eigenständig mit Daten versorgt werden. Bei Bedarf können eigene hinzugefügt werden, die Daten bereitstellen, die aus anderen Quellen bezogen werden. So kann z.B. mit evcc - aber auch ohne, ein eigener Flow mit ausgewählten Nodes aufgebaut werden. Die Nodes sind mit Standards vorbelegt, ergänzend überschreiben die Nachrichteneingänge  die Konfiguration, bzw. sichere Vorbelegungen. Ein modularer Aufbau der Funktionen soll eine gute Weiterverwendung ermöglichen, ohne dabei zu sehr auf spezifische Anforderungen einer Installation einzugehen. Die Funktionen und Implementierung hat Beobachtungen und eigene Erfahrungswerte als Grundlage.
+
+Inzwischen gibt es zusätzlich die Möglichkeit eine externe Vorgabe der Batteriesteuerung zu integrieren. Diese Verwendung der externen Steuerung berücksichtigt dann weiterhin den Status der Laderegelung der evcc-Instanz und die aktuellen Energiewerte.
+
+Ich setze die npm-Bausteine in einer Node-Red Instanz innerhalb einer ioBroker-Installation ein, sie sollten aber auch anderweitig, z.B. in homeassistant nutzbar sein.
 
 Eine Publizierung des Paketes ist aktuell noch nicht erfolgt, dafür sind Erfahrungswerte und weitere Optimierungen notwendig. 
 
