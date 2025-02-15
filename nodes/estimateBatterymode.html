@@ -78,15 +78,38 @@
         <li><b>Battery Buffer (%):</b> - der Mindest-SoC der Hausbatterie</li>
         <li><b>Battery Capacity (kWh):</b> - die Gesamtkapazität der Batterie</li>
         <li><b>Max Charge (kWh):</b> - die maximale Ladeleistung</li>
-        <li><b>Feed-in Tariff (€):</b> - Einspeiseverfügung</li>
+        <li><b>Feed-in Tariff (€):</b> - Einspeisevergütung</li>
         <li><b>Efficiency (%):</b> - Wirkungsgrad der Batterie</li>
         <li><b>Performance (%):</b> - Preisvorteil</li>
-		<li><b>lastGridchargePrice (€):</b> - letzter Preis für Netzladung, optional</li>
-		<li><b>charge (bool):</b> - Netzladung erlaubt, optional</li>
+        <li><b>lastGridchargePrice (€):</b> - letzter Preis für Netzladung, optional</li>
+        <li><b>charge (bool):</b> - Netzladung erlaubt, optional</li>
+        <li><b>msg.payload.priceData</b> - Array mit stündlichen Strompreisen (Import/Export)</li>
+        <li><b>msg.payload.productionForecast</b> - Prognose der PV-Erzeugung</li>
+        <li><b>msg.payload.consumptionForecast</b> - Prognose des Haushaltsverbrauchs</li>
+        <li><b>msg.payload.soc</b> - aktueller Ladestand der Batterie</li>
     </ul>
+    <p><b>Beispiel für eine Preis- und Prognosenachricht:</b></p>
+    <pre>
+    {
+        "priceData": [
+            {"start": "2025-02-15T00:00:00+01:00", "importPrice": 0.3123, "exportPrice": 0.079},
+            {"start": "2025-02-15T12:00:00+01:00", "importPrice": 0.2851, "exportPrice": 0.079},
+            {"start": "2025-02-15T18:00:00+01:00", "importPrice": 0.3592, "exportPrice": 0.079}
+        ],
+        "productionForecast": [
+            {"start": "2025-02-15T08:00:00.000Z", "value": 0.1811},
+            {"start": "2025-02-15T12:00:00.000Z", "value": 5.087}
+        ],
+        "consumptionForecast": [
+            {"start": "2025-02-15T06:00:00.000Z", "value": 1},
+            {"start": "2025-02-15T18:00:00.000Z", "value": 1}
+        ],
+        "soc": 5
+    }
+    </pre>
     <p><b>Outputs:</b></p>
     <ul>
-        <li><b>msg.paylod.batteryModes</b> - ein Array der erwarteten Energieverteilung (Attribute: start, mode)</li>
-        <li><b>msg.paylod.stats</b> - Statistiken</li>
+        <li><b>msg.payload.batteryModes</b> - ein Array der erwarteten Energieverteilung (Attribute: start, mode)</li>
+        <li><b>msg.payload.stats</b> - Statistiken</li>
     </ul>
 </script>
