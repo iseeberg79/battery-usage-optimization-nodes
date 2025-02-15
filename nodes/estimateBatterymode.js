@@ -53,7 +53,7 @@ module.exports = function(RED) {
                 for (let i = 0; i < maxPriceIndex; i++) {
                      if (data[i].start > currentTime && data[i].importPrice < threshold) {
                         loadableHours++;
-                		avgPrice += data[i].importPrice;
+                        avgPrice += data[i].importPrice;
                     }
                 }
 
