@@ -25,12 +25,22 @@
 </script>
 
 <script type="text/x-red"
-	data-help-name="@iseeberg79/EstimateSolarEnergy">
+    data-help-name="@iseeberg79/EstimateSolarEnergy">
     <p>Dieser Node schätzt die Solarenergie basierend auf den bereitgestellten Prognosen, stündlich</p>
     <p><b>Inputs:</b></p>
     <ul>
         <li><b>payload.forecasts</b> - Array der Solarprognosen</li>
     </ul>
+    <p><b>Beispiel für eine Forecast-Nachricht:</b></p>
+    <pre>
+    {
+        "forecasts": [
+            {"pv_estimate": 0.1, "period_end": "2025-02-15T08:00:00Z"},
+            {"pv_estimate": 0.5, "period_end": "2025-02-15T12:00:00Z"},
+            {"pv_estimate": 0.2, "period_end": "2025-02-15T16:00:00Z"}
+        ]
+    }
+    </pre>
     <p><b>Outputs:</b></p>
     <ul>
         <li><b>payload.today</b> - geschätzte Solarenergie für heute</li>

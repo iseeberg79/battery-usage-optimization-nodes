@@ -75,32 +75,43 @@
 </script>
 
 <script type="text/x-red"
-	data-help-name="@iseeberg79/DetermineBatteryMode">
+    data-help-name="@iseeberg79/DetermineBatteryMode">
     <p>Dieser Node ermöglicht die Bestimmung des Batteriemodus, häufig ausführen (minütlich?)</p>
     <p><b>Inputs:</b></p>
     <ul>
-		<li><b>optimize</b> - Optimierung des Batteriemodus, errechnet</li>
-		<li><b>enableGridcharge</b> - Aktivierung der Netzladung, errechnet</li>
-	</ul>
-	<ul>
+        <li><b>optimize</b> - Optimierung des Batteriemodus, errechnet</li>
+        <li><b>enableGridcharge</b> - Aktivierung der Netzladung, errechnet</li>
+    </ul>
+    <ul>
         <li><b>enableGridchargeThreshold</b> - Schwellenwert zum Aktivieren der Netzladung</li>
         <li><b>disableGridchargeThreshold</b> - Schwellenwert zum Deaktivieren der Netzladung</li>
         <li><b>batteryCapacity</b> - Batteriekapazität</li>
         <li><b>efficiency</b> - Effizienz</li>
-		<li><b>feedin</b> - Einspeisevergütung</li>
+        <li><b>feedin</b> - Einspeisevergütung</li>
         <li><b>minsoc</b> - Batterielevel für Zurücksetzung des Netzladungspreises (min)</li>
         <li><b>maxsoc</b> - Batterielevel für Zurücksetzung des Netzladungspreises (max)</li>
-		<li><b>estimator</b> - überschreibt die interne Berechnung des Batteriemodus (Array mit start, mode)</li>
-	</ul>
-	<ul>
-		<li><b>price</b> - aktueller Strompreis</li>
-		<li><b>average</b> - durchschnittlicher Strompreis</li>
-		<li><b>lastGridchargePrice</b> - letzter Ladepreis des Batteriespeichers</li>
-		<li><b>minimum</b> - minimaler Strompreis</li>
-		<li><b>soc</b> - aktueller Ladestand der Hausbatterie</li>
-		<li><b>energy_req</b> - geschätzter Haushaltsverbrauch</li>
-		<li><b>pvforecast</b> - geschätzte PV-Erzeugung</li>
+        <li><b>estimator</b> - überschreibt die interne Berechnung des Batteriemodus (Array mit start, mode)</li>
     </ul>
+    <ul>
+        <li><b>price</b> - aktueller Strompreis</li>
+        <li><b>average</b> - durchschnittlicher Strompreis</li>
+        <li><b>lastGridchargePrice</b> - letzter Ladepreis des Batteriespeichers</li>
+        <li><b>minimum</b> - minimaler Strompreis</li>
+        <li><b>soc</b> - aktueller Ladestand der Hausbatterie</li>
+        <li><b>energy_req</b> - geschätzter Haushaltsverbrauch</li>
+        <li><b>pvforecast</b> - geschätzte PV-Erzeugung</li>
+    </ul>
+    <p><b>Beispiel für eine Estimator-Nachricht:</b></p>
+    <pre>
+    {
+        "batteryModes": [
+            {"start": "2025-01-26T20:00:00+01:00", ..., "mode": "normal"},
+            {"start": "2025-01-27T02:00:00+01:00", ..., "mode": "charge"},
+            {"start": "2025-01-27T06:00:00+01:00", ..., "mode": "hold"},
+            {"start": "2025-01-27T12:00:00+01:00", ..., "mode": "hold"}
+        ]
+    }
+    </pre>
     <p><b>Outputs:</b></p>
     <ul>
         <li><b>Output 1</b> - der berechnete Batteriemodus</li>
