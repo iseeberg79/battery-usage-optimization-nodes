@@ -24,13 +24,18 @@
     </div>
 </script>
 
-<script type="text/x-red"
-	data-help-name="@iseeberg79/EstimateHouseholdConsumption">
+<<script type="text/x-red"
+    data-help-name="@iseeberg79/EstimateHouseholdConsumption">
     <p>Dieser Node schätzt den Stromverbrauch eines Haushalts, stündlich ausführen</p>
     <p><b>Inputs:</b></p>
     <ul>
-        <li><b>profile</b> - Verbrauchsprofil des Haushalts (Array)</li>
+        <li><b>profile</b> - Verbrauchsprofil des Haushalts (Array, 24h)</li>
     </ul>
+    <p><b>Beispiel für ein Verbrauchsprofil:</b></p>
+    <pre>
+    [ 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.6, 1, 0.6, 0.6, 0.5, 0.4, 0.9, 1.2, 0.5, 0.4, 0.4, 0.7, 0.9, 1, 0.6, 0.6, 0.4, 0.3]
+    </pre>
+
     <p><b>Outputs:</b></p>
     <ul>
         <li><b>payload</b> -  berechnete Verbrauchsdaten</li>
