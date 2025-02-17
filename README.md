@@ -1,7 +1,5 @@
 
-[![92C08093-CA7B-463E-8BE3-9F03C6622BD6_klein](https://github.com/user-attachments/assets/7716fdb4-b872-445b-ae45-9caabe0a44a3)](## "generated using a public AI image generator")
-
-# Optimierung der Verwendung des Hausspeichers im Zusammenspiel von Node-RED, EVCC und einem dynamischen Stromtarif
+[![92C08093-CA7B-463E-8BE3-9F03C6622BD6_klein](https://github.com/user-attachments/assets/7716fdb4-b872-445b-ae45-9caabe0a44a3)](## "generated using a public AI image # Optimierung der Verwendung des Hausspeichers im Zusammenspiel von Node-RED, evcc und einem dynamischen Stromtarif
 
 ## Funktionsweise
 
@@ -17,14 +15,14 @@ Die optimierte Steuerung ist nur aktiv, wenn die prognostizierte tägliche PV-Er
 
 Ein vordefiniertes Standardlastprofil für einen 4-Personen-Haushalt mit berufstätigen Eltern und Schulkindern (ca. 15 kWh/Tag) wird genutzt. Der Verbrauch wird von der aktuellen Stunde bis zum nächsten Morgen (8 Uhr) unter Berücksichtigung des stündlichen Bedarfs berechnet.
 
-Wenn Strompreise für den aktuellen und den kommenden Tag verfügbar sind, fließen diese in die Optimierung ein. Die Preise können über [EVCC](https://evcc.io/) per HTTP-API oder alternativ von der Fraunhofer ISE [Energy-Charts](https://www.energy-charts.info/) bezogen werden.
+Wenn Strompreise für den aktuellen und den kommenden Tag verfügbar sind, fließen diese in die Optimierung ein. Die Preise können über [evcc](https://evcc.io/) per HTTP-API oder alternativ von der Fraunhofer ISE [Energy-Charts](https://www.energy-charts.info/) bezogen werden.
 
 ## Steuerung des Batteriespeichers
 
 Die Berechnung ermittelt den optimalen Batteriemodus. Die eigentliche Steuerung eines (hybriden) Wechselrichters ist aufgrund hardwareabhängiger Faktoren separat zu implementieren:
 
-- Eine Netzladung kann über die Übergabe des Netzladungspreises an eine [EVCC](https://evcc.io/) Instanz per MQTT/HTTP-API gesteuert werden.
-- Eine Batteriesperre kann, wenn EVCC dies unterstützt, basierend auf den Informationen aus dem [EVCC-Wiki](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren) realisiert werden. Dabei kann entweder der ermittelte Preis direkt genutzt oder der Modus per MQTT/HTTP-API gesteuert werden (Lade-/Entlademodus).
+- Eine Netzladung kann über die Übergabe des Netzladungspreises an eine [evcc](https://evcc.io/) Instanz per MQTT/HTTP-API gesteuert werden.
+- Eine Batteriesperre kann, wenn evcc dies unterstützt, basierend auf den Informationen aus dem [evcc-Wiki](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren) realisiert werden. Dabei kann entweder der ermittelte Preis direkt genutzt oder der Modus per MQTT/HTTP-API gesteuert werden (Lade-/Entlademodus).
 
 ## Node-RED-Integration
 
@@ -33,9 +31,9 @@ Das Node-RED-Paket enthält verschiedene Nodes zur Optimierung der Batterienutzu
 - Bewertung von Solarprognosen
 - Steuerung des Batteriemodus
 
-Die Nodes sind flexibel nutzbar und können mit externen Datenquellen kombiniert werden. Es besteht die Möglichkeit, eigene Nodes für zusätzliche Datenquellen zu integrieren. So kann die Lösung mit oder ohne EVCC betrieben werden. Die Nodes sind mit Standardwerten vorkonfiguriert, wobei die Nachrichteneingänge eine Konfigurationsanpassung ermöglichen. Das modulare Design erleichtert die Wiederverwendung und Anpassung an unterschiedliche Installationen.
+Die Nodes sind flexibel nutzbar und können mit externen Datenquellen kombiniert werden. Es besteht die Möglichkeit, eigene Nodes für zusätzliche Datenquellen zu integrieren. So kann die Lösung mit oder ohne evcc betrieben werden. Die Nodes sind mit Standardwerten vorkonfiguriert, wobei die Nachrichteneingänge eine Konfigurationsanpassung ermöglichen. Das modulare Design erleichtert die Wiederverwendung und Anpassung an unterschiedliche Installationen.
 
-Eine externe Steuerung kann eingebunden werden, die weiterhin den Status der EVCC-Laderegelung und aktuelle Energiewerte berücksichtigt.
+Eine externe Steuerung kann eingebunden werden, die weiterhin den Status der evcc-Laderegelung und aktuelle Energiewerte berücksichtigt.
 
 ## Einsatz und Weiterentwicklung
 
