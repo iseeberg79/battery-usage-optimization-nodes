@@ -1,5 +1,7 @@
 
-[![92C08093-CA7B-463E-8BE3-9F03C6622BD6_klein](https://github.com/user-attachments/assets/7716fdb4-b872-445b-ae45-9caabe0a44a3)](## "generated using a public AI image # Optimierung der Verwendung des Hausspeichers im Zusammenspiel von Node-RED, evcc und einem dynamischen Stromtarif
+[![92C08093-CA7B-463E-8BE3-9F03C6622BD6_klein](https://github.com/user-attachments/assets/7716fdb4-b872-445b-ae45-9caabe0a44a3)](## "generated using a public AI image
+
+# Optimierung der Verwendung des Hausspeichers im Zusammenspiel von Node-RED, evcc und einem dynamischen Stromtarif
 
 ## Funktionsweise
 
