@@ -66,7 +66,8 @@ module.exports = function(RED) {
 						} else {
 							if (debug) { node.warn(`Battery mode is not charge`); }
 							outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
-							outputs[2] = { payload: 0.00 };
+							//outputs[2] = { payload: 0.00 };
+							outputs[2] = { payload: ""};
 							node.status({ fill: "red", shape: "dot", text: msg.targetMode });
 						}
 					}
