@@ -33,35 +33,35 @@ module.exports = function(RED) {
 			const recent = new Date((new Date()).getTime() - 60 * 60 * 1000).getTime();
 
 			function calculateLoadableHours(data, threshold) {
-            const currentTime = new Date().toISOString();
-                let maxPrice = -Infinity;
-                let maxPriceIndex = -1;
-                let avgPrice = 0;
+			    const currentTime = new Date().toISOString();
+			    let maxPrice = -Infinity;
+			    let maxPriceIndex = -1;
+				let avgPrice = 0;
 
 				if (debug) { node.warn("importPrice #19"); }
-                // Schritt 1: Den Index des höchsten Importpreises finden, ohne das Array zu verändern
-                for (let i = 0; i < data.length; i++) {
-                    if (data[i].importPrice > maxPrice) {
-                        maxPrice = data[i].importPrice;
-                        maxPriceIndex = i;
-                        }
-                }
+			    // Schritt 1: Den Index des höchsten Importpreises finden, ohne das Array zu verändern
+			    for (let i = 0; i < data.length; i++) {
+			        if (data[i].importPrice > maxPrice) {
+			            maxPrice = data[i].importPrice;
+			            maxPriceIndex = i;
+			        }
+			    }
 
-                // Schritt 2: Daten nach dem aktuellen Zeitpunkt und vor dem höchsten Importpreis filtern
-                let loadableHours = 0;
-                if (debug) { node.warn("importPrice #20"); }
-                for (let i = 0; i < maxPriceIndex; i++) {
-                     if (data[i].start > currentTime && data[i].importPrice < threshold) {
-                        loadableHours++;
-                        avgPrice += data[i].importPrice;
-                    }
-                }
+			    // Schritt 2: Daten nach dem aktuellen Zeitpunkt und vor dem höchsten Importpreis filtern
+			    let loadableHours = 0;
+				if (debug) { node.warn("importPrice #20"); }
+			    for (let i = 0; i < maxPriceIndex; i++) {
+			        if (data[i].start > currentTime && data[i].importPrice < threshold) {
+			            loadableHours++;
+						avgPrice += data[i].importPrice;
+			        }
+			    }
 
-                // Mögliche Netzladungsmenge berechnen (pro Stunde maximal maxCharge kWh)
-                const loadableEnergy = (Math.min(loadableHours * maxCharge, battery_capacity) * 0.9); // Annahme etwas reduzieren!
-                if (debug) { node.warn("Loadable Energy: " + loadableEnergy + ", Hours: " + loadableHours + ", Threshold: " + threshold); }
+			    // Mögliche Netzladungsmenge berechnen (pro Stunde maximal maxCharge kWh)
+			    const loadableEnergy = (Math.min(loadableHours * maxCharge, battery_capacity) * 0.9); // Annahme etwas reduzieren!
+				if (debug) { node.warn("Loadable Energy: " + loadableEnergy + ", Hours: " + loadableHours + ", Threshold: " + threshold); }
 				
-                return { loadableHours, loadableEnergy, avgPrice: (avgPrice / loadableHours * factor) };
+			    return { loadableHours, loadableEnergy, avgPrice: (avgPrice / loadableHours * factor) };
 			}
 
 			
@@ -99,7 +99,7 @@ module.exports = function(RED) {
 
 				return Object.keys(summary).map(hour => ({
 					timestamp: hour + ':00:00.0000000Z', // Stundenformat zurück in vollständigen Zeitstempel
-					value: summary[hour]
+					value: summary[hour] / 2 // Umrechnung in Wh aus der Summe zweier 30-Minuten-Werte
 				}));
 			};
 
