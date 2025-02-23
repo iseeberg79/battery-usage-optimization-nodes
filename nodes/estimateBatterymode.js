@@ -27,10 +27,13 @@ module.exports = function(RED) {
 			const battery_capacity = batteryCapacity - (batteryCapacity / 100 * batteryBuffer); // available energy kWh
 
 			let startBatteryPower = (msg.payload.soc - batteryBuffer) / 100 * battery_capacity;  // batteryPower aus dem Nachrichtenfluss (Energiemenge des Batteriespeichers)
-			const priceData = msg.payload.priceData;
 
-			//const now = (new Date()).getTime();
+			const now = (new Date()).getTime();
 			const recent = new Date((new Date()).getTime() - 60 * 60 * 1000).getTime();
+			
+			function alignArray(array, minStartTime) {
+			    return array.filter(entry => new Date(entry.start).getTime() >= minStartTime);
+            }
 
 			function calculateLoadableHours(data, threshold) {
 			    const currentTime = new Date().toISOString();
@@ -87,6 +90,7 @@ module.exports = function(RED) {
 
 			// Funktion, um die Werte pro Stunde zu summieren
 			const summarizeSolarByHour = (array) => {
+				//TODO prüfen, ob synchron mit consumption (sonst reduce auf aktuelle Daten)
 				const summary = {};
 
 				array.forEach(item => {
@@ -185,11 +189,13 @@ module.exports = function(RED) {
 				if (debug) { node.warn("importPrice #8"); }
 				return ((min.importPrice * factor) * rate);
 			}
+			
+			const priceData = alignArray(msg.payload.priceData, now);
 
-			const consumptionForecast = extendForecast(msg.payload.consumptionForecast);
+			const consumptionForecast = alignArray(extendForecast(msg.payload.consumptionForecast),now);
 
 			// Zusammengefasste PV-Produktion (stundenbasiert)
-			const productionForecast = summarizeSolarByHour(msg.payload.productionForecast);
+			const productionForecast = alignArray(summarizeSolarByHour(msg.payload.productionForecast),now);
 
 			//let batteryPower = startBatteryPower;
 			let batteryPower = 0; // es wird mit leerer Batterie gestartet, um den maximalen morgigen Füllstand zu berechnen
