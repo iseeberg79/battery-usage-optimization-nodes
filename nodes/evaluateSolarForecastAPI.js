@@ -27,14 +27,10 @@ module.exports = function (RED) {
             node.send(msg);
         });
     }
-    RED.nodes.registerType(
-        "EvaluateSolarForecastAPI",
-        EvaluateSolarForecastAPI,
-        {
-            defaults: {
-                name: { value: "" },
-                url: { value: "http://localhost:7070/api/tariff/solar" },
-            },
+    RED.nodes.registerType("EvaluateSolarForecastAPI", EvaluateSolarForecastAPI, {
+        defaults: {
+            name: { value: "" },
+            url: { value: "http://localhost:7070/api/tariff/solar" },
         },
-    );
+    });
 };
