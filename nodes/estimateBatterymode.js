@@ -36,10 +36,12 @@ module.exports = function (RED) {
             //const now = new Date().getTime();
             const recent = new Date(new Date().getTime() - 60 * 60 * 1000).getTime();
 
+			// Filtern der Daten nach dem aktuellen Zeitpunkt, Vergleichbarkeit und Ausrichtung
             function alignArray(array, minStartTime) {
                 return array.filter((entry) => new Date(entry.start).getTime() >= minStartTime);
             }
 
+			// Berechnung der maximalen Netzladungsmenge
             function calculateLoadableHours(data, threshold) {
                 if (debug) {
                     node.warn("calculateLoadableHours");
@@ -117,25 +119,7 @@ module.exports = function (RED) {
                 return extendedForecast;
             }
 
-            // Funktion, um die Werte pro Stunde zu summieren
-            const summarizeSolarByHour = (array) => {
-                //deprecated function
-                const summary = {};
-
-                array.forEach((item) => {
-                    const hour = item.start.slice(0, 13); // Nur das Stundenformat beibehalten
-                    if (!summary[hour]) {
-                        summary[hour] = 0;
-                    }
-                    summary[hour] += item.value;
-                });
-
-                return Object.keys(summary).map((hour) => ({
-                    timestamp: hour + ":00:00.0000000Z", // Stundenformat zurück in vollständigen Zeitstempel
-                    value: summary[hour] / 2, // Umrechnung in Wh aus der Summe zweier 30-Minuten-Werte
-                }));
-            };
-
+			// Zusammenfassen der PV-Produktion (stundenbasiert)
             function transformSolarProductionArray(array) {
                 if (debug) {
                     node.warn("transformSolarProductionArray");
@@ -168,6 +152,7 @@ module.exports = function (RED) {
                 return transformedArray;
             }
 
+			// durchschnittlicher Importpreis
             function calculateAverage(data) {
                 if (debug) {
                     node.warn("calculateAverage");
@@ -177,6 +162,7 @@ module.exports = function (RED) {
                 return average;
             }
 
+			// maximaler morgiger SoC
             function getMaximumSoC(data) {
                 if (debug) {
                     node.warn("getMaximumSoC");
@@ -186,6 +172,7 @@ module.exports = function (RED) {
                 });
             }
 
+			// aktuelle Stunde (des Tages: 0-23)
             function getCurrentHourIndex(data) {
                 if (debug) {
                     node.warn("getCurrentHourIndex");
@@ -196,6 +183,7 @@ module.exports = function (RED) {
                 });
             }
 
+			// höchster absoluter Preis
             function getMaximumAbs(data) {
                 if (debug) {
                     node.warn("getMaximumAbs");
@@ -205,6 +193,7 @@ module.exports = function (RED) {
                 });
             }
 
+			// niedrigster Energieverbrauch (Fallback)
             function getLowestEnergyEntry(data) {
                 if (debug) {
                     node.warn("getLowestCostEntry");
@@ -212,6 +201,7 @@ module.exports = function (RED) {
                 return data.reduce((min, current) => (current.value < min.value ? current : min), { value: Infinity });
             }
 
+			// niedrigster absoluter Preis
             function getMinimumPriceAbs(data) {
                 if (debug) {
                     node.warn("getMinimumPriceAbs");
@@ -221,6 +211,7 @@ module.exports = function (RED) {
                 });
             }
 
+			// niedrigster relativer Preis (vor dem Preismaximum)
             function getMinimumPrice(data) {
                 if (debug) {
                     node.warn("getMinimumPrice");
@@ -249,6 +240,7 @@ module.exports = function (RED) {
                 }
             }
 
+			// höchster relativer Preis
             function getMaximumPrice(data) {
                 const startIndex = getCurrentHourIndex(data);
                 const dataFromStart = data.slice(startIndex);
@@ -261,6 +253,7 @@ module.exports = function (RED) {
                 });
             }
 
+			// maximaler Preisunterschied
             function getMaximumPriceGap(data) {
                 if (debug) {
                     node.warn("getMaximumPriceGap");
@@ -283,6 +276,7 @@ module.exports = function (RED) {
                 return diff;
             }
 
+			// Effizienz der Netzladung berechnen
             function calcPerformance(min) {
                 if (debug) {
                     node.warn("calcPerformance");
@@ -303,13 +297,16 @@ module.exports = function (RED) {
             );
             msg.payload.productionForecast = productionForecast;
 
-            let batteryPower = startBatteryPower;
+			//TODO falsch bei viel PV Energieüberschuss
+            //let batteryPower = startBatteryPower;
             //TODO unsicher, was richtig ist - 0 führt zu falschen Ergebnissen, wenn wenig PV, aber Batterie gefüllt - aber gridcharge klappt nicht (soc > 30)
-            //let batteryPower = 0; // es wird mit leerer Batterie gestartet, um den maximalen morgigen Füllstand zu berechnen
+			//TODO Lösungsidee - hier 0, aber nach dem Optimierungspunkt wird die Batterie mit der verbleibenden Energie ergänzt aus dem vorherigen Zeitraum festgelegt
+            let batteryPower = 0; // es wird mit leerer Batterie gestartet, um den maximalen möglichen morgigen Füllstand zu berechnen
             if (debug) {
                 node.warn("batteryPower: " + batteryPower);
             }
 
+			// möglichen Energiespeicherbedarf berechnen inkl. PV-Überschuss (prog. Verbrauch - prog. Produktion)
             const energyNeeded = priceData.reduce((result, price, i) => {
                 const timestamp = new Date(price.start).getTime();
                 if (timestamp > recent) {
@@ -364,7 +361,7 @@ module.exports = function (RED) {
             if (estimatedMaximumSoc.start < lowestEnergyEntry.start) {
                 if (debug) {
                     node.warn(
-                        "estimatedMaximumSoc.start < lowestEnergyEntry.start, replaced: " + lowestEnergyEntry.start,
+                        "uneindeutig: estimatedMaximumSoc.start < lowestEnergyEntry.start, replaced by " + lowestEnergyEntry.start,
                     );
                 }
                 estimatedMaximumSoc = lowestEnergyEntry;
@@ -373,6 +370,8 @@ module.exports = function (RED) {
             const avg = Math.floor(calculateAverage(energyNeeded) * 1000) / 1000;
             const minimumPriceEntry = getMinimumPrice(energyNeeded);
             const maximumPriceEntry = getMaximumPrice(energyNeeded);
+			
+			// Kopie des Arrays anlegen
             const energyAvailable = JSON.parse(JSON.stringify(energyNeeded));
 
             // hier wird die Batterienutzungsoptimierung/-glättung durchgeführt
@@ -396,7 +395,7 @@ module.exports = function (RED) {
                 node.warn("Netzladungsperformance: " + gridchargePerformance);
             }
 
-            // Prognose verwerfen und Startwert annehmen
+            // Prognose verwerfen und aktuellen Batterieleistungswert annehmen
             let currentbatteryPower = startBatteryPower;
             if (debug) {
                 node.warn("aktuell verfügbare batteryPower: " + currentbatteryPower);
@@ -404,10 +403,8 @@ module.exports = function (RED) {
 
             let breakevenPoint = estimatedMaximumSoc.start;
             let chargedEnergyPrice = batteryEnergyPrice;
-            let estimatedbatteryPower = (batteryCapacity / 100) * (estimatedMaximumSoc.soc - batteryBuffer); // erwartete, maximale Batterieleistung
-            if (debug) {
-                node.warn("erwartete verfügbare batteryPower: " + estimatedbatteryPower);
-            }
+			let estimatedbatteryPower = 0;
+			
             if (gridchargePerformance && charge) {
                 if (debug) {
                     node.warn("Netzladung wird verwendet");
@@ -424,9 +421,10 @@ module.exports = function (RED) {
                     breakevenPoint = minimumPriceEntry.start;
                 }
                 const energy = calculateLoadableHours(energyNeeded, avg / rate / factor);
+				//TODO der Ladungsstand der Batterie muss berücksichtigt werden.
                 estimatedbatteryPower = batteryCapacity * Math.min(1, energy.loadableEnergy / battery_capacity); // Netzladung wird vorher für eine volle Batterie sorgen
                 if (debug) {
-                    node.warn("neue erwartete verfügbare batteryPower: " + estimatedbatteryPower);
+                    node.warn("erwartete verfügbare batteryPower (d. Netzladung): " + estimatedbatteryPower);
                 }
                 chargedEnergyPrice = energy.avgPrice;
             }
@@ -443,6 +441,7 @@ module.exports = function (RED) {
                 node.warn("nach dem Sortieren");
             }
             const batteryModes = energyAvailable.map((hour) => {
+				let usedEnergy = 0;
                 // Verwendung des aktuellen Batteriespeichers bis zum Entscheidungszeitpunkt
                 if (hour.value > 0 && hour.start < breakevenPoint) {
                     if (debug) {
@@ -468,9 +467,27 @@ module.exports = function (RED) {
                         if (debug) {
                             node.warn(hour.value + "/" + hour.mode + ": currentbatteryPower: " + currentbatteryPower);
                         }
+						usedEnergy += dischargeAmount;
                     }
                 }
-
+				
+				//estimatedbatteryPower = (batteryCapacity / 100) * (estimatedMaximumSoc.soc - batteryBuffer); // erwartete, maximale Batterieleistung
+				//if (debug) {
+				//    node.warn("erwartete verfügbare batteryPower: " + estimatedbatteryPower);
+				//}
+				
+				// Berechnung der verbleibenden Batterieleistung
+				let remainingEnergy = Math.max(0,(startBatteryPower * (batteryCapacity / 100)) - usedEnergy);
+				
+				// Berechnung der erwarteten Batterieleistung inkl. PV Überschuss / Netzladung
+				// TODO zwei Optionen - mehr als 100% erlauben - oder nicht... (da zeitlich versetzt, richtig?)
+				let minEnergy = (batteryCapacity / 100) * batteryBuffer;
+				//estimatedbatteryPower = Math.max(batteryCapacity, estimatedbatteryPower + remainingEnergy + (batteryCapacity / 100) * estimatedMaximumSoc.soc) - minEnergy;
+				estimatedbatteryPower = estimatedbatteryPower + Math.max(batteryCapacity, remainingEnergy + (batteryCapacity / 100) * estimatedMaximumSoc.soc) - minEnergy; 
+				if (debug) {
+				    node.warn("erwartete verfügbare batteryPower (summiert): " + estimatedbatteryPower);
+				}
+				
                 // prognostizierte Verwendung, nachdem PV/Netz geladen wurde
                 if (hour.value > 0 && hour.start >= breakevenPoint) {
                     if (debug) {
@@ -571,6 +588,7 @@ module.exports = function (RED) {
             batteryModes.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
             // Preisermittlung
+			// TODO Idee: auch die nicht optimierte Verwendung der Batterie berechnen und später die drei Werte (Netzladung/Batterie/ohne) vergleichen
             //const totalCost = energyNeeded.reduce((sum, entry) => sum + entry.cost, 0);
             const totalCostOptimized = batteryModes.reduce((sum, entry) => sum + entry.cost, 0);
 
