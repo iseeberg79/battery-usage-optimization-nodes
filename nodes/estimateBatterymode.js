@@ -53,6 +53,7 @@ module.exports = function (RED) {
                     node.warn("calculateLoadableHours");
                 }
                 const currentTime = new Date().toISOString();
+
                 let maxPrice = -Infinity;
                 let maxPriceIndex = -1;
                 let avgPrice = 0;
@@ -60,12 +61,13 @@ module.exports = function (RED) {
                 if (debug) {
                     node.warn("importPrice #19");
                 }
+
                 // Schritt 1: Den Index des höchsten Importpreises finden, ohne das Array zu verändern
                 for (let i = 0; i < data.length; i++) {
                     if (data[i].importPrice > maxPrice) {
                         maxPrice = data[i].importPrice;
                         maxPriceIndex = i;
-                    }
+                        }
                 }
 
                 // Schritt 2: Daten nach dem aktuellen Zeitpunkt und vor dem höchsten Importpreis filtern

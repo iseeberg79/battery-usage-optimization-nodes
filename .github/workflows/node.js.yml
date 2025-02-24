@@ -45,7 +45,12 @@ jobs:
 
     - name: Pack project
       run: npm pack --pack-destination ./build/${{ matrix.node-version }}/
- 
+#
+#    - name: Publish project  
+#      run: npm publish
+#      env:
+#           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
     - name: Archive build artifacts 
       uses: actions/upload-artifact@v4 
       with: 
