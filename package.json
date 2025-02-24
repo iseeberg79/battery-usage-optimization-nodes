@@ -1,6 +1,6 @@
 {
     "name": "@iseeberg79/battery-usage-optimization-nodes",
-    "version": "0.1.1-rc37",
+    "version": "0.1.1-rc37.1",
     "devDependencies": {
         "eslint": "^7.32.0",
         "grunt": "~0.4.5",
@@ -30,7 +30,7 @@
         "nodes": {
             "DetermineBatteryMode": "nodes/determineBatteryMode.js",
             "EvaluateSolarForecast": "nodes/evaluateSolarForecast.js",
-            "EvaluateSolarForecastAPI": "evaluateSolarForecastAPI.js",
+            "EvaluateSolarForecastAPI": "nodes/evaluateSolarForecastAPI.js",
             "ControlBattery": "nodes/controlBattery.js",
             "DeterminePowerValues": "nodes/determinePowerValues.js",
             "DetermineControlMode": "nodes/determineControlMode.js",
