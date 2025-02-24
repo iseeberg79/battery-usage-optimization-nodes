@@ -38,8 +38,7 @@ module.exports = function (RED) {
             const rate = 1 + performance / 100;
 
             const batteryEnergyPrice = feedin * factor; // Einspeisetarif inkl. Wandlungsverluste
-            let lastGridchargePrice =
-                typeof msg.lastGridchargePrice !== "undefined" ? msg.lastGridchargePrice : batteryEnergyPrice; // Netzladungspreis pro kWh
+            let lastGridchargePrice = typeof msg.lastGridchargePrice !== "undefined" ? msg.lastGridchargePrice : batteryEnergyPrice; // Netzladungspreis pro kWh
             const battery_capacity = batteryCapacity - (batteryCapacity / 100) * batteryBuffer; // available energy kWh
 
             let startBatteryPower = ((msg.payload.soc - batteryBuffer) / 100) * battery_capacity; // batteryPower aus dem Nachrichtenfluss (Energiemenge des Batteriespeichers)
@@ -90,14 +89,7 @@ module.exports = function (RED) {
                 // Mögliche Netzladungsmenge berechnen (pro Stunde maximal maxCharge kWh)
                 const loadableEnergy = Math.min(loadableHours * maxCharge, battery_capacity) * 0.9; // Annahme etwas reduzieren!
                 if (debug) {
-                    node.warn(
-                        "Loadable Energy: " +
-                            loadableEnergy +
-                            ", Hours: " +
-                            loadableHours +
-                            ", Threshold: " +
-                            threshold,
-                    );
+                    node.warn("Loadable Energy: " + loadableEnergy + ", Hours: " + loadableHours + ", Threshold: " + threshold);
                 }
 
                 return {
@@ -361,10 +353,7 @@ module.exports = function (RED) {
             msg.payload.consumptionForecast = consumptionForecast;
 
             // Zusammengefasste PV-Produktion (stundenbasiert)
-            const productionForecast = alignArray(
-                transformSolarProductionArray(msg.payload.productionForecast),
-                recent,
-            );
+            const productionForecast = alignArray(transformSolarProductionArray(msg.payload.productionForecast), recent);
             msg.payload.productionForecast = productionForecast;
 
             //TODO falsch bei viel PV Energieüberschuss
@@ -432,10 +421,7 @@ module.exports = function (RED) {
             let lowestEnergyEntry = getLowestEnergyEntry(energyNeeded);
             if (estimatedMaximumSoc.start < lowestEnergyEntry.start) {
                 if (debug) {
-                    node.warn(
-                        "uneindeutig: estimatedMaximumSoc.start < lowestEnergyEntry.start, replaced by " +
-                            lowestEnergyEntry.start,
-                    );
+                    node.warn("uneindeutig: estimatedMaximumSoc.start < lowestEnergyEntry.start, replaced by " + lowestEnergyEntry.start);
                 }
                 estimatedMaximumSoc = lowestEnergyEntry;
             }
@@ -486,11 +472,7 @@ module.exports = function (RED) {
                 // wichtige Prüfung, ob das Maximum nach dem Minimum liegt
                 if (minimumPriceEntry.start < estimatedMaximumSoc.start) {
                     if (debug) {
-                        node.warn(
-                            minimumPriceEntry.start +
-                                ": ersetzen, liegt nach dem errechneten Maximum um: " +
-                                estimatedMaximumSoc.start,
-                        );
+                        node.warn(minimumPriceEntry.start + ": ersetzen, liegt nach dem errechneten Maximum um: " + estimatedMaximumSoc.start);
                     }
                     breakevenPoint = minimumPriceEntry.start;
                 }
@@ -514,15 +496,7 @@ module.exports = function (RED) {
             const comparedUsage = energyUnoptimized.map((hour) => {
                 if (comparedBatteryPower >= 0 && lastGridchargePrice < hour.importPrice) {
                     if (debug) {
-                        node.warn(
-                            hour.start +
-                                " " +
-                                hour.value +
-                                " " +
-                                estimatedMaximumSoc.start +
-                                " " +
-                                estimatedMaximumSoc.soc,
-                        );
+                        node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc);
                     }
                     const dischargeAmount = Math.min(hour.value, comparedBatteryPower);
                     comparedBatteryPower -= dischargeAmount;
@@ -566,15 +540,7 @@ module.exports = function (RED) {
                     }
                     if (currentbatteryPower >= 0 && lastGridchargePrice < hour.importPrice) {
                         if (debug) {
-                            node.warn(
-                                hour.start +
-                                    " " +
-                                    hour.value +
-                                    " " +
-                                    estimatedMaximumSoc.start +
-                                    " " +
-                                    estimatedMaximumSoc.soc,
-                            );
+                            node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc);
                         }
                         const dischargeAmount = Math.min(hour.value, currentbatteryPower);
                         currentbatteryPower -= dischargeAmount;
@@ -610,11 +576,7 @@ module.exports = function (RED) {
                 let minEnergy = (batteryCapacity / 100) * batteryBuffer;
                 estimatedbatteryPower = Math.max(
                     minEnergy,
-                    estimatedbatteryPower +
-                        Math.min(
-                            battery_capacity + minEnergy,
-                            remainingEnergy + (batteryCapacity / 100) * estimatedMaximumSoc.soc,
-                        ),
+                    estimatedbatteryPower + Math.min(battery_capacity + minEnergy, remainingEnergy + (batteryCapacity / 100) * estimatedMaximumSoc.soc),
                 );
                 if (debug) {
                     node.warn("erwartete verfügbare batteryPower (summiert): " + estimatedbatteryPower);
@@ -627,15 +589,7 @@ module.exports = function (RED) {
                     }
                     if (estimatedbatteryPower > 0 && lastGridchargePrice < hour.importPrice) {
                         if (debug) {
-                            node.warn(
-                                hour.start +
-                                    " " +
-                                    hour.value +
-                                    " " +
-                                    estimatedMaximumSoc.start +
-                                    " " +
-                                    estimatedMaximumSoc.soc,
-                            );
+                            node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc);
                         }
                         const dischargeAmount = Math.min(hour.value, estimatedbatteryPower);
                         estimatedbatteryPower -= dischargeAmount;
@@ -644,9 +598,7 @@ module.exports = function (RED) {
                         hour.cost = dischargeAmount * chargedEnergyPrice + hour.value * hour.importPrice;
                         hour.mode = "normal";
                         if (debug) {
-                            node.warn(
-                                hour.value + "/" + hour.mode + ": estimatedbatteryPower: " + estimatedbatteryPower,
-                            );
+                            node.warn(hour.value + "/" + hour.mode + ": estimatedbatteryPower: " + estimatedbatteryPower);
                         }
                     }
                 }
@@ -663,16 +615,6 @@ module.exports = function (RED) {
                     hour.mode = "normal";
                 }
 
-                //TODO zu prüfen, war vorher nicht nötig...
-                // interne Steuerung der Batterie, wenn niedriger Ladungszustand nach dem Entscheidungszeitpunkt
-                //				if (hour.mode == "hold" && hour.value > 0 && hour.start > breakevenPoint && estimatedbatteryPower <= 0) {
-                //					if (debug) {
-                //						node.warn(hour.start + ": Batterieladungszustand zu gering, interne Steuerung zulassen.");
-                //					}
-                //					hour.cost = hour.value * hour.importPrice;
-                //					hour.energy = 0;
-                //					hour.mode = "normal";
-                //				}
                 delete hour.soc;
                 return hour;
             });
@@ -741,71 +683,35 @@ module.exports = function (RED) {
             let energyPrice = feedin * factor;
             estimatedbatteryPower = Math.max(minEnergy, Math.min(battery_capacity + minEnergy, startBatteryPower));
             for (let i = 0; i < batteryModes.length; i++) {
+				let chargedEnergy = 0;
                 if (batteryModes[i].mode == "charge" && batteryModes[i].energy !== "undefined") {
                     // bei nachfolgenden den richtigen Preis verwenden
-                    let power = Math.max(
-                        minEnergy,
-                        Math.min(
-                            battery_capacity + minEnergy,
-                            estimatedbatteryPower + Math.abs(batteryModes[i].energy),
-                        ),
-                    );
-                    let grid = (power - estimatedbatteryPower) * batteryModes[i].importPrice * factor;
+                    let power = Math.max(minEnergy, Math.min(battery_capacity + minEnergy, estimatedbatteryPower + Math.abs(batteryModes[i].energy)));
+					chargedEnergy = (power - estimatedbatteryPower);
+                    let grid = chargedEnergy * batteryModes[i].importPrice * factor;
                     let old = estimatedbatteryPower * energyPrice;
                     energyPrice = (grid + old) / power;
                     if (debug) {
-                        node.warn(
-                            i +
-                                ": Power: " +
-                                power +
-                                " / Grid: " +
-                                grid +
-                                " / Old: " +
-                                old +
-                                " / homePrice: " +
-                                energyPrice,
-                        );
+                        node.warn(i + ": Power: " + power + " / Grid: " + grid + " / Old: " + old + " / homePrice: " + energyPrice);
                     }
                     estimatedbatteryPower = power;
                 } else {
                     // geladene PV Leistung reduziert den Netzladungspreis
                     if (batteryModes[i].mode == "hold" && batteryModes[i].value < 0) {
-                        let power = Math.max(
-                            minEnergy,
-                            Math.min(
-                                battery_capacity + minEnergy,
-                                estimatedbatteryPower + Math.abs(batteryModes[i].value),
-                            ),
-                        );
+                        let power = Math.max(minEnergy, Math.min(battery_capacity + minEnergy, estimatedbatteryPower + Math.abs(batteryModes[i].value)));
                         let pv = Math.abs(batteryModes[i].value) * feedin * factor;
                         let old = estimatedbatteryPower * energyPrice;
                         if (power - estimatedbatteryPower > 0) {
                             energyPrice = (pv + old) / power;
                         }
                         if (debug) {
-                            node.warn(
-                                i +
-                                    ": Power: " +
-                                    power +
-                                    " / PV: " +
-                                    pv +
-                                    " / Old: " +
-                                    old +
-                                    " / homePrice: " +
-                                    energyPrice,
-                            );
+                            node.warn(i + ": Power: " + power + " / PV: " + pv + " / Old: " + old + " / homePrice: " + energyPrice);
                         }
                         estimatedbatteryPower = power;
                     }
                     // die Batterie wird zu den mittleren Kosten PV/Netz entladen
                     if (batteryModes[i].mode == "normal" && batteryModes[i].energy !== "undefined") {
-                        let power = Math.max(
-                            minEnergy,
-                            Math.min(
-                                battery_capacity + minEnergy,
-                                estimatedbatteryPower - Math.abs(batteryModes[i].energy),
-                            ),
-                        );
+                        let power = Math.max(minEnergy, Math.min(battery_capacity + minEnergy, estimatedbatteryPower - Math.abs(batteryModes[i].energy)));
                         estimatedbatteryPower = power;
                         if (debug) {
                             node.warn(i + ": Power: " + power + " / homePrice: " + energyPrice);
@@ -824,13 +730,10 @@ module.exports = function (RED) {
                     }
                 }
                 if (batteryModes[i].mode == "charge") {
-                    batteryModes[i].cost2 =
-                        batteryModes[i].importPrice * Math.abs(batteryModes[i].energy) * factor +
-                        batteryModes[i].value * batteryModes[i].importPrice;
+                    batteryModes[i].cost2 = batteryModes[i].importPrice * chargedEnergy * factor + batteryModes[i].value * batteryModes[i].importPrice;
                 }
                 if (batteryModes[i].mode == "normal") {
-                    batteryModes[i].cost2 =
-                        energyPrice * batteryModes[i].energy + batteryModes[i].value * batteryModes[i].importPrice; // + Feedin-Kosten
+                    batteryModes[i].cost2 = energyPrice * batteryModes[i].energy + batteryModes[i].value * batteryModes[i].importPrice; // + Feedin-Kosten
                 }
             }
 
