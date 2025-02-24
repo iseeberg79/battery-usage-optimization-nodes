@@ -1,0 +1,46 @@
+<script type="text/javascript">
+    RED.nodes.registerType('EvaluateSolarForecastAPI', {
+        category : 'function',
+        color : '#a6bbcf',
+        defaults : {
+            name : {
+                value : ""
+            },
+            url : {
+                value : "http://localhost:7070/api/tariff/solar"
+            }
+        },
+        inputs : 1,
+        outputs : 1,
+        icon : "file.png",
+        label : function() {
+            return this.name || "Evaluate Solar Forecast API";
+        }
+    });
+</script>
+
+<script type="text/x-red"
+    data-template-name="EvaluateSolarForecastAPI">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-url"><i class="fa fa-link"></i> URL</label>
+        <input type="text" id="node-input-url" placeholder="http://localhost:7070/api/tariff/solar">
+    </div>
+</script>
+
+<script type="text/x-red"
+    data-help-name="EvaluateSolarForecastAPI">
+    <p>Dieser Node holt die Solarprognosen von der angegebenen URL und leitet sie weiter.</p>
+    <p><b>Inputs:</b></p>
+    <ul>
+        <li><b>url</b> - Die URL für die Datenanfrage</li>
+    </ul>
+    <p><b>Outputs:</b></p>
+    <ul>
+        <li><b>payload</b> - die abgerufenen Solarprognosen</li>
+    </ul>
+</script>
+

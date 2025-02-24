@@ -30,6 +30,7 @@
         "nodes": {
             "DetermineBatteryMode": "nodes/determineBatteryMode.js",
             "EvaluateSolarForecast": "nodes/evaluateSolarForecast.js",
+            "EvaluateSolarForecastAPI": "evaluateSolarForecastAPI.js",
             "ControlBattery": "nodes/controlBattery.js",
             "DeterminePowerValues": "nodes/determinePowerValues.js",
             "DetermineControlMode": "nodes/determineControlMode.js",
