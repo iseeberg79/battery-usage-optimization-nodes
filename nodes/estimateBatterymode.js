@@ -22,9 +22,7 @@ module.exports = function (RED) {
             if (typeof msg.charge !== "undefined") {
                 charge = charge && msg.charge;
             }
-			if (debug) {
-			    node.warn("Netzladung aktiviert: " + charge);
-			}
+			if (debug) {node.warn("Netzladung aktiviert: " + charge);}
             const factor = 1 + (100 - efficiency) / 100;
             const rate = 1 + performance / 100;
 
