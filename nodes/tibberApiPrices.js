@@ -77,7 +77,7 @@ module.exports = function (RED) {
         });
     }
 
-    RED.nodes.registerType("tibber-api-prices", TibberApiPrices, {
+    RED.nodes.registerType("@iseeberg79/tibber-api-prices", TibberApiPrices, {
         credentials: {
             accessToken: { type: "text" }
         },

@@ -1,8 +1,16 @@
 [
     {
-        "id": "d828cc95360f4c45",
+        "id": "ec1d395861064d7f",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "53e2a6db5810145a",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -20,28 +28,28 @@
         "topic": "",
         "payload": "pvForecast1",
         "payloadType": "global",
-        "x": 180,
-        "y": 260,
+        "x": 160,
+        "y": 280,
         "wires": [
             [
-                "69602ecf457ecfc8"
+                "fbf644e9c08d4914"
             ]
         ]
     },
     {
-        "id": "00b09473d8685ebd",
+        "id": "d6bf1a495dd6f026",
         "type": "comment",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "erwarteter Solarertrag zweier PV Anlagen - stündlich",
         "info": "",
-        "x": 310,
-        "y": 220,
+        "x": 290,
+        "y": 240,
         "wires": []
     },
     {
-        "id": "e063e5af6110505f",
+        "id": "34746799d5a10261",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -54,19 +62,19 @@
         "once": false,
         "onceDelay": "10",
         "topic": "",
-        "x": 130,
-        "y": 160,
+        "x": 110,
+        "y": 180,
         "wires": [
             [
-                "bbae2bf77e5df7f4",
-                "d75f1f608f08c020"
+                "e594e759c085e00b",
+                "7560963e91850164"
             ]
         ]
     },
     {
-        "id": "4e640ae19780edc2",
+        "id": "306e7ccdb97ebcec",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -76,14 +84,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 900,
-        "y": 140,
+        "x": 880,
+        "y": 160,
         "wires": []
     },
     {
-        "id": "4f406597326ac519",
+        "id": "9ee2ab254e30dffe",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -106,19 +114,19 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 160,
+        "x": 680,
+        "y": 180,
         "wires": [
             [
-                "4e640ae19780edc2",
-                "a0b4d4567c6ed771"
+                "306e7ccdb97ebcec",
+                "58cd324f4e333c0a"
             ]
         ]
     },
     {
-        "id": "657e7d78f98ea24b",
+        "id": "c0b4817d7edba1b3",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -128,14 +136,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 900,
-        "y": 220,
+        "x": 880,
+        "y": 240,
         "wires": []
     },
     {
-        "id": "62d508aeb1f7efab",
+        "id": "f7a57ba9ea0f2101",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -151,39 +159,39 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 260,
+        "x": 680,
+        "y": 280,
         "wires": [
             [
-                "657e7d78f98ea24b",
-                "a0b4d4567c6ed771"
+                "c0b4817d7edba1b3",
+                "58cd324f4e333c0a"
             ]
         ]
     },
     {
-        "id": "9742c76cebbfb222",
+        "id": "397378f25cda559f",
         "type": "comment",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Abruf des erwarten Solarertrags von zwei PV Anlagen - täglich",
         "info": "",
-        "x": 340,
-        "y": 120,
+        "x": 320,
+        "y": 140,
         "wires": []
     },
     {
-        "id": "06478e77d6131403",
+        "id": "c7d5eca76779dd32",
         "type": "comment",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Abruf des erwarten Strompreises (Fraunhofer ISE)",
         "info": "",
-        "x": 310,
-        "y": 340,
+        "x": 290,
+        "y": 360,
         "wires": []
     },
     {
-        "id": "a828d51d3b373f2b",
+        "id": "5be548095786633b",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -206,18 +214,18 @@
         "once": false,
         "onceDelay": "10",
         "topic": "",
-        "x": 130,
-        "y": 380,
+        "x": 110,
+        "y": 400,
         "wires": [
             [
-                "3127cb8de95cd5ca"
+                "5234a24bc61cc724"
             ]
         ]
     },
     {
-        "id": "b7c21f4c0d694786",
+        "id": "d908f798e42944fb",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -240,18 +248,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 380,
+        "x": 680,
+        "y": 400,
         "wires": [
             [
-                "8716ef41c51f5cc8"
+                "3816e596e3bf2a58"
             ]
         ]
     },
     {
-        "id": "8716ef41c51f5cc8",
+        "id": "3816e596e3bf2a58",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -261,24 +269,24 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 380,
+        "x": 860,
+        "y": 400,
         "wires": []
     },
     {
-        "id": "bc7751ab9b712009",
+        "id": "9d5f6b2831254abe",
         "type": "comment",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Abruf des erwarten Strompreises (evcc)",
         "info": "",
-        "x": 270,
-        "y": 440,
+        "x": 250,
+        "y": 460,
         "wires": []
     },
     {
-        "id": "9b9289568196ac1c",
+        "id": "619f1468d1e2ca2e",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -291,18 +299,18 @@
         "once": true,
         "onceDelay": "10",
         "topic": "",
-        "x": 130,
-        "y": 480,
+        "x": 110,
+        "y": 500,
         "wires": [
             [
-                "0319aaa02c87f4e9"
+                "0b20e06a17ba2313"
             ]
         ]
     },
     {
-        "id": "1d6ff2c5c998aba7",
+        "id": "bcbafbf86dd3bdd4",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -312,14 +320,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 480,
+        "x": 860,
+        "y": 500,
         "wires": []
     },
     {
-        "id": "9786fbf15b1cebd4",
+        "id": "f78ba4dee6dcd2b7",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -342,18 +350,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 480,
+        "x": 680,
+        "y": 500,
         "wires": [
             [
-                "1d6ff2c5c998aba7"
+                "bcbafbf86dd3bdd4"
             ]
         ]
     },
     {
-        "id": "cc3635dd544a1dc1",
+        "id": "f1ed8d6e45d13ca3",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -371,18 +379,18 @@
         "once": true,
         "onceDelay": "20",
         "topic": "",
-        "x": 130,
-        "y": 580,
+        "x": 110,
+        "y": 600,
         "wires": [
             [
-                "db9c00f61794fc54"
+                "e01e4d7655508ff5"
             ]
         ]
     },
     {
-        "id": "217976be437efae6",
+        "id": "3ca363df5cec6a9a",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -405,18 +413,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 580,
+        "x": 680,
+        "y": 600,
         "wires": [
             [
-                "49ef78ea7b74b6ca"
+                "e88fea866c7d8049"
             ]
         ]
     },
     {
-        "id": "49ef78ea7b74b6ca",
+        "id": "e88fea866c7d8049",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -426,54 +434,54 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 580,
+        "x": 860,
+        "y": 600,
         "wires": []
     },
     {
-        "id": "8f03b68bbf2e9574",
+        "id": "ebf9ada825d379d3",
         "type": "comment",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Berechnung der benötigen Energie (Stromverbrauch)",
         "info": "",
-        "x": 310,
-        "y": 540,
+        "x": 290,
+        "y": 560,
         "wires": []
     },
     {
-        "id": "abb3f3ac8916d559",
+        "id": "878be5e4426712c0",
         "type": "comment",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Auswertung des heutigen Steuerungsmodus (1-2x täglich)",
         "info": "",
-        "x": 330,
-        "y": 640,
+        "x": 310,
+        "y": 660,
         "wires": []
     },
     {
-        "id": "e9acb2f006d925f8",
+        "id": "453f8c1a8a58f461",
         "type": "comment",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Berechnung des aktuellen Batteriemodus, 5-minütlich",
         "info": "",
-        "x": 320,
-        "y": 780,
+        "x": 300,
+        "y": 800,
         "wires": []
     },
     {
-        "id": "418896f9ac224aa1",
+        "id": "2fed352598674983",
         "type": "comment",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Berechnung des aktuellen Batteriemodus, watchdog-Intervall",
         "info": "",
-        "x": 340,
-        "y": 900,
+        "x": 320,
+        "y": 920,
         "wires": []
     },
     {
-        "id": "e428a5bc437feca2",
+        "id": "30105ce2d52ab699",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Mitternacht",
         "props": [
             {
@@ -516,18 +524,18 @@
         "once": true,
         "onceDelay": "20",
         "topic": "",
-        "x": 150,
-        "y": 680,
+        "x": 130,
+        "y": 700,
         "wires": [
             [
-                "a5429b6a24458fef"
+                "2ef70dc2ccc8c99c"
             ]
         ]
     },
     {
-        "id": "2a20e598db29cc39",
+        "id": "dc935091ad7d894b",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -605,18 +613,18 @@
         "once": true,
         "onceDelay": "40",
         "topic": "",
-        "x": 130,
-        "y": 820,
+        "x": 110,
+        "y": 840,
         "wires": [
             [
-                "90069f15cec585d3"
+                "5c0a2ccb59ef0f7f"
             ]
         ]
     },
     {
-        "id": "3da7fdf4e8e372e4",
+        "id": "0a3f04a3f1d89239",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -664,18 +672,18 @@
         "once": true,
         "onceDelay": "60",
         "topic": "",
-        "x": 130,
-        "y": 960,
+        "x": 110,
+        "y": 980,
         "wires": [
             [
-                "a8e1208a697baf0a"
+                "fe2e1d65dec418f4"
             ]
         ]
     },
     {
-        "id": "dcf58549ea1eea09",
+        "id": "561bc6f25bc8a5cc",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -685,14 +693,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 680,
+        "x": 860,
+        "y": 700,
         "wires": []
     },
     {
-        "id": "86a20d6230cc9b5b",
+        "id": "b15e3f6244c16be5",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -702,14 +710,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 760,
+        "x": 860,
+        "y": 780,
         "wires": []
     },
     {
-        "id": "f1909c82699d0831",
+        "id": "6ae44d0b1b4e56da",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -719,14 +727,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 820,
+        "x": 860,
+        "y": 840,
         "wires": []
     },
     {
-        "id": "d7a8430bb0f242d7",
+        "id": "0f42f6e8e0b1a4b5",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -736,14 +744,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 940,
+        "x": 860,
+        "y": 960,
         "wires": []
     },
     {
-        "id": "96fc5504a6b2e415",
+        "id": "57139274fa39890d",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -753,14 +761,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 1000,
+        "x": 860,
+        "y": 1020,
         "wires": []
     },
     {
-        "id": "8067f82adefbf68b",
+        "id": "55eefafcbf61d1ac",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -770,14 +778,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 1060,
+        "x": 860,
+        "y": 1080,
         "wires": []
     },
     {
-        "id": "0f7c08aaca6ef252",
+        "id": "43507a25391454e7",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -787,14 +795,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 880,
-        "y": 1120,
+        "x": 860,
+        "y": 1140,
         "wires": []
     },
     {
-        "id": "5d4e9c0d101552dd",
+        "id": "185d656bbdbe5ce8",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -804,14 +812,14 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 880,
-        "y": 880,
+        "x": 860,
+        "y": 900,
         "wires": []
     },
     {
-        "id": "e5900435c808c8e0",
+        "id": "c4a5c0cda359e825",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -827,18 +835,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 680,
+        "x": 680,
+        "y": 700,
         "wires": [
             [
-                "dcf58549ea1eea09"
+                "561bc6f25bc8a5cc"
             ]
         ]
     },
     {
-        "id": "11f603b1c5db6eca",
+        "id": "cbd697b9f5894bb9",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -854,18 +862,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 760,
+        "x": 680,
+        "y": 780,
         "wires": [
             [
-                "86a20d6230cc9b5b"
+                "b15e3f6244c16be5"
             ]
         ]
     },
     {
-        "id": "4d8c6cdae78da54c",
+        "id": "bd0d8817f7ed08fc",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -881,28 +889,28 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 820,
+        "x": 680,
+        "y": 840,
         "wires": [
             [
-                "f1909c82699d0831"
+                "6ae44d0b1b4e56da"
             ]
         ]
     },
     {
-        "id": "99793a19973b61b6",
+        "id": "12b15e676b5cfb27",
         "type": "comment",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Abruf der aktuellen Leistungsdaten (evcc)",
         "info": "",
-        "x": 280,
-        "y": 40,
+        "x": 260,
+        "y": 60,
         "wires": []
     },
     {
-        "id": "d197f5dbb546bc56",
+        "id": "801a2868ee0aca5c",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -915,18 +923,18 @@
         "once": true,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 130,
-        "y": 80,
+        "x": 110,
+        "y": 100,
         "wires": [
             [
-                "d145172187cf635a"
+                "86a211820c2d1f10"
             ]
         ]
     },
     {
-        "id": "40ba76623a8741b5",
+        "id": "3fba26566b297694",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -936,14 +944,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 900,
-        "y": 80,
+        "x": 880,
+        "y": 100,
         "wires": []
     },
     {
-        "id": "2280166f9af1cf73",
+        "id": "2c343359261abd9f",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -966,18 +974,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 720,
-        "y": 80,
+        "x": 700,
+        "y": 100,
         "wires": [
             [
-                "40ba76623a8741b5"
+                "3fba26566b297694"
             ]
         ]
     },
     {
-        "id": "167d584a6c709594",
+        "id": "cca1ee52a50453ce",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -993,18 +1001,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 940,
+        "x": 680,
+        "y": 960,
         "wires": [
             [
-                "d7a8430bb0f242d7"
+                "0f42f6e8e0b1a4b5"
             ]
         ]
     },
     {
-        "id": "6e9eb3a408218377",
+        "id": "fc63df2a739b4d48",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -1020,18 +1028,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 980,
+        "x": 680,
+        "y": 1000,
         "wires": [
             [
-                "96fc5504a6b2e415"
+                "57139274fa39890d"
             ]
         ]
     },
     {
-        "id": "d41095de37554de3",
+        "id": "6fda2ed140f4f369",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -1047,107 +1055,107 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 1020,
+        "x": 680,
+        "y": 1040,
         "wires": [
             [
-                "8067f82adefbf68b"
+                "55eefafcbf61d1ac"
             ]
         ]
     },
     {
-        "id": "bbae2bf77e5df7f4",
+        "id": "e594e759c085e00b",
         "type": "@iseeberg79/EvaluateSolarForecast",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "rooftopid": "",
         "token": "",
         "url": "",
-        "x": 390,
-        "y": 160,
+        "x": 370,
+        "y": 180,
         "wires": [
             [
-                "4f406597326ac519"
+                "9ee2ab254e30dffe"
             ]
         ]
     },
     {
-        "id": "69602ecf457ecfc8",
+        "id": "fbf644e9c08d4914",
         "type": "@iseeberg79/EstimateSolarEnergy",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
-        "x": 420,
-        "y": 260,
+        "x": 400,
+        "y": 280,
         "wires": [
             [
-                "62d508aeb1f7efab"
+                "f7a57ba9ea0f2101"
             ]
         ]
     },
     {
-        "id": "3127cb8de95cd5ca",
+        "id": "5234a24bc61cc724",
         "type": "@iseeberg79/EvaluateGridEnergyPrices",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "bzn": "DE-LU",
         "url": "https://api.energy-charts.info/price",
-        "x": 400,
-        "y": 380,
+        "x": 380,
+        "y": 400,
         "wires": [
             [
-                "b7c21f4c0d694786"
+                "d908f798e42944fb"
             ]
         ]
     },
     {
-        "id": "0319aaa02c87f4e9",
+        "id": "0b20e06a17ba2313",
         "type": "@iseeberg79/EvaluateGridEnergyPricesAPI",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "url": "http://localhost:7070/api/tariff/grid",
-        "x": 410,
-        "y": 480,
+        "x": 390,
+        "y": 500,
         "wires": [
             [
-                "9786fbf15b1cebd4"
+                "f78ba4dee6dcd2b7"
             ]
         ]
     },
     {
-        "id": "db9c00f61794fc54",
+        "id": "e01e4d7655508ff5",
         "type": "@iseeberg79/EstimateHouseholdConsumption",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
-        "x": 420,
-        "y": 580,
+        "x": 400,
+        "y": 600,
         "wires": [
             [
-                "217976be437efae6"
+                "3ca363df5cec6a9a"
             ]
         ]
     },
     {
-        "id": "32dcd5f264915cc2",
+        "id": "c9bd6d4e68380399",
         "type": "@iseeberg79/DetermineControlMode",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "minPvRequired": "10000",
         "minPriceDeviation": "",
         "minPriceDifference": "",
         "priceLimit": "",
         "avg": "",
-        "x": 510,
-        "y": 680,
+        "x": 490,
+        "y": 700,
         "wires": [
             [
-                "e5900435c808c8e0"
+                "c4a5c0cda359e825"
             ]
         ]
     },
     {
-        "id": "90069f15cec585d3",
+        "id": "5c0a2ccb59ef0f7f",
         "type": "@iseeberg79/DetermineBatteryMode",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "enableGridchargeThreshold": "",
         "disableGridchargeThreshold": "",
@@ -1155,79 +1163,79 @@
         "minsoc": "",
         "maxsoc": "",
         "efficiency": "",
-        "x": 390,
-        "y": 820,
+        "x": 370,
+        "y": 840,
         "wires": [
             [
-                "11f603b1c5db6eca"
+                "cbd697b9f5894bb9"
             ],
             [
-                "4d8c6cdae78da54c"
+                "bd0d8817f7ed08fc"
             ],
             [
-                "5d4e9c0d101552dd"
+                "185d656bbdbe5ce8"
             ]
         ]
     },
     {
-        "id": "a8e1208a697baf0a",
+        "id": "fe2e1d65dec418f4",
         "type": "@iseeberg79/ControlBattery",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "configuredMinSoC": "",
         "maximumGridprice": "",
         "configuredBatteryLock": false,
-        "x": 360,
-        "y": 960,
+        "x": 340,
+        "y": 980,
         "wires": [
             [
-                "167d584a6c709594"
+                "cca1ee52a50453ce"
             ],
             [
-                "6e9eb3a408218377"
+                "fc63df2a739b4d48"
             ],
             [
-                "d41095de37554de3"
+                "6fda2ed140f4f369"
             ],
             [
-                "0f7c08aaca6ef252"
+                "43507a25391454e7"
             ]
         ]
     },
     {
-        "id": "d145172187cf635a",
+        "id": "86a211820c2d1f10",
         "type": "@iseeberg79/DeterminePowerValues",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "url": "http://localhost:7070/api/state",
-        "x": 410,
-        "y": 80,
+        "x": 390,
+        "y": 100,
         "wires": [
             [
-                "2280166f9af1cf73"
+                "2c343359261abd9f"
             ]
         ]
     },
     {
-        "id": "d75f1f608f08c020",
+        "id": "7560963e91850164",
         "type": "@iseeberg79/EvaluateSolarForecast",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "rooftopid": "",
         "token": "",
         "url": "",
-        "x": 410,
-        "y": 180,
+        "x": 390,
+        "y": 200,
         "wires": [
             [
-                "409ec49b81beddba"
+                "015a88698cf80307"
             ]
         ]
     },
     {
-        "id": "409ec49b81beddba",
+        "id": "015a88698cf80307",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -1250,31 +1258,31 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 720,
-        "y": 180,
+        "x": 700,
+        "y": 200,
         "wires": [
             [
-                "a0b4d4567c6ed771"
+                "58cd324f4e333c0a"
             ]
         ]
     },
     {
-        "id": "cd07e27f530f869b",
+        "id": "c64c402c24b062fe",
         "type": "@iseeberg79/EstimateSolarEnergy",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
-        "x": 440,
-        "y": 280,
+        "x": 420,
+        "y": 300,
         "wires": [
             [
-                "73f66af5a8d07e25"
+                "a5c1eb08187cd0e4"
             ]
         ]
     },
     {
-        "id": "e67d08b5e7356f27",
+        "id": "6c041c6c5cd2159d",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -1292,18 +1300,18 @@
         "topic": "",
         "payload": "pvForecast2",
         "payloadType": "global",
-        "x": 200,
-        "y": 280,
+        "x": 180,
+        "y": 300,
         "wires": [
             [
-                "cd07e27f530f869b"
+                "c64c402c24b062fe"
             ]
         ]
     },
     {
-        "id": "73f66af5a8d07e25",
+        "id": "a5c1eb08187cd0e4",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -1319,18 +1327,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 720,
-        "y": 280,
+        "x": 700,
+        "y": 300,
         "wires": [
             [
-                "a0b4d4567c6ed771"
+                "58cd324f4e333c0a"
             ]
         ]
     },
     {
-        "id": "a0b4d4567c6ed771",
+        "id": "58cd324f4e333c0a",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "summieren",
         "rules": [
             {
@@ -1374,18 +1382,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 910,
-        "y": 280,
+        "x": 890,
+        "y": 300,
         "wires": [
             [
-                "fe9e1f5e36324ac1"
+                "fd6084fd9c1a78bb"
             ]
         ]
     },
     {
-        "id": "fe9e1f5e36324ac1",
+        "id": "fd6084fd9c1a78bb",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -1395,14 +1403,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 1080,
-        "y": 280,
+        "x": 1060,
+        "y": 300,
         "wires": []
     },
     {
-        "id": "a5429b6a24458fef",
+        "id": "2ef70dc2ccc8c99c",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Maximum",
         "rules": [
             {
@@ -1432,18 +1440,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 320,
-        "y": 680,
+        "x": 300,
+        "y": 700,
         "wires": [
             [
-                "32dcd5f264915cc2"
+                "c9bd6d4e68380399"
             ]
         ]
     },
     {
-        "id": "1309c85bad05b955",
+        "id": "c9a5ede43852e54e",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -1459,18 +1467,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 900,
-        "y": 1280,
+        "x": 880,
+        "y": 1300,
         "wires": [
             [
-                "9734e9d9c72f3824"
+                "07ac307ca42ff0b4"
             ]
         ]
     },
     {
-        "id": "9734e9d9c72f3824",
+        "id": "07ac307ca42ff0b4",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -1480,14 +1488,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 1040,
-        "y": 1280,
+        "x": 1020,
+        "y": 1300,
         "wires": []
     },
     {
-        "id": "70dbc8466ddc6558",
+        "id": "5b8a657a5cc6dbf8",
         "type": "ioBroker in",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "price_avg_weekly",
         "attrname": "payload",
         "topic": "alias.0.energy.grid.price_avg_weekly",
@@ -1497,35 +1505,35 @@
         "gap": "",
         "fireOnStart": "false",
         "outFormat": "MQTT",
-        "x": 580,
-        "y": 1310,
+        "x": 560,
+        "y": 1330,
         "wires": [
             [
-                "8807482bf36bcaac"
+                "ef666ed377a494af"
             ]
         ]
     },
     {
-        "id": "049c4121ee772cb5",
+        "id": "f3853287e700f386",
         "type": "ioBroker get",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "topic": "alias.0.energy.grid.price_avg_weekly",
         "attrname": "payload",
         "payloadType": "value",
         "errOnInvalidState": "nothing",
-        "x": 520,
-        "y": 1270,
+        "x": 500,
+        "y": 1290,
         "wires": [
             [
-                "8807482bf36bcaac"
+                "ef666ed377a494af"
             ]
         ]
     },
     {
-        "id": "a19789bb81087401",
+        "id": "38ef5aceb9797210",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -1543,18 +1551,18 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 150,
-        "y": 1220,
+        "x": 130,
+        "y": 1240,
         "wires": [
             [
-                "028a7c855dd01c15"
+                "c3bcfb6672483096"
             ]
         ]
     },
     {
-        "id": "028a7c855dd01c15",
+        "id": "c3bcfb6672483096",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "initialisieren",
         "rules": [
             {
@@ -1584,68 +1592,68 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 310,
-        "y": 1220,
+        "x": 290,
+        "y": 1240,
         "wires": [
             [
-                "049c4121ee772cb5",
-                "7ea7c839297e6b5f"
+                "f3853287e700f386",
+                "1bf85817badf884f"
             ]
         ]
     },
     {
-        "id": "8807482bf36bcaac",
+        "id": "ef666ed377a494af",
         "type": "json",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "property": "payload",
         "action": "obj",
         "pretty": false,
-        "x": 770,
-        "y": 1280,
+        "x": 750,
+        "y": 1300,
         "wires": [
             [
-                "1309c85bad05b955"
+                "c9a5ede43852e54e"
             ]
         ]
     },
     {
-        "id": "7ea7c839297e6b5f",
+        "id": "1bf85817badf884f",
         "type": "ioBroker get",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "topic": "alias.0.energy.battery.minsoc",
         "attrname": "payload",
         "payloadType": "value",
         "errOnInvalidState": "nothing",
-        "x": 550,
-        "y": 1220,
+        "x": 530,
+        "y": 1240,
         "wires": [
             [
-                "897540af8a457484"
+                "5dd11b43cf34ff12"
             ]
         ]
     },
     {
-        "id": "897540af8a457484",
+        "id": "5dd11b43cf34ff12",
         "type": "json",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "property": "payload",
         "action": "obj",
         "pretty": false,
-        "x": 770,
-        "y": 1220,
+        "x": 750,
+        "y": 1240,
         "wires": [
             [
-                "b42a0e02f18460e1"
+                "e92586b7987444b1"
             ]
         ]
     },
     {
-        "id": "b42a0e02f18460e1",
+        "id": "e92586b7987444b1",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -1661,18 +1669,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 900,
-        "y": 1220,
+        "x": 880,
+        "y": 1240,
         "wires": [
             [
-                "e851622d028af763"
+                "70e233125e6e09e2"
             ]
         ]
     },
     {
-        "id": "2f3ba4f1120a609f",
+        "id": "8078a07acd8728ee",
         "type": "ioBroker in",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "attrname": "payload",
         "topic": "alias.0.energy.battery.minsoc",
@@ -1682,18 +1690,18 @@
         "gap": "",
         "fireOnStart": "false",
         "outFormat": "MQTT",
-        "x": 550,
-        "y": 1170,
+        "x": 530,
+        "y": 1190,
         "wires": [
             [
-                "897540af8a457484"
+                "5dd11b43cf34ff12"
             ]
         ]
     },
     {
-        "id": "e851622d028af763",
+        "id": "70e233125e6e09e2",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -1703,14 +1711,14 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 1040,
-        "y": 1220,
+        "x": 1020,
+        "y": 1240,
         "wires": []
     },
     {
-        "id": "562c05a95dc9ab23",
+        "id": "43cf98b13cdb48f0",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "14 Uhr",
         "props": [
             {
@@ -1753,18 +1761,18 @@
         "once": false,
         "onceDelay": "20",
         "topic": "",
-        "x": 140,
-        "y": 720,
+        "x": 120,
+        "y": 740,
         "wires": [
             [
-                "a5429b6a24458fef"
+                "2ef70dc2ccc8c99c"
             ]
         ]
     },
     {
-        "id": "9f09354c95ed3ea4",
+        "id": "4ffc70bcef0aff59",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "force charge",
         "props": [
             {
@@ -1782,18 +1790,18 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 150,
-        "y": 1480,
+        "x": 130,
+        "y": 1500,
         "wires": [
             [
-                "086a7a5d5266c7d9"
+                "2f13328d3d3a7fac"
             ]
         ]
     },
     {
-        "id": "086a7a5d5266c7d9",
+        "id": "2f13328d3d3a7fac",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "rules": [
             {
@@ -1809,55 +1817,16 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 330,
-        "y": 1480,
+        "x": 310,
+        "y": 1500,
         "wires": [
             []
         ]
     },
     {
-        "id": "d6508994230062e5",
-        "type": "inject",
-        "z": "cd9dc0e3193f2e03",
-        "name": "Bereitstellung",
-        "props": [
-            {
-                "p": "topic",
-                "vt": "str"
-            },
-            {
-                "p": "input.household",
-                "v": "energy.household",
-                "vt": "global"
-            },
-            {
-                "p": "input.priceData",
-                "v": "energy.priceData",
-                "vt": "global"
-            },
-            {
-                "p": "input.pvforecast",
-                "v": "energy.pvforecast",
-                "vt": "global"
-            }
-        ],
-        "repeat": "3600",
-        "crontab": "",
-        "once": true,
-        "onceDelay": "35",
-        "topic": "",
-        "x": 160,
-        "y": 1380,
-        "wires": [
-            [
-                "9d24aaad53466e37"
-            ]
-        ]
-    },
-    {
-        "id": "9d24aaad53466e37",
+        "id": "eb9bc9f973090a31",
         "type": "function",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "transformieren",
         "func": "const startTimestamp = (new Date()).setHours(0,0,0,0);\nconst interval = 60 * 60 * 1000;\n\n// Transformation priceData\nconst transformPriceData = (data) => {\n    return data.map(item => ({\n        value: item.price,\n        start: item.start,\n        exportPrice: 0.079, // Bei Bedarf anpassen\n        importPrice: item.price\n    }));\n};\n\n// Transformation productionForecast\nconst transformProductionForecast = (data) => {\n    return data.map(item => ({\n        start: item.period_end,\n        value: item.pv_estimate\n    }));\n};\n\n// Transformation consumptionForecast\nconst transformConsumptionForecast = (data, startTimestamp, interval) => {\n    return data.map((value, index) => ({\n        start: (new Date(startTimestamp + index * interval)).toISOString(),\n        value: value\n    }));\n};\n\nconst priceData = msg.input.priceData;\nconst productionForecast = msg.input.pvforecast;\nconst consumptionForecast = msg.input.household;\n\nconst transformedData = {\n    priceData: transformPriceData(priceData),\n    productionForecast: transformProductionForecast(productionForecast),\n    consumptionForecast: transformConsumptionForecast(consumptionForecast, startTimestamp, interval),\n    soc: msg.input.soc\n};\n\ndelete msg.input;\n\nmsg.payload = transformedData;\n\nreturn msg;",
         "outputs": 1,
@@ -1866,18 +1835,18 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 340,
-        "y": 1380,
+        "x": 320,
+        "y": 1400,
         "wires": [
             [
-                "1665cd6c922d3ee6"
+                "d6c83a05ca88f0ef"
             ]
         ]
     },
     {
-        "id": "1665cd6c922d3ee6",
+        "id": "d6c83a05ca88f0ef",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -1893,18 +1862,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 520,
-        "y": 1380,
+        "x": 500,
+        "y": 1400,
         "wires": [
             [
-                "e6d82ba020b5c8ea"
+                "aa2a5706068de4bc"
             ]
         ]
     },
     {
-        "id": "7ed67deeba4a952d",
+        "id": "9b46559b1f0c2cbc",
         "type": "inject",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "props": [
             {
@@ -1922,18 +1891,18 @@
         "topic": "",
         "payload": "energy",
         "payloadType": "flow",
-        "x": 510,
-        "y": 1420,
+        "x": 490,
+        "y": 1440,
         "wires": [
             [
-                "e6d82ba020b5c8ea"
+                "aa2a5706068de4bc"
             ]
         ]
     },
     {
-        "id": "e6d82ba020b5c8ea",
+        "id": "aa2a5706068de4bc",
         "type": "@iseeberg79/EstimateBatterymode",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "",
         "batteryBuffer": "",
         "batteryCapacity": "",
@@ -1941,18 +1910,18 @@
         "feedin": "",
         "efficiency": "",
         "performance": "",
-        "x": 720,
-        "y": 1380,
+        "x": 700,
+        "y": 1400,
         "wires": [
             [
-                "41afce905c17a456"
+                "d7c22e3c89524bf3"
             ]
         ]
     },
     {
-        "id": "41afce905c17a456",
+        "id": "d7c22e3c89524bf3",
         "type": "change",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "speichern",
         "rules": [
             {
@@ -1975,18 +1944,18 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 900,
-        "y": 1380,
+        "x": 880,
+        "y": 1400,
         "wires": [
             [
-                "1eb77f7021550823"
+                "1fce251c878d0e25"
             ]
         ]
     },
     {
-        "id": "1eb77f7021550823",
+        "id": "1fce251c878d0e25",
         "type": "debug",
-        "z": "cd9dc0e3193f2e03",
+        "z": "ec1d395861064d7f",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -1996,8 +1965,62 @@
         "targetType": "full",
         "statusVal": "payload",
         "statusType": "msg",
-        "x": 1040,
-        "y": 1380,
+        "x": 1020,
+        "y": 1400,
         "wires": []
+    },
+    {
+        "id": "7511cf026ef5e9db",
+        "type": "inject",
+        "z": "ec1d395861064d7f",
+        "name": "Bereitstellung",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "input.household",
+                "v": "energy.household",
+                "vt": "global"
+            },
+            {
+                "p": "input.priceData",
+                "v": "energy.priceData",
+                "vt": "global"
+            },
+            {
+                "p": "input.pvforecast",
+                "v": "energy.pvforecast",
+                "vt": "global"
+            },
+            {
+                "p": "input.soc",
+                "v": "energy.soc",
+                "vt": "global"
+            },
+            {
+                "p": "debug",
+                "v": "false",
+                "vt": "bool"
+            },
+            {
+                "p": "charge",
+                "v": "false",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "35",
+        "topic": "",
+        "x": 140,
+        "y": 1400,
+        "wires": [
+            [
+                "eb9bc9f973090a31"
+            ]
+        ]
     }
 ]
