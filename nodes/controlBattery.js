@@ -52,9 +52,21 @@ module.exports = function(RED) {
 					msg.effectiveFeedin = msg.price;
 					if (!msg.optimize) {
 						if (debug) { node.warn(`Optimize is false`); }
-						msg.targetMode = msg.evccBatteryMode;
+						// in dem Zeitraum findet sie Berechnung des heutigen Modus statt; in diesem sollte noch gesteuert werden (i.d.R. zurückgesetzt)
+						if (new Date().getHours() == 0 && new Date().getMinutes() < 20 && msg.batterymode != "charge") {
+							if (debug) { node.warn(`Optimize is false, transitional period`); }
+							msg.targetMode = msg.batterymode;
+							if (msg.targetMode === "hold") {
+								node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
+							} else {
+								node.status({ fill: "green", shape: "dot", text: msg.targetMode });
+							}
+						} else {
+							// problematisch, wenn der Ladungsmodus zuvor aktiv war (0:00 Uhr - 0:20 Uhr // Tagumschaltung)
+							msg.targetMode = msg.evccBatteryMode;
+							node.status({ fill: "red", shape: "dot", text: msg.targetMode });
+						}
 						outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
-						node.status({ fill: "red", shape: "dot", text: msg.targetMode });
 					} else {
 						if (debug) { node.warn(`Optimize is true`); }
 						msg.targetMode = msg.batterymode;
@@ -98,7 +110,7 @@ module.exports = function(RED) {
 							if (debug) { node.warn(`Battery mode is charge with price <= maximumGridprice`); }
 							msg.targetMode = msg.batterymode;
 							outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
-							outputs[2] = { payload: msg.price };
+							outputs[2] = { payload: Math.ceil(msg.price*1000)/1000 }; // evcc is to sensitive for floating point
 							node.status({ fill: "red", shape: "dot", text: msg.targetMode });
 						}
 						if ((msg.batterymode === 'normal') || (msg.batterymode === 'unknown')) {
@@ -118,20 +130,24 @@ module.exports = function(RED) {
 					msg.targetMode = 'hold';
 					outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
 					node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
-				}
-
+				}				
 				outputs[3] = msg;
+				
 			} else {
 				node.warn("UI Sperre: forcierte Batteriesperre!");
+				// TODO das hier ist ggf. falsch, da die UI basierte Sperre trotzdem gesetzt werden soll?
 				if (msg.optimize) {
-					if (debug) { node.warn(`Optimize is true with battery lock`); }
+					if (debug) { node.warn(`Optimize is true - external forced battery lock`); }
 					msg.targetMode = 'hold';
 					outputs[0] = { payload: 100 };
 					outputs[1] = { payload: msg.targetMode, optimize: false };
 					node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
+				} else {
+					if (debug) { node.warn(`Optimize is false - requested external forced battery lock`); }
 				}
 			}
-
+	
+			// TODO zu klären - löschen?
 //			// wenn der Ladungsstand niedrig ist, den Status auf "normal" setzen
 //			//if ((msg.targetMode == "hold") && (msg.actualsoc < msg.minsoc)) {
 //			if ((msg.targetMode == "hold") && (msg.actualsoc < msg.configuredMinSoC)) {
