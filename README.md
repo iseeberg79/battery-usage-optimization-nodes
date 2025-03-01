@@ -41,7 +41,7 @@ Eine externe Steuerung kann eingebunden werden, die weiterhin den Status der evc
 
 Ich setze die npm-Bausteine innerhalb einer Node-RED-Instanz auf ioBroker ein. Sie sollten jedoch auch mit anderen Plattformen wie Home Assistant kompatibel sein.
 
-Eine Veröffentlichung des Pakets ist derzeit noch nicht erfolgt, da weitere Erfahrungswerte und Optimierungen erforderlich sind.
+Eine Veröffentlichung des Pakets ist inzwischen erfolgt, weitere Erfahrungswerte und Optimierungen sind nötig.
 
 ---
 
