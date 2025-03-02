@@ -5,6 +5,7 @@ module.exports = function (RED) {
 
         let debug = false; // debugging
         let estimation = false; // estimate 48h
+        let error = false;
 
         // Konfigurationsparameter
         const batteryBuffer = config.batteryBuffer || 5; // minsoc %
@@ -13,6 +14,7 @@ module.exports = function (RED) {
         const feedin = config.feedin || 0.079; // Einspeisetarif pro kWh
         const efficiency = config.efficiency || 80; // Wirkungsgrad %
         const performance = config.performance || 20; // Vorteil %
+        let soc = 0; // state of charge
         let charge = true; // Netzladung aktivieren
         //TODO es fehlt der lastGridchargePrice als Übergabe für eine Verschiebung der Feedin-Grenze
 
@@ -35,6 +37,20 @@ module.exports = function (RED) {
                 estimation = msg.estimation;
             }
 
+            // use soc from message flow
+            if (typeof msg.payload.soc !== "undefined") {
+                soc = msg.payload.soc;
+            }
+
+            // abort on missing forecast input
+            if (typeof msg.payload.priceData == "undefined" || typeof msg.payload.productionForecast == "undefined" || typeof msg.payload.consumptionForecast == "undefined") {
+                node.status({ fill: "red", shape: "ring", text: "missing forecasts" });
+                msg.error = "no forecasts";
+                error = true;
+            } else {
+                node.status({ fill: "orange", shape: "dot", text: "processing" });
+            }
+
             const factor = 1 + (100 - efficiency) / 100;
             const rate = 1 + performance / 100;
 
@@ -42,7 +58,7 @@ module.exports = function (RED) {
             let lastGridchargePrice = typeof msg.lastGridchargePrice !== "undefined" ? msg.lastGridchargePrice : batteryEnergyPrice; // Netzladungspreis pro kWh
             const battery_capacity = batteryCapacity - (batteryCapacity / 100) * batteryBuffer; // available energy kWh
 
-            const startPower = ((msg.payload.soc - batteryBuffer) / 100) * battery_capacity; // batteryPower aus dem Nachrichtenfluss (Energiemenge des Batteriespeichers)
+            const startPower = ((soc - batteryBuffer) / 100) * battery_capacity; // batteryPower aus dem Nachrichtenfluss (Energiemenge des Batteriespeichers)
             let startBatteryPower = startPower;
 
             //const now = new Date().getTime();
@@ -102,49 +118,7 @@ module.exports = function (RED) {
             }
 
             // TODO das Folgende auch für die Preise machen, um das maximale zur Prognose beizutragen?
-
-            /*			
-						// Erweiterung der Strompreisdaten auf 48 Stunden
-						function extendDataTo48Hours(data, avg) {
-			
-							// Funktion, um eine neue Zeit im ISO-Format zu generieren
-							function getNewTime(date, hoursToAdd) {
-								const newDate = new Date(date);
-								newDate.setHours(newDate.getHours() + hoursToAdd);
-								return newDate.toISOString();
-							}
-			
-							// Daten ab dem aktuellen Zeitpunkt filtern
-							const filteredData = data.filter(item => new Date(item.start) >= recent);
-							if (debug) {
-								node.warn("filteredData-length: " + filteredData.length);
-							}
-			
-							// Erweiterung des Datensatzes auf 48 Stunden
-							let extendedData = [];
-							for (let i = 0; i < 48; i++) {
-								if (i < filteredData.length) {
-									extendedData.push(filteredData[i]);
-								} else {
-									const lastData = extendedData[extendedData.length - 1];
-									if (debug) {
-										node.warn("lastData.start: " + lastData.start);
-									}
-									const newStart = getNewTime(lastData.start, 1);
-									//const newEnd = getNewTime(lastData.start, 2);
-									extendedData.push({
-										start: newStart,
-										//end: newEnd,
-										value: avg,
-										exportPrice: lastData.exportPrice,
-										importPrice: avg
-									});
-								}
-							}
-			
-							return extendedData;
-						}
-			*/
+            // sinnlos, das mit dem Durchschnittspreis auszuführen - bräuchte bessere Prognose
 
             // Zeitverschiebung der Verbrauchsprognose um 24 Stunden und Erweiterung auf 48 Felder
             function extendForecast(forecast) {
@@ -345,6 +319,7 @@ module.exports = function (RED) {
                 let energyPrice = feedin * factor;
                 let estimatedbatteryPower = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, startBatteryPower));
                 let gridCharged = false;
+                let costTotal = 0;
 
                 for (let i = 0; i < modes.length; i++) {
                     let chargedEnergy = 0;
@@ -423,28 +398,21 @@ module.exports = function (RED) {
                         if (modes[i].energy > 0) {
                             // Bezug und Speicherkosten (Kosten inkl. Verluste sicherstellen)
                             energyPrice = Math.max(energyPrice, feedin * factor);
+                            modes[i].homePrice = energyPrice;
                         }
                         //modes[i].cost2 = energyPrice * modes[i].energy + modes[i].value * modes[i].importPrice;
                         modes[i].cost2 = energyPrice * modes[i].energy + Math.max(0, modes[i].value) * modes[i].importPrice;
                     }
+
+                    // formatieren
+                    let cost = Math.round(modes[i].cost2 * 10000) / 10000;
+                    costTotal += cost;
+                    modes[i].cost2 = cost;
                 }
 
-                return modes.reduce((sum, entry) => sum + entry.cost2, 0);
+                //return parseFloat(costTotal.toFixed(2));
+                return Math.round(costTotal * 100) / 100;
             }
-
-            /*
-						let prices = msg.payload.priceData;
-						if (estimation) {
-							if (debug) {
-								node.warn("prices-length: " + prices.length);
-							}
-							prices = extendDataTo48Hours(prices, calculateAverage(prices));
-							if (debug) {
-								node.warn("extended to: " + prices.length);
-								node.warn("last Dataset: " + JSON.stringify(prices[prices.length - 1]));
-							}
-						}
-			*/
 
             const priceData = alignArray(msg.payload.priceData, recent);
             msg.payload.priceData = priceData;
@@ -515,7 +483,7 @@ module.exports = function (RED) {
             }, []);
             msg.payload.energyNeeded = JSON.parse(JSON.stringify(energyNeeded));
 
-            const totalCost = energyNeeded.reduce((sum, entry) => sum + entry.cost, 0);
+            const totalCost = Math.round(energyNeeded.reduce((sum, entry) => sum + entry.cost, 0) * 100) / 100;
 
             let estimatedMaximumSoc = getMaximumSoC(energyNeeded);
             let lowestEnergyEntry = getLowestEnergyEntry(energyNeeded);
@@ -592,22 +560,24 @@ module.exports = function (RED) {
             if (debug) {
                 node.warn("vor der Vergleichsberechnung");
             }
+
             let comparedBatteryPower = startPower; // ensure valid starting value
+            if (debug) {
+                node.warn("compared starting - battery: " + comparedBatteryPower);
+            }
+
+            energyUnoptimized.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
             const comparedUsage = energyUnoptimized.map((hour) => {
-                hour.energy = 0;
                 hour.mode = "normal";
 
-                // Kapazität für Ausgleich im Batteriespeicher
-                if (debug) {
-                    node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc);
-                }
                 const dischargeAmount = Math.min(Math.max(0, hour.value), comparedBatteryPower);
                 comparedBatteryPower -= dischargeAmount;
                 hour.value -= dischargeAmount;
                 hour.energy = dischargeAmount; // nicht kleiner für die spätere Berechnung
                 hour.cost = hour.energy * batteryEnergyPrice + Math.max(0, hour.value) * hour.importPrice;
+
                 if (debug) {
-                    node.warn(hour.value + "/" + hour.mode + ": currentbatteryPower: " + currentbatteryPower);
+                    node.warn("compared: " + hour.start + " / " + hour.value + " / " + dischargeAmount + " / " + comparedBatteryPower);
                 }
 
                 // Ladung berücksichtigen
@@ -689,7 +659,7 @@ module.exports = function (RED) {
                     }
                     if (estimatedbatteryPower > 0 && lastGridchargePrice < hour.importPrice) {
                         if (debug) {
-                            node.warn(hour.start + " " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc);
+                            node.warn(hour.start + " / " + hour.value + " " + estimatedMaximumSoc.start + " " + estimatedMaximumSoc.soc);
                         }
                         const dischargeAmount = Math.min(hour.value, estimatedbatteryPower);
                         estimatedbatteryPower -= dischargeAmount;
@@ -775,14 +745,11 @@ module.exports = function (RED) {
 
             // Preisermittlung
             // auch die nicht optimierte Verwendung der Batterie berechnen und vielleicht die drei Werte (Netzladung/Batterie/ohne) vergleichen // charge ist aber zu ungenau
-            //const totalCost = energyNeeded.reduce((sum, entry) => sum + entry.cost, 0);
 
             startBatteryPower = startPower; // ensure correct starting value
-            //const totalCostOptimized = batteryModes.reduce((sum, entry) => sum + entry.cost, 0);
             const totalCostOptimized = calculateEnergyCosts2(batteryModes, batteryCapacity, batteryBuffer, feedin, factor, startBatteryPower, debug);
 
             startBatteryPower = startPower; // ensure correct starting value
-            //const totalCostNotOptimized = comparedUsage.reduce((sum, entry) => sum + entry.cost, 0);
             const totalCostNotOptimized = calculateEnergyCosts2(comparedUsage, batteryCapacity, batteryBuffer, feedin, factor, startBatteryPower, debug);
 
             msg.payload.batteryModes = batteryModes;
@@ -790,7 +757,6 @@ module.exports = function (RED) {
             msg.payload.stats = {
                 totalCosts: totalCost,
                 totalCostOptimized: totalCostOptimized,
-                //totalCostOptimized2: totalCostOptimized2,
                 totalCostNotOptimized: totalCostNotOptimized,
                 minimumEntry: minimumPriceEntry,
                 maximumEntry: maximumPriceEntry,
@@ -799,6 +765,9 @@ module.exports = function (RED) {
                 chargeHours: hours,
             };
 
+            if (!error) {
+                node.status({ fill: "green", shape: "dot", text: "ready" });
+            }
             node.send(msg);
         });
     }
