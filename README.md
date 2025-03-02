@@ -32,10 +32,43 @@ Das Node-RED-Paket enthält verschiedene Nodes zur Optimierung der Batterienutzu
 - Bestimmung des Batteriemodus
 - Bewertung von Solarprognosen
 - Steuerung des Batteriemodus
+- Prognose einer optimierten Batteriesteuerung
 
 Die Nodes sind flexibel nutzbar und können mit externen Datenquellen kombiniert werden. Es besteht die Möglichkeit, eigene Nodes für zusätzliche Datenquellen zu integrieren. So kann die Lösung mit oder ohne evcc betrieben werden. Die Nodes sind mit Standardwerten vorkonfiguriert, wobei die Nachrichteneingänge eine Konfigurationsanpassung ermöglichen. Das modulare Design erleichtert die Wiederverwendung und Anpassung an unterschiedliche Installationen.
 
-Eine externe Steuerung kann eingebunden werden, die weiterhin den Status der evcc-Laderegelung und aktuelle Energiewerte berücksichtigt.
+Eine externe Steuerung kann eingebunden werden, die weiterhin den Status der evcc-Laderegelung und aktuelle Energiewerte berücksichtigt. 
+
+Die Prognosefunktion der Steuerung bildet eine solche externe Vorgabe ab. Es wird ein JSON geliefert, das für die Steuerung verwendet werden: 
+
+| Startzeit                | Energie | Importpreis (€/kWh) | prog.Kosten (€) | Modus   | Verbrauch (-kWh) | Produktion (+kWh) | Entladung (-kWh) | SoC (%) | eff.Preis (€/kWh) | opt.Kosten (€) |
+|--------------------------|------|---------------------|------------|---------|------------------|------------------|---------------|---------|------------------------|--------------|
+| 2025-03-03 06:00:00+01:00 | 1    | 0.3150              | 0.3150     | normal  | 1                | 0                | 0             | 5       | 0.0948                 | 0.3150       |
+| 2025-03-03 07:00:00+01:00 | 0.427| 0.3453              | 0.2016     | normal  | 1                | 0.00265          | 0.57          | 5       | 0.0948                 | 0.2016       |
+| 2025-03-03 08:00:00+01:00 | 0.239| 0.3269              | 0.0780     | normal  | 0.4              | 0.1613           | 0             | 5       | 0.0948                 | 0.0780       |
+| 2025-03-03 09:00:00+01:00 | 0.115| 0.2784              | 0.0320     | normal  | 0.4              | 0.28515          | 0             | 5       | 0.0948                 | 0.0320       |
+| 2025-03-03 10:00:00+01:00 | -0.334| 0.2375             | 0          | hold    | 0.4              | 0.7343           | 0             | 7.95    | 0.0790                 | 0            |
+| 2025-03-03 11:00:00+01:00 | -2.382| 0.1590             | 0          | hold    | 0.4              | 2.7824           | 0             | 30.64   | 0.0790                 | 0            |
+| 2025-03-03 12:00:00+01:00 | -3.796| 0.1517             | 0          | hold    | 1                | 4.79605          | 0             | 66.79   | 0.0790                 | 0            |
+| 2025-03-03 13:00:00+01:00 | -5.208| 0.1514             | 0          | hold    | 1                | 6.20825          | 0             | 100     | 0.0790                 | 0            |
+| 2025-03-03 14:00:00+01:00 | -6.678| 0.2244             | 0          | hold    | 0.4              | 7.07795          | 0             | 100     | 0.0790                 | 0            |
+| 2025-03-03 15:00:00+01:00 | -6.742| 0.2514             | 0          | hold    | 0.4              | 7.1421           | 0             | 100     | 0.0790                 | 0            |
+| 2025-03-03 16:00:00+01:00 | -5.781| 0.2779             | 0          | hold    | 0.4              | 6.1807           | 0             | 100     | 0.0790                 | 0            |
+| 2025-03-03 17:00:00+01:00 | -3.360| 0.3284             | 0          | hold    | 1                | 4.3602           | 0             | 100     | 0.0790                 | 0            |
+| 2025-03-03 18:00:00+01:00 | 0    | 0.3702              | 0.0375     | normal  | 1                | 0.6044           | 0.3956        | 96.23   | 0.0948                 | 0.0375       |
+| 2025-03-03 19:00:00+01:00 | 0    | 0.3607              | 0.0948     | normal  | 1                | 0                | 1             | 86.71   | 0.0948                 | 0.0948       |
+| 2025-03-03 20:00:00+01:00 | 0    | 0.3304              | 0.0948     | normal  | 1                | 0                | 1             | 77.18   | 0.0948                 | 0.0948       |
+
+
+Es wird der optimierte Verlauf der bekannten Prognosedaten (Preis, PV-Forecast) berechnet, dies schließt eine optionale Netzladung ein. Es werden Statistik- und Berechnungsdaten ausgegeben.
+Das obige Beispiel ist für einen Tag mit ausreichend Solarertrag und hohen Preisen außerhalb der Zeiten mit Solarerzeugung erstellt. Eine Steuerung ist nicht nötig, würde hier jedoch bei Stunden mit niedrigen Strompreisen verwendet. 
+
+Die Statistikdaten ermöglichen eine Berechnung, ob eine Optimierung zu Preisersparnissen führt:
+
+![image](https://github.com/user-attachments/assets/c19cf251-4244-4232-b647-efa5c4d7c611)
+
+Die übergebene Standardverteilung des prognostizierten Strombedarfes entscheidet über die Genauigkeit des Ergebnisses. 
+
+
 
 ## Einsatz und Weiterentwicklung
 
