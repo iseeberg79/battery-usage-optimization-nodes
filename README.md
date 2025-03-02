@@ -38,7 +38,7 @@ Die Nodes sind flexibel nutzbar und können mit externen Datenquellen kombiniert
 
 Eine externe Steuerung kann eingebunden werden, die weiterhin den Status der evcc-Laderegelung und aktuelle Energiewerte berücksichtigt. 
 
-Die Prognosefunktion der Steuerung bildet eine solche externe Vorgabe ab. Es wird ein JSON geliefert, das für die Steuerung verwendet werden: 
+Die Prognosefunktion der Steuerung bildet eine solche externe Vorgabe ab. Es wird ein JSON geliefert, das für die Steuerung verwendet werden kann: 
 
 | Startzeit                | Energie | Importpreis (€/kWh) | prog.Kosten (€) | Modus   | Verbrauch (-kWh) | Produktion (+kWh) | Entladung (-kWh) | SoC (%) | eff.Preis (€/kWh) | opt.Kosten (€) |
 |--------------------------|------|---------------------|------------|---------|------------------|------------------|---------------|---------|------------------------|--------------|
