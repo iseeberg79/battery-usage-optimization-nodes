@@ -705,37 +705,38 @@ module.exports = function (RED) {
             }
 
             let hours = 0;
+			// TODO prüfen, könnte zufällig mit maximaler PV Leistung übereinstimmen (Bedingung ergänzt, prüfen!)
             // maximale drei Stunden Netzladung - es wird nicht immer mit maximaler Ladeleistung geladen
-            if (gridchargePerformance && charge) {
+            if (gridchargePerformance && charge && batteryModes[0].value > (-1 * maxCharge)) {
                 if (debug) {
                     node.warn("Calculated efficient grid charge option, 1st hour");
                 }
                 batteryModes[0].mode = "charge";
                 batteryModes[0].energy = -1 * maxCharge;
                 if (debug) {
-                    node.warn("importPrice #16");
+                    node.warn("grid charging - option #1");
                 }
                 batteryModes[0].cost = batteryModes[0].cost + batteryModes[0].importPrice * maxCharge; // worst-case
                 hours += 1;
-                if (calcPerformance(batteryModes[1]) < avg) {
+                if (calcPerformance(batteryModes[1]) < avg && batteryModes[1].value > (-1 * maxCharge)) {
                     if (debug) {
                         node.warn("Calculated efficient grid charge option, 2nd hour");
                     }
                     batteryModes[1].mode = "charge";
                     batteryModes[1].energy = -1 * maxCharge;
                     if (debug) {
-                        node.warn("importPrice #17");
+                        node.warn("grid charging - option #2");
                     }
                     batteryModes[1].cost = batteryModes[1].cost + batteryModes[1].importPrice * maxCharge; // worst-case
                     hours += 1;
-                    if (calcPerformance(batteryModes[2]) < avg) {
+                    if (calcPerformance(batteryModes[2]) < avg && batteryModes[2].value > (-1 * maxCharge)) {
                         if (debug) {
                             node.warn("Calculated efficient grid charge option, 3rd hour");
                         }
                         batteryModes[2].mode = "charge";
                         batteryModes[2].energy = -1 * maxCharge;
                         if (debug) {
-                            node.warn("importPrice #18");
+                            node.warn("grid charging - option #3");
                         }
                         batteryModes[2].cost = batteryModes[2].cost + batteryModes[2].importPrice * maxCharge; // worst-case
                         hours += 1;
