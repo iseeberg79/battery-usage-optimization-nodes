@@ -414,6 +414,22 @@ module.exports = function (RED) {
                 return Math.round(costTotal * 100) / 100;
             }
 
+			// fehlende Energiemenge und Stunden mit Strombezug berechnen
+			function calculateSumAndCount(data) {
+			  return data.reduce(
+			    (acc, { value }) => {
+			      if (value >= 0) {
+			        acc.delta += value;
+			        acc.count += 1;
+			      }
+			      return acc;
+			    },
+			    { delta: 0, count: 0 }
+			  );
+			}
+
+
+			
             const priceData = alignArray(msg.payload.priceData, recent);
             msg.payload.priceData = priceData;
 
@@ -744,6 +760,8 @@ module.exports = function (RED) {
                 }
             }
 
+            const efficiency = calculateSumAndCount(batteryModes);
+			
             // Preisermittlung
             // auch die nicht optimierte Verwendung der Batterie berechnen und vielleicht die drei Werte (Netzladung/Batterie/ohne) vergleichen // charge ist aber zu ungenau
 
@@ -764,6 +782,8 @@ module.exports = function (RED) {
                 diff: diff,
                 avg: avg,
                 chargeHours: hours,
+				gridConsumptionHours: efficiency.count,
+				dailyDeficit: efficiency.delta,
             };
 
             if (!error) {
