@@ -11,8 +11,7 @@ module.exports = function (RED) {
         node.on("input", async function (msg) {
             const rooftopid = typeof msg.rooftopid !== "undefined" ? msg.rooftopid : node.rooftopid || "invalid";
             const token = typeof msg.token !== "undefined" ? msg.token : node.token || "invalid";
-            const url =
-                typeof msg.url !== "undefined" ? msg.url : node.url || "https://api.solcast.com.au/rooftop_sites/";
+            const url = typeof msg.url !== "undefined" ? msg.url : node.url || "https://api.solcast.com.au/rooftop_sites/";
 
             if (rooftopid === "invalid" || token === "invalid") {
                 node.error("Ungültige Konfiguration: rooftopid/token", msg);
@@ -69,6 +68,7 @@ module.exports = function (RED) {
             msg.payload.today = Math.round(todayTotal.pv_estimate);
             msg.payload.remain = Math.round(remainderToday.pv_estimate);
             msg.payload.tomorrow = Math.round(tomorrowTotal.pv_estimate);
+            msg.payload.lastchange = new Date().getTime();
 
             delete msg.token;
             delete msg.rooftopid;

@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 module.exports = function (RED) {
-    function EvaluateSolarForecastAPI(config) {
+    function EvaluateSolarForecastAPINode(config) {
         RED.nodes.createNode(this, config);
         const node = this;
         node.url = config.url || "http://localhost:7070/api/tariff/solar";
@@ -47,25 +47,26 @@ module.exports = function (RED) {
             tomorrow.setDate(tomorrow.getDate() + 1);
             const tomorrowDateString = tomorrow.toISOString().split("T")[0];
 
-            const todayTotal = calculateTotalForDay(today);
-            const tomorrowTotal = calculateTotalForDay(tomorrowDateString);
+            const todayTotal = calculateTotalForDay(today) * 1000;
+            const tomorrowTotal = calculateTotalForDay(tomorrowDateString) * 1000;
 
             // Berechnung der verbleibenden Erträge für heute
-            const remainderToday = rates.reduce((sum, item) => {
-                const startDate = new Date(item.start);
-                if (startDate > now && startDate.toISOString().split("T")[0] === today) {
-                    return sum + item.value;
-                }
-                return sum;
-            }, 0);
+            const remainderToday =
+                rates.reduce((sum, item) => {
+                    const startDate = new Date(item.start);
+                    if (startDate > now && startDate.toISOString().split("T")[0] === today) {
+                        return sum + item.value;
+                    }
+                    return sum;
+                }, 0) * 1000;
 
             // Forward the JSON response as payload
             msg.payload.rates = rates;
 
+            msg.payload.today = Math.floor(todayTotal * 100) / 100;
+            msg.payload.tomorrow = Math.floor(tomorrowTotal * 100) / 100;
+            msg.payload.remain = Math.floor(remainderToday * 100) / 100;
             msg.payload.lastchange = new Date().getTime();
-            msg.payload.todayTotal = Math.floor(todayTotal * 100) / 100;
-            msg.payload.tomorrowTotal = Math.floor(tomorrowTotal * 100) / 100;
-            msg.payload.remainderToday = Math.floor(remainderToday * 100) / 100;
 
             // cleanup
             delete msg.payload.result;
@@ -73,7 +74,7 @@ module.exports = function (RED) {
             node.send(msg);
         });
     }
-    RED.nodes.registerType("@iseeberg79/EvaluateSolarForecastAPI", EvaluateSolarForecastAPI, {
+    RED.nodes.registerType("@iseeberg79/EvaluateSolarForecastAPI", EvaluateSolarForecastAPINode, {
         defaults: {
             name: { value: "" },
             url: { value: "http://localhost:7070/api/tariff/solar" },

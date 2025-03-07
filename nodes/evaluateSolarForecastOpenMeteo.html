@@ -1,85 +1,101 @@
 <script type="text/javascript">
-    RED.nodes.registerType('@iseeberg79/EvaluateSolarForecastOpenMeteoNode', {
-        category: 'function',
-        color: '#a6bbcf',
+    RED.nodes.registerType("@iseeberg79/EvaluateSolarForecastOpenMeteo", {
+        category: "function",
+        color: "#a6bbcf",
         defaults: {
             name: { value: "" },
-            baseUrl: { value: "https://api.open-meteo.com/v1/forecast" },
-            lat: { value: 53.81 },
-            lon: { value: 7.33 },
-            azimuth: { value: 60 },
-            tilt: { value: 50 },
-            power: { value: 11 },
-            efficiency: { value: 0.9 },
-            models: { value: "icon_seamless" },
-            timezone: { value: "GMT" },
-            hourly: { value: ["shortwave_radiation", "shortwave_radiation_instant"] }
+            url: { value: "https://api.open-meteo.com/v1/forecast" },
+            lat: { value: 55.33 },
+            lon: { value: 7.81 },
+            az: { value: 0 },
+            dec: { value: 30 },
+            ac: { value: 10000 },
+            efficiency: { value: 100 },
+            alphatemp: { value: -0.004 },
+            rossmodel: { value: 0.0260 },
+            kwp: { value: 11 },
         },
         inputs: 1,
         outputs: 1,
         icon: "file.png",
-        label: function() {
+        label: function () {
             return this.name || "Evaluate Solar Forecast OpenMeteo";
-        }
+        },
     });
 </script>
 
-<script type="text/x-red" data-template-name="@iseeberg79/EvaluateSolarForecastOpenMeteoNode">
+<script type="text/x-red" data-template-name="@iseeberg79/EvaluateSolarForecastOpenMeteo">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-baseUrl"><i class="fa fa-link"></i> Base URL</label>
-        <input type="text" id="node-input-baseUrl" placeholder="https://api.open-meteo.com/v1/forecast">
+        <label for="node-input-url"><i class="fa fa-link"></i> URL</label>
+        <input type="text" id="node-input-url" placeholder="https://api.open-meteo.com/v1/forecast">
     </div>
     <div class="form-row">
         <label for="node-input-lat"><i class="fa fa-map-marker"></i> Latitude</label>
-        <input type="number" id="node-input-lat" placeholder="53.81">
+        <input type="number" id="node-input-lat" placeholder="55.33">
     </div>
     <div class="form-row">
         <label for="node-input-lon"><i class="fa fa-map-marker"></i> Longitude</label>
-        <input type="number" id="node-input-lon" placeholder="7.33">
+        <input type="number" id="node-input-lon" placeholder="7.81">
     </div>
     <div class="form-row">
-        <label for="node-input-azimuth"><i class="fa fa-compass"></i> Azimuth</label>
-        <input type="number" id="node-input-azimuth" placeholder="60">
+        <label for="node-input-az"><i class="fa fa-compass"></i> Azimuth</label>
+        <input type="number" id="node-input-az" placeholder="0">
     </div>
     <div class="form-row">
-        <label for="node-input-tilt"><i class="fa fa-angle-up"></i> Tilt</label>
-        <input type="number" id="node-input-tilt" placeholder="50">
+        <label for="node-input-dec"><i class="fa fa-angle-up"></i> Tilt</label>
+        <input type="number" id="node-input-dec" placeholder="30">
     </div>
     <div class="form-row">
-        <label for="node-input-power"><i class="fa fa-bolt"></i> Power</label>
-        <input type="number" id="node-input-power" placeholder="11">
+        <label for="node-input-ac"><i class="fa fa-bolt"></i> AC Power [W]</label>
+        <input type="number" id="node-input-ac" placeholder="10000">
     </div>
     <div class="form-row">
-        <label for="node-input-efficiency"><i class="fa fa-percent"></i> Efficiency</label>
-        <input type="number" id="node-input-efficiency" placeholder="0.9">
+        <label for="node-input-efficiency"><i class="fa fa-percent"></i> Efficiency [%]</label>
+        <input type="number" id="node-input-efficiency" placeholder="100">
     </div>
     <div class="form-row">
-        <label for="node-input-models"><i class="fa fa-cubes"></i> Models</label>
-        <input type="text" id="node-input-models" placeholder="icon_seamless">
+        <label for="node-input-alphatemp"><i class="fa fa-thermometer-half"></i> Temperature Coefficient</label>
+        <input type="number" id="node-input-alphatemp" placeholder="-0.004">
     </div>
     <div class="form-row">
-        <label for="node-input-timezone"><i class="fa fa-clock-o"></i> Timezone</label>
-        <input type="text" id="node-input-timezone" placeholder="GMT">
+        <label for="node-input-rossmodel"><i class="fa fa-cubes"></i> Cooling Type [Ross Model]</label>
+        <input type="number" id="node-input-rossmodel" placeholder="0.0260">
     </div>
     <div class="form-row">
-        <label for="node-input-hourly"><i class="fa fa-clock"></i> Hourly</label>
-        <input type="text" id="node-input-hourly" placeholder="shortwave_radiation,shortwave_radiation_instant">
+        <label for="node-input-kwp"><i class="fa fa-bolt"></i> Power [kWp]</label>
+        <input type="number" id="node-input-kwp" placeholder="11">
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="@iseeberg79/EvaluateSolarForecastOpenMeteoNode">
-    <p>Dieser Node wertet die PV-Generationsdaten basierend auf den bereitgestellten Wettervorhersagen der Open-Meteo API aus.</p>
-    <p><b>Inputs:</b></p>
-    <ul>
-        <li><b>input</b> - Ein Objekt, das zusätzliche Parameter für die API-Anfrage enthält.</li>
-    </ul>
-    <p><b>Outputs:</b></p>
-    <ul>
-        <li><b>payload</b> - Die verarbeiteten PV-Generationsdaten.</li>
-        <li><b>payload.values</b> - Die einzelnen Generationsdaten (Array).</li>
-    </ul>
+<script type="text/x-red" data-help-name="@iseeberg79/EvaluateSolarForecastOpenMeteo">
+     <p>Dieser Node wertet die PV-Generationsdaten basierend auf den bereitgestellten Wettervorhersagen der Open-Meteo API aus.</p>
+     <p><b>Inputs:</b></p>
+     <ul>
+         <li><b>input</b> - Ein Objekt, das zusätzliche Parameter für die API-Anfrage enthält:</li>
+         <ul>
+             <li><b>url</b> - URL der API</li>
+             <li><b>lat</b> - Breite</li>
+             <li><b>lon</b> - Länge</li>
+             <li><b>az</b> - Azimut</li>
+             <li><b>dec</b> - Neigungswinkel</li>
+             <li><b>ac</b> - AC-Leistung [kW]</li>
+             <li><b>efficiency</b> - Wirkungsgrad [%]</li>
+             <li><b>alphatemp</b> - Temperaturkoeffizient</li>
+             <li><b>rossmodel</b> - Kühlungsmodell [Ross Modell], see also https://www.researchgate.net/figure/Ross-coefficients-for-different-mounting-conditions-for-silicon-PV-panels-from-reference_tbl1_275438802</li>
+             <li><b>kwp</b> - Leistung [kWp]</li>
+    <li><b>days</b> - Vorhersagetage.</li>
+         </ul>
+     </ul>
+     <p><b>Outputs:</b></p>
+     <ul>
+         <li><b>payload</b> - die verarbeiteten PV-Generationsdaten</li>
+         <li><b>payload.today</b> - der heutige Ertrag [Wh]</li>
+         <li><b>payload.remain</b> - der verbleibende Ertrag für heute [Wh]</li>
+         <li><b>payload.tomorrow</b> - der morgige Ertrag [Wh]</li>
+         <li><b>payload.values</b> - die einzelnen Generationsdaten (Array) [Wh]</li>
+     </ul>
 </script>
