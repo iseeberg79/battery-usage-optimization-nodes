@@ -70,8 +70,9 @@ module.exports = function (RED) {
                     const period_end = new Date(time * 1000);
 
                     return {
-                        start: new Date(period_end.getTime() - 3600000).toISOString(),
-                        end: period_end.toISOString(),
+						//ISO timestamp
+                        start: new Date(period_end.getTime() - 3600000).toISOString().replace(/\.\d{1,7}Z$/, 'Z'),
+                        end: period_end.toISOString().replace(/\.\d{1,7}Z$/, 'Z'),
                         pv_estimate:
                             Math.round(
                                 limit(
