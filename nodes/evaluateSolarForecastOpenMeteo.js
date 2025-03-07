@@ -86,8 +86,8 @@ module.exports = function (RED) {
                                                     25.0)) *
                                         (efficiency / 100),
                                     ac,
-                                ) * 100,
-                            ) / 100,
+                                ),
+                            ),
                     };
                 });
 
