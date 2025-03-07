@@ -1,16 +1,16 @@
 [
     {
-        "id": "ec1d395861064d7f",
+        "id": "0b8b5d37e2f6870d",
         "type": "tab",
-        "label": "Flow 1",
-        "disabled": false,
+        "label": "Example",
+        "disabled": true,
         "info": "",
         "env": []
     },
     {
-        "id": "53e2a6db5810145a",
+        "id": "c814c1258fca691b",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -32,14 +32,14 @@
         "y": 280,
         "wires": [
             [
-                "fbf644e9c08d4914"
+                "b23b9ea49715ef77"
             ]
         ]
     },
     {
-        "id": "d6bf1a495dd6f026",
+        "id": "a6a33a7f44b8e2b5",
         "type": "comment",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "erwarteter Solarertrag zweier PV Anlagen - stündlich",
         "info": "",
         "x": 290,
@@ -47,9 +47,9 @@
         "wires": []
     },
     {
-        "id": "34746799d5a10261",
+        "id": "c2151b9f35b9b1a2",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -66,15 +66,15 @@
         "y": 180,
         "wires": [
             [
-                "e594e759c085e00b",
-                "7560963e91850164"
+                "73ed64c5a8f44e54",
+                "7291946152aa2961"
             ]
         ]
     },
     {
-        "id": "306e7ccdb97ebcec",
+        "id": "c8e23295d61a5349",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -89,9 +89,9 @@
         "wires": []
     },
     {
-        "id": "9ee2ab254e30dffe",
+        "id": "59831b40673936d4",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -118,15 +118,15 @@
         "y": 180,
         "wires": [
             [
-                "306e7ccdb97ebcec",
-                "58cd324f4e333c0a"
+                "c8e23295d61a5349",
+                "ec778bfdb5482b51"
             ]
         ]
     },
     {
-        "id": "c0b4817d7edba1b3",
+        "id": "e220a6ab1baf9248",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -141,9 +141,9 @@
         "wires": []
     },
     {
-        "id": "f7a57ba9ea0f2101",
+        "id": "cdc10bf472f66a97",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -163,15 +163,15 @@
         "y": 280,
         "wires": [
             [
-                "c0b4817d7edba1b3",
-                "58cd324f4e333c0a"
+                "e220a6ab1baf9248",
+                "ec778bfdb5482b51"
             ]
         ]
     },
     {
-        "id": "397378f25cda559f",
+        "id": "a0781184c27fb37d",
         "type": "comment",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Abruf des erwarten Solarertrags von zwei PV Anlagen - täglich",
         "info": "",
         "x": 320,
@@ -179,9 +179,9 @@
         "wires": []
     },
     {
-        "id": "c7d5eca76779dd32",
+        "id": "ebbcaa4c66e56a8a",
         "type": "comment",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Abruf des erwarten Strompreises (Fraunhofer ISE)",
         "info": "",
         "x": 290,
@@ -189,9 +189,9 @@
         "wires": []
     },
     {
-        "id": "5be548095786633b",
+        "id": "324b33d71d619ece",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -218,14 +218,14 @@
         "y": 400,
         "wires": [
             [
-                "5234a24bc61cc724"
+                "11cc1e76689ba1f4"
             ]
         ]
     },
     {
-        "id": "d908f798e42944fb",
+        "id": "6e9e8acfbb64752f",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -252,14 +252,14 @@
         "y": 400,
         "wires": [
             [
-                "3816e596e3bf2a58"
+                "ab822f55e6600851"
             ]
         ]
     },
     {
-        "id": "3816e596e3bf2a58",
+        "id": "ab822f55e6600851",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -274,9 +274,9 @@
         "wires": []
     },
     {
-        "id": "9d5f6b2831254abe",
+        "id": "26fe6007c6e42349",
         "type": "comment",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Abruf des erwarten Strompreises (evcc)",
         "info": "",
         "x": 250,
@@ -284,9 +284,9 @@
         "wires": []
     },
     {
-        "id": "619f1468d1e2ca2e",
+        "id": "ab68d091115d72d5",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -303,14 +303,14 @@
         "y": 500,
         "wires": [
             [
-                "0b20e06a17ba2313"
+                "411cbc6f3bda7130"
             ]
         ]
     },
     {
-        "id": "bcbafbf86dd3bdd4",
+        "id": "91ef3697b1d23803",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -325,9 +325,9 @@
         "wires": []
     },
     {
-        "id": "f78ba4dee6dcd2b7",
+        "id": "3376f2f5af4434f1",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -354,14 +354,14 @@
         "y": 500,
         "wires": [
             [
-                "bcbafbf86dd3bdd4"
+                "91ef3697b1d23803"
             ]
         ]
     },
     {
-        "id": "f1ed8d6e45d13ca3",
+        "id": "0b74cc2a4341730d",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -383,14 +383,14 @@
         "y": 600,
         "wires": [
             [
-                "e01e4d7655508ff5"
+                "318f073259d4193a"
             ]
         ]
     },
     {
-        "id": "3ca363df5cec6a9a",
+        "id": "06dbb167db2e8ddb",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -417,14 +417,14 @@
         "y": 600,
         "wires": [
             [
-                "e88fea866c7d8049"
+                "8c4be2ba1874e727"
             ]
         ]
     },
     {
-        "id": "e88fea866c7d8049",
+        "id": "8c4be2ba1874e727",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -439,9 +439,9 @@
         "wires": []
     },
     {
-        "id": "ebf9ada825d379d3",
+        "id": "d2479802bbab8294",
         "type": "comment",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Berechnung der benötigen Energie (Stromverbrauch)",
         "info": "",
         "x": 290,
@@ -449,9 +449,9 @@
         "wires": []
     },
     {
-        "id": "878be5e4426712c0",
+        "id": "ef49d4c218b58240",
         "type": "comment",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Auswertung des heutigen Steuerungsmodus (1-2x täglich)",
         "info": "",
         "x": 310,
@@ -459,9 +459,9 @@
         "wires": []
     },
     {
-        "id": "453f8c1a8a58f461",
+        "id": "57422ed1ac334835",
         "type": "comment",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Berechnung des aktuellen Batteriemodus, 5-minütlich",
         "info": "",
         "x": 300,
@@ -469,9 +469,9 @@
         "wires": []
     },
     {
-        "id": "2fed352598674983",
+        "id": "a60d24c7f3334cab",
         "type": "comment",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Berechnung des aktuellen Batteriemodus, watchdog-Intervall",
         "info": "",
         "x": 320,
@@ -479,9 +479,9 @@
         "wires": []
     },
     {
-        "id": "30105ce2d52ab699",
+        "id": "7fffc2a556e187e5",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Mitternacht",
         "props": [
             {
@@ -528,14 +528,14 @@
         "y": 700,
         "wires": [
             [
-                "2ef70dc2ccc8c99c"
+                "6933bf565f948b6b"
             ]
         ]
     },
     {
-        "id": "dc935091ad7d894b",
+        "id": "f46f9d2522cb76f2",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -617,14 +617,14 @@
         "y": 840,
         "wires": [
             [
-                "5c0a2ccb59ef0f7f"
+                "cefb46bd96aa111d"
             ]
         ]
     },
     {
-        "id": "0a3f04a3f1d89239",
+        "id": "ad145c45825a6bbb",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -676,14 +676,14 @@
         "y": 980,
         "wires": [
             [
-                "fe2e1d65dec418f4"
+                "af8d5fca29264f35"
             ]
         ]
     },
     {
-        "id": "561bc6f25bc8a5cc",
+        "id": "6b322cae4a54aad2",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -698,9 +698,9 @@
         "wires": []
     },
     {
-        "id": "b15e3f6244c16be5",
+        "id": "45356e551cdb9d63",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -715,9 +715,9 @@
         "wires": []
     },
     {
-        "id": "6ae44d0b1b4e56da",
+        "id": "d882e3d4995180e7",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -732,9 +732,9 @@
         "wires": []
     },
     {
-        "id": "0f42f6e8e0b1a4b5",
+        "id": "2b1666e8cc801121",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -749,9 +749,9 @@
         "wires": []
     },
     {
-        "id": "57139274fa39890d",
+        "id": "35e77e7c208ad0da",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -766,9 +766,9 @@
         "wires": []
     },
     {
-        "id": "55eefafcbf61d1ac",
+        "id": "4d5250ebc309eed8",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -783,9 +783,9 @@
         "wires": []
     },
     {
-        "id": "43507a25391454e7",
+        "id": "df4362019424ebff",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -800,9 +800,9 @@
         "wires": []
     },
     {
-        "id": "185d656bbdbe5ce8",
+        "id": "bc83ffe09694e85c",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -817,9 +817,9 @@
         "wires": []
     },
     {
-        "id": "c4a5c0cda359e825",
+        "id": "84ba259a38d29940",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -839,14 +839,14 @@
         "y": 700,
         "wires": [
             [
-                "561bc6f25bc8a5cc"
+                "6b322cae4a54aad2"
             ]
         ]
     },
     {
-        "id": "cbd697b9f5894bb9",
+        "id": "173f8dfa4a086eee",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -866,14 +866,14 @@
         "y": 780,
         "wires": [
             [
-                "b15e3f6244c16be5"
+                "45356e551cdb9d63"
             ]
         ]
     },
     {
-        "id": "bd0d8817f7ed08fc",
+        "id": "dc91923fc51f7263",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -893,14 +893,14 @@
         "y": 840,
         "wires": [
             [
-                "6ae44d0b1b4e56da"
+                "d882e3d4995180e7"
             ]
         ]
     },
     {
-        "id": "12b15e676b5cfb27",
+        "id": "8d5d7b59c36772e2",
         "type": "comment",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Abruf der aktuellen Leistungsdaten (evcc)",
         "info": "",
         "x": 260,
@@ -908,9 +908,9 @@
         "wires": []
     },
     {
-        "id": "801a2868ee0aca5c",
+        "id": "d6a7785a276a249b",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -927,14 +927,14 @@
         "y": 100,
         "wires": [
             [
-                "86a211820c2d1f10"
+                "98c223deab12de15"
             ]
         ]
     },
     {
-        "id": "3fba26566b297694",
+        "id": "103c0cebb0801aac",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -949,9 +949,9 @@
         "wires": []
     },
     {
-        "id": "2c343359261abd9f",
+        "id": "158bc5da842e61c3",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -978,14 +978,14 @@
         "y": 100,
         "wires": [
             [
-                "3fba26566b297694"
+                "103c0cebb0801aac"
             ]
         ]
     },
     {
-        "id": "cca1ee52a50453ce",
+        "id": "46a0796815092b07",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -1005,14 +1005,14 @@
         "y": 960,
         "wires": [
             [
-                "0f42f6e8e0b1a4b5"
+                "2b1666e8cc801121"
             ]
         ]
     },
     {
-        "id": "fc63df2a739b4d48",
+        "id": "d634e5b4de633d92",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -1032,14 +1032,14 @@
         "y": 1000,
         "wires": [
             [
-                "57139274fa39890d"
+                "35e77e7c208ad0da"
             ]
         ]
     },
     {
-        "id": "6fda2ed140f4f369",
+        "id": "066cc836848d5026",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -1059,14 +1059,14 @@
         "y": 1040,
         "wires": [
             [
-                "55eefafcbf61d1ac"
+                "4d5250ebc309eed8"
             ]
         ]
     },
     {
-        "id": "e594e759c085e00b",
+        "id": "73ed64c5a8f44e54",
         "type": "@iseeberg79/EvaluateSolarForecast",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "rooftopid": "",
         "token": "",
@@ -1075,27 +1075,27 @@
         "y": 180,
         "wires": [
             [
-                "9ee2ab254e30dffe"
+                "59831b40673936d4"
             ]
         ]
     },
     {
-        "id": "fbf644e9c08d4914",
+        "id": "b23b9ea49715ef77",
         "type": "@iseeberg79/EstimateSolarEnergy",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "x": 400,
         "y": 280,
         "wires": [
             [
-                "f7a57ba9ea0f2101"
+                "cdc10bf472f66a97"
             ]
         ]
     },
     {
-        "id": "5234a24bc61cc724",
+        "id": "11cc1e76689ba1f4",
         "type": "@iseeberg79/EvaluateGridEnergyPrices",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "bzn": "DE-LU",
         "url": "https://api.energy-charts.info/price",
@@ -1103,41 +1103,41 @@
         "y": 400,
         "wires": [
             [
-                "d908f798e42944fb"
+                "6e9e8acfbb64752f"
             ]
         ]
     },
     {
-        "id": "0b20e06a17ba2313",
+        "id": "411cbc6f3bda7130",
         "type": "@iseeberg79/EvaluateGridEnergyPricesAPI",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "url": "http://localhost:7070/api/tariff/grid",
         "x": 390,
         "y": 500,
         "wires": [
             [
-                "f78ba4dee6dcd2b7"
+                "3376f2f5af4434f1"
             ]
         ]
     },
     {
-        "id": "e01e4d7655508ff5",
+        "id": "318f073259d4193a",
         "type": "@iseeberg79/EstimateHouseholdConsumption",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "x": 400,
         "y": 600,
         "wires": [
             [
-                "3ca363df5cec6a9a"
+                "06dbb167db2e8ddb"
             ]
         ]
     },
     {
-        "id": "c9bd6d4e68380399",
+        "id": "c77b8fe6abe47e6d",
         "type": "@iseeberg79/DetermineControlMode",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "minPvRequired": "10000",
         "minPriceDeviation": "",
@@ -1148,14 +1148,14 @@
         "y": 700,
         "wires": [
             [
-                "c4a5c0cda359e825"
+                "84ba259a38d29940"
             ]
         ]
     },
     {
-        "id": "5c0a2ccb59ef0f7f",
+        "id": "cefb46bd96aa111d",
         "type": "@iseeberg79/DetermineBatteryMode",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "enableGridchargeThreshold": "",
         "disableGridchargeThreshold": "",
@@ -1167,20 +1167,20 @@
         "y": 840,
         "wires": [
             [
-                "cbd697b9f5894bb9"
+                "173f8dfa4a086eee"
             ],
             [
-                "bd0d8817f7ed08fc"
+                "dc91923fc51f7263"
             ],
             [
-                "185d656bbdbe5ce8"
+                "bc83ffe09694e85c"
             ]
         ]
     },
     {
-        "id": "fe2e1d65dec418f4",
+        "id": "af8d5fca29264f35",
         "type": "@iseeberg79/ControlBattery",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "configuredMinSoC": "",
         "maximumGridprice": "",
@@ -1189,37 +1189,37 @@
         "y": 980,
         "wires": [
             [
-                "cca1ee52a50453ce"
+                "46a0796815092b07"
             ],
             [
-                "fc63df2a739b4d48"
+                "d634e5b4de633d92"
             ],
             [
-                "6fda2ed140f4f369"
+                "066cc836848d5026"
             ],
             [
-                "43507a25391454e7"
+                "df4362019424ebff"
             ]
         ]
     },
     {
-        "id": "86a211820c2d1f10",
+        "id": "98c223deab12de15",
         "type": "@iseeberg79/DeterminePowerValues",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "url": "http://localhost:7070/api/state",
         "x": 390,
         "y": 100,
         "wires": [
             [
-                "2c343359261abd9f"
+                "158bc5da842e61c3"
             ]
         ]
     },
     {
-        "id": "7560963e91850164",
+        "id": "7291946152aa2961",
         "type": "@iseeberg79/EvaluateSolarForecast",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "rooftopid": "",
         "token": "",
@@ -1228,14 +1228,14 @@
         "y": 200,
         "wires": [
             [
-                "015a88698cf80307"
+                "c268397e63a23ef9"
             ]
         ]
     },
     {
-        "id": "015a88698cf80307",
+        "id": "c268397e63a23ef9",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -1262,27 +1262,27 @@
         "y": 200,
         "wires": [
             [
-                "58cd324f4e333c0a"
+                "ec778bfdb5482b51"
             ]
         ]
     },
     {
-        "id": "c64c402c24b062fe",
+        "id": "c70d1185a6bb8ff3",
         "type": "@iseeberg79/EstimateSolarEnergy",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "x": 420,
         "y": 300,
         "wires": [
             [
-                "a5c1eb08187cd0e4"
+                "fa037f70cc8d5c4f"
             ]
         ]
     },
     {
-        "id": "6c041c6c5cd2159d",
+        "id": "61e2d5bbf8461420",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -1304,14 +1304,14 @@
         "y": 300,
         "wires": [
             [
-                "c64c402c24b062fe"
+                "c70d1185a6bb8ff3"
             ]
         ]
     },
     {
-        "id": "a5c1eb08187cd0e4",
+        "id": "fa037f70cc8d5c4f",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -1331,14 +1331,14 @@
         "y": 300,
         "wires": [
             [
-                "58cd324f4e333c0a"
+                "ec778bfdb5482b51"
             ]
         ]
     },
     {
-        "id": "58cd324f4e333c0a",
+        "id": "ec778bfdb5482b51",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "summieren",
         "rules": [
             {
@@ -1386,14 +1386,14 @@
         "y": 300,
         "wires": [
             [
-                "fd6084fd9c1a78bb"
+                "f3e65588e9c3bfc1"
             ]
         ]
     },
     {
-        "id": "fd6084fd9c1a78bb",
+        "id": "f3e65588e9c3bfc1",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -1408,9 +1408,9 @@
         "wires": []
     },
     {
-        "id": "2ef70dc2ccc8c99c",
+        "id": "6933bf565f948b6b",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Maximum",
         "rules": [
             {
@@ -1444,14 +1444,14 @@
         "y": 700,
         "wires": [
             [
-                "c9bd6d4e68380399"
+                "c77b8fe6abe47e6d"
             ]
         ]
     },
     {
-        "id": "c9a5ede43852e54e",
+        "id": "98d954ca97cc59a5",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -1471,14 +1471,14 @@
         "y": 1300,
         "wires": [
             [
-                "07ac307ca42ff0b4"
+                "c01558d89612f410"
             ]
         ]
     },
     {
-        "id": "07ac307ca42ff0b4",
+        "id": "c01558d89612f410",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -1493,9 +1493,9 @@
         "wires": []
     },
     {
-        "id": "5b8a657a5cc6dbf8",
+        "id": "f4e1b881b70b1515",
         "type": "ioBroker in",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "price_avg_weekly",
         "attrname": "payload",
         "topic": "alias.0.energy.grid.price_avg_weekly",
@@ -1509,14 +1509,14 @@
         "y": 1330,
         "wires": [
             [
-                "ef666ed377a494af"
+                "fc930de34be88341"
             ]
         ]
     },
     {
-        "id": "f3853287e700f386",
+        "id": "37ebd20a9e8cbb06",
         "type": "ioBroker get",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "topic": "alias.0.energy.grid.price_avg_weekly",
         "attrname": "payload",
@@ -1526,14 +1526,14 @@
         "y": 1290,
         "wires": [
             [
-                "ef666ed377a494af"
+                "fc930de34be88341"
             ]
         ]
     },
     {
-        "id": "38ef5aceb9797210",
+        "id": "eff46a92c81dbae7",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -1555,14 +1555,14 @@
         "y": 1240,
         "wires": [
             [
-                "c3bcfb6672483096"
+                "d5966f329aa35b78"
             ]
         ]
     },
     {
-        "id": "c3bcfb6672483096",
+        "id": "d5966f329aa35b78",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "initialisieren",
         "rules": [
             {
@@ -1596,15 +1596,15 @@
         "y": 1240,
         "wires": [
             [
-                "f3853287e700f386",
-                "1bf85817badf884f"
+                "37ebd20a9e8cbb06",
+                "1ed054933cd8314a"
             ]
         ]
     },
     {
-        "id": "ef666ed377a494af",
+        "id": "fc930de34be88341",
         "type": "json",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "property": "payload",
         "action": "obj",
@@ -1613,14 +1613,14 @@
         "y": 1300,
         "wires": [
             [
-                "c9a5ede43852e54e"
+                "98d954ca97cc59a5"
             ]
         ]
     },
     {
-        "id": "1bf85817badf884f",
+        "id": "1ed054933cd8314a",
         "type": "ioBroker get",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "topic": "alias.0.energy.battery.minsoc",
         "attrname": "payload",
@@ -1630,14 +1630,14 @@
         "y": 1240,
         "wires": [
             [
-                "5dd11b43cf34ff12"
+                "44a17aab9efb073f"
             ]
         ]
     },
     {
-        "id": "5dd11b43cf34ff12",
+        "id": "44a17aab9efb073f",
         "type": "json",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "property": "payload",
         "action": "obj",
@@ -1646,14 +1646,14 @@
         "y": 1240,
         "wires": [
             [
-                "e92586b7987444b1"
+                "f121ded33aa09ebb"
             ]
         ]
     },
     {
-        "id": "e92586b7987444b1",
+        "id": "f121ded33aa09ebb",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -1673,14 +1673,14 @@
         "y": 1240,
         "wires": [
             [
-                "70e233125e6e09e2"
+                "bf0d4f7137589d21"
             ]
         ]
     },
     {
-        "id": "8078a07acd8728ee",
+        "id": "51d76b4bc3ce9403",
         "type": "ioBroker in",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "attrname": "payload",
         "topic": "alias.0.energy.battery.minsoc",
@@ -1694,14 +1694,14 @@
         "y": 1190,
         "wires": [
             [
-                "5dd11b43cf34ff12"
+                "44a17aab9efb073f"
             ]
         ]
     },
     {
-        "id": "70e233125e6e09e2",
+        "id": "bf0d4f7137589d21",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -1716,9 +1716,9 @@
         "wires": []
     },
     {
-        "id": "43cf98b13cdb48f0",
+        "id": "a52d5d6ead953b43",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "14 Uhr",
         "props": [
             {
@@ -1765,14 +1765,14 @@
         "y": 740,
         "wires": [
             [
-                "2ef70dc2ccc8c99c"
+                "6933bf565f948b6b"
             ]
         ]
     },
     {
-        "id": "4ffc70bcef0aff59",
+        "id": "c577a75af380b456",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "force charge",
         "props": [
             {
@@ -1794,14 +1794,14 @@
         "y": 1500,
         "wires": [
             [
-                "2f13328d3d3a7fac"
+                "0173975d276a3397"
             ]
         ]
     },
     {
-        "id": "2f13328d3d3a7fac",
+        "id": "0173975d276a3397",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "rules": [
             {
@@ -1824,11 +1824,11 @@
         ]
     },
     {
-        "id": "eb9bc9f973090a31",
+        "id": "9e1946a96f333ac9",
         "type": "function",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "transformieren",
-        "func": "const startTimestamp = (new Date()).setHours(0,0,0,0);\nconst interval = 60 * 60 * 1000;\n\n// Transformation priceData\nconst transformPriceData = (data) => {\n    return data.map(item => ({\n        value: item.price,\n        start: item.start,\n        exportPrice: 0.079, // Bei Bedarf anpassen\n        importPrice: item.price\n    }));\n};\n\n// Transformation productionForecast\nconst transformProductionForecast = (data) => {\n    return data.map(item => ({\n        start: item.period_end,\n        value: item.pv_estimate\n    }));\n};\n\n// Transformation consumptionForecast\nconst transformConsumptionForecast = (data, startTimestamp, interval) => {\n    return data.map((value, index) => ({\n        start: (new Date(startTimestamp + index * interval)).toISOString(),\n        value: value\n    }));\n};\n\nconst priceData = msg.input.priceData;\nconst productionForecast = msg.input.pvforecast;\nconst consumptionForecast = msg.input.household;\n\nconst transformedData = {\n    priceData: transformPriceData(priceData),\n    productionForecast: transformProductionForecast(productionForecast),\n    consumptionForecast: transformConsumptionForecast(consumptionForecast, startTimestamp, interval),\n    soc: msg.input.soc\n};\n\ndelete msg.input;\n\nmsg.payload = transformedData;\n\nreturn msg;",
+        "func": "const startTimestamp = (new Date()).setHours(0,0,0,0);\nconst interval = 60 * 60 * 1000;\n\n// Transformation priceData\nconst transformPriceData = (data) => {\n    return data.map(item => ({\n        value: item.price,\n        start: item.start,\n        exportPrice: 0.079, // Bei Bedarf anpassen\n        importPrice: item.price\n    }));\n};\n\n// Transformation productionForecast\nconst transformProductionForecast = (data) => {\n    return data.map(item => ({\n        start: new Date(new Date(item.period_end).getTime() - 3600000).toISOString(),\n        value: item.pv_estimate // in kWh\n    }));\n};\n\n// Transformation consumptionForecast\nconst transformConsumptionForecast = (data, startTimestamp, interval) => {\n    return data.map((value, index) => ({\n        start: (new Date(startTimestamp + index * interval)).toISOString(),\n        value: value // in kWh\n    }));\n};\n\nconst priceData = msg.input.priceData;\nconst productionForecast = msg.input.pvforecast;\nconst consumptionForecast = msg.input.household;\n\nconst transformedData = {\n    priceData: transformPriceData(priceData),\n    productionForecast: transformProductionForecast(productionForecast),\n    consumptionForecast: transformConsumptionForecast(consumptionForecast, startTimestamp, interval),\n    soc: msg.input.soc\n};\n\ndelete msg.input;\n\nmsg.payload = transformedData;\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1839,14 +1839,14 @@
         "y": 1400,
         "wires": [
             [
-                "d6c83a05ca88f0ef"
+                "17772782358bc77e"
             ]
         ]
     },
     {
-        "id": "d6c83a05ca88f0ef",
+        "id": "17772782358bc77e",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -1866,14 +1866,14 @@
         "y": 1400,
         "wires": [
             [
-                "aa2a5706068de4bc"
+                "10d5a08f10a3bdca"
             ]
         ]
     },
     {
-        "id": "9b46559b1f0c2cbc",
+        "id": "b1e387827dc7d81f",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "props": [
             {
@@ -1895,14 +1895,14 @@
         "y": 1440,
         "wires": [
             [
-                "aa2a5706068de4bc"
+                "10d5a08f10a3bdca"
             ]
         ]
     },
     {
-        "id": "aa2a5706068de4bc",
+        "id": "10d5a08f10a3bdca",
         "type": "@iseeberg79/EstimateBatterymode",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "",
         "batteryBuffer": "",
         "batteryCapacity": "",
@@ -1914,14 +1914,14 @@
         "y": 1400,
         "wires": [
             [
-                "d7c22e3c89524bf3"
+                "5a1776c68020b3fd"
             ]
         ]
     },
     {
-        "id": "d7c22e3c89524bf3",
+        "id": "5a1776c68020b3fd",
         "type": "change",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "speichern",
         "rules": [
             {
@@ -1948,14 +1948,14 @@
         "y": 1400,
         "wires": [
             [
-                "1fce251c878d0e25"
+                "ba7aef57e47318de"
             ]
         ]
     },
     {
-        "id": "1fce251c878d0e25",
+        "id": "ba7aef57e47318de",
         "type": "debug",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Ergebnis",
         "active": false,
         "tosidebar": true,
@@ -1970,9 +1970,9 @@
         "wires": []
     },
     {
-        "id": "7511cf026ef5e9db",
+        "id": "bd4867a8d5520917",
         "type": "inject",
-        "z": "ec1d395861064d7f",
+        "z": "0b8b5d37e2f6870d",
         "name": "Bereitstellung",
         "props": [
             {
@@ -2019,7 +2019,287 @@
         "y": 1400,
         "wires": [
             [
-                "eb9bc9f973090a31"
+                "9e1946a96f333ac9"
+            ]
+        ]
+    },
+    {
+        "id": "c7800eb6ba4594f5",
+        "type": "inject",
+        "z": "0b8b5d37e2f6870d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1580,
+        "wires": [
+            [
+                "aa86585d6188c4c0"
+            ]
+        ]
+    },
+    {
+        "id": "0dae1ca63e5a94d2",
+        "type": "change",
+        "z": "0b8b5d37e2f6870d",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "solar_evcc",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 1580,
+        "wires": [
+            [
+                "6ec6d2ebeaf99873"
+            ]
+        ]
+    },
+    {
+        "id": "aa86585d6188c4c0",
+        "type": "@iseeberg79/EvaluateSolarForecastAPI",
+        "z": "0b8b5d37e2f6870d",
+        "name": "",
+        "url": "",
+        "x": 340,
+        "y": 1580,
+        "wires": [
+            [
+                "0dae1ca63e5a94d2"
+            ]
+        ]
+    },
+    {
+        "id": "59b9cc91c05542c7",
+        "type": "debug",
+        "z": "0b8b5d37e2f6870d",
+        "name": "Solardaten",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload.today",
+        "statusType": "msg",
+        "x": 790,
+        "y": 1660,
+        "wires": []
+    },
+    {
+        "id": "ec28321f4054d850",
+        "type": "change",
+        "z": "0b8b5d37e2f6870d",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "openmeteo",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 1660,
+        "wires": [
+            [
+                "59b9cc91c05542c7"
+            ]
+        ]
+    },
+    {
+        "id": "82bc8f2f3ef047c3",
+        "type": "inject",
+        "z": "0b8b5d37e2f6870d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "debug",
+                "v": "true",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1660,
+        "wires": [
+            [
+                "5c1ae4bc8077ebf2"
+            ]
+        ]
+    },
+    {
+        "id": "5c1ae4bc8077ebf2",
+        "type": "@iseeberg79/EvaluateSolarForecastOpenMeteo",
+        "z": "0b8b5d37e2f6870d",
+        "name": "",
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "lat": "",
+        "lon": "",
+        "az": "",
+        "dec": "",
+        "ac": "",
+        "efficiency": "",
+        "alphatemp": "",
+        "rossmodel": "",
+        "kwp": "",
+        "x": 370,
+        "y": 1660,
+        "wires": [
+            [
+                "ec28321f4054d850"
+            ]
+        ]
+    },
+    {
+        "id": "6ec6d2ebeaf99873",
+        "type": "debug",
+        "z": "0b8b5d37e2f6870d",
+        "name": "Solardaten",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload.todayTotal",
+        "statusType": "msg",
+        "x": 790,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "f89e63e6e096dc1e",
+        "type": "inject",
+        "z": "0b8b5d37e2f6870d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "debug",
+                "v": "true",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1740,
+        "wires": [
+            [
+                "f4199096089cd8cf"
+            ]
+        ]
+    },
+    {
+        "id": "27bfaad951c3d3a7",
+        "type": "change",
+        "z": "0b8b5d37e2f6870d",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "tibber_prices",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 1740,
+        "wires": [
+            [
+                "e8c99a18a38ce22f"
+            ]
+        ]
+    },
+    {
+        "id": "e8c99a18a38ce22f",
+        "type": "debug",
+        "z": "0b8b5d37e2f6870d",
+        "name": "Solardaten",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 1740,
+        "wires": []
+    },
+    {
+        "id": "f4199096089cd8cf",
+        "type": "@iseeberg79/tibber-api-prices",
+        "z": "0b8b5d37e2f6870d",
+        "name": "",
+        "accessToken": "",
+        "x": 310,
+        "y": 1740,
+        "wires": [
+            [
+                "27bfaad951c3d3a7"
             ]
         ]
     }
