@@ -116,6 +116,8 @@ npm install @iseeberg79/battery-usage-optimization-nodes
 
 [solcast](https://solcast.com.au) 
 
+[Open-Meteo](https://open-meteo.com/)
+
 [Energy-Charts](https://www.energy-charts.info/)
 
 [iobroker.net](https://www.iobroker.net) 
