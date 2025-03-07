@@ -70,25 +70,22 @@ module.exports = function (RED) {
                     const period_end = new Date(time * 1000);
 
                     return {
-						//ISO timestamp
-                        start: new Date(period_end.getTime() - 3600000).toISOString().replace(/\.\d{1,7}Z$/, 'Z'),
-                        end: period_end.toISOString().replace(/\.\d{1,7}Z$/, 'Z'),
-                        pv_estimate:
-                            Math.round(
-                                limit(
-                                    0,
-                                    kwp *
-                                        1000 *
-                                        (globalTiltedIrradiance / 1000) *
-                                        (1 +
-                                            alphatemp *
-                                                ((temperature + (payload.hourly.temperature_2m[index - 1] || temperature)) / 2 +
-                                                    (globalTiltedIrradiance / 800.0) * rossmodel -
-                                                    25.0)) *
-                                        (efficiency / 100),
-                                    ac,
-                                ),
+                        //ISO timestamp
+                        start: new Date(period_end.getTime() - 3600000).toISOString().replace(/\.\d{1,7}Z$/, "Z"),
+                        end: period_end.toISOString().replace(/\.\d{1,7}Z$/, "Z"),
+                        pv_estimate: Math.round(
+                            limit(
+                                0,
+                                kwp *
+                                    1000 *
+                                    (globalTiltedIrradiance / 1000) *
+                                    (1 +
+                                        alphatemp *
+                                            ((temperature + (payload.hourly.temperature_2m[index - 1] || temperature)) / 2 + (globalTiltedIrradiance / 800.0) * rossmodel - 25.0)) *
+                                    (efficiency / 100),
+                                ac,
                             ),
+                        ),
                     };
                 });
 
