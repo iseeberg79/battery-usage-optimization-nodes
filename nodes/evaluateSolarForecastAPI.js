@@ -10,17 +10,18 @@ module.exports = function (RED) {
             // Defaults to provided URL or local API
             msg.url = typeof msg.url !== "undefined" ? msg.url : node.url;
 
+			// Funktion, um die Erträge für einen bestimmten Tag zu berechnen
+			function calculateTotalForDay(rates, day) {
+			    return rates.reduce((sum, item) => {
+			        const startDate = new Date(item.start);
+			        if (startDate.toISOString().split("T")[0] === day) {
+			            return sum + item.value;
+			        }
+			        return sum;
+			    }, 0);
+			}
+			
             try {
-                // Funktion, um die Erträge für einen bestimmten Tag zu berechnen
-                function calculateTotalForDay(day) {
-                    return rates.reduce((sum, item) => {
-                        const startDate = new Date(item.start);
-                        if (startDate.toISOString().split("T")[0] === day) {
-                            return sum + item.value;
-                        }
-                        return sum;
-                    }, 0);
-                }
 
                 // HTTP request
                 try {
@@ -48,8 +49,8 @@ module.exports = function (RED) {
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 const tomorrowDateString = tomorrow.toISOString().split("T")[0];
 
-                const todayTotal = calculateTotalForDay(today) * 1000;
-                const tomorrowTotal = calculateTotalForDay(tomorrowDateString) * 1000;
+                const todayTotal = calculateTotalForDay(rates, today) * 1000;
+                const tomorrowTotal = calculateTotalForDay(rates, tomorrowDateString) * 1000;
 
                 // Berechnung der verbleibenden Erträge für heute
                 const remainderToday =
