@@ -14,6 +14,7 @@
             alphatemp: { value: -0.004 },
             rossmodel: { value: 0.0260 },
             kwp: { value: 11 },
+            days: { value: 3},
         },
         inputs: 1,
         outputs: 1,
@@ -69,6 +70,10 @@
         <label for="node-input-kwp"><i class="fa fa-bolt"></i> Power [kWp]</label>
         <input type="number" id="node-input-kwp" placeholder="11">
     </div>
+    <div class="form-row">
+        <label for="node-input-days"> Days</label>
+        <input type="number" id="node-input-days" placeholder="3">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="@iseeberg79/EvaluateSolarForecastOpenMeteo">
@@ -87,6 +92,7 @@
              <li><b>alphatemp</b> - Temperaturkoeffizient</li>
              <li><b>rossmodel</b> - Kühlungsmodell [Ross Modell], see also https://www.researchgate.net/figure/Ross-coefficients-for-different-mounting-conditions-for-silicon-PV-panels-from-reference_tbl1_275438802</li>
              <li><b>kwp</b> - Leistung [kWp]</li>
+             <li><b>days</b> - Tage der Vorhersage</li>
     <li><b>days</b> - Vorhersagetage.</li>
          </ul>
      </ul>
