@@ -16,124 +16,123 @@ module.exports = function (RED) {
                 debug = msg.debug;
             }
 
-			let outputs = [null, null, null];
-			let socControlMode;
+            let outputs = [null, null, null];
+            let socControlMode;
 
-			// aus anderem Knoten berechnet
-			const enableGridcharge = typeof msg.enableGridcharge !== "undefined" ? msg.enableGridcharge : false;
-			const optimize = typeof msg.optimize !== "undefined" ? msg.optimize : false;
+            // aus anderem Knoten berechnet
+            const enableGridcharge = typeof msg.enableGridcharge !== "undefined" ? msg.enableGridcharge : false;
+            const optimize = typeof msg.optimize !== "undefined" ? msg.optimize : false;
 
-			// Standardwerte aus der Konfiguration übernehmen
-			const enableGridchargeThreshold = (msg.enableGridchargeThreshold =
-			    typeof msg.enableGridchargeThreshold !== "undefined" ? msg.enableGridchargeThreshold : node.enableGridchargeThreshold || 50);
-			const disableGridchargeThreshold = (msg.disableGridchargeThreshold =
-			    typeof msg.disableGridchargeThreshold !== "undefined" ? msg.disableGridchargeThreshold : node.disableGridchargeThreshold || 80);
-			const batteryCapacity = (msg.batteryCapacity = typeof msg.batteryCapacity !== "undefined" ? msg.batteryCapacity : node.batteryCapacity || 10000);
-			const feedin = (msg.feedin = typeof msg.feedin !== "undefined" ? msg.feedin : 0.079);
-			const resetminsoc = (msg.minsoc = typeof msg.minsoc !== "undefined" ? msg.minsoc : node.minsoc || 10);
-			const resetmaxsoc = (msg.maxsoc = typeof msg.maxsoc !== "undefined" ? msg.maxsoc : node.maxsoc || 90);
-			const efficiency = (msg.efficiency = typeof msg.efficiency !== "undefined" ? msg.efficiency : node.efficiency || 80);
+            // Standardwerte aus der Konfiguration übernehmen
+            const enableGridchargeThreshold = (msg.enableGridchargeThreshold =
+                typeof msg.enableGridchargeThreshold !== "undefined" ? msg.enableGridchargeThreshold : node.enableGridchargeThreshold || 50);
+            const disableGridchargeThreshold = (msg.disableGridchargeThreshold =
+                typeof msg.disableGridchargeThreshold !== "undefined" ? msg.disableGridchargeThreshold : node.disableGridchargeThreshold || 80);
+            const batteryCapacity = (msg.batteryCapacity = typeof msg.batteryCapacity !== "undefined" ? msg.batteryCapacity : node.batteryCapacity || 10000);
+            const feedin = (msg.feedin = typeof msg.feedin !== "undefined" ? msg.feedin : 0.079);
+            const resetminsoc = (msg.minsoc = typeof msg.minsoc !== "undefined" ? msg.minsoc : node.minsoc || 10);
+            const resetmaxsoc = (msg.maxsoc = typeof msg.maxsoc !== "undefined" ? msg.maxsoc : node.maxsoc || 90);
+            const efficiency = (msg.efficiency = typeof msg.efficiency !== "undefined" ? msg.efficiency : node.efficiency || 80);
 
-			// Werte für die Berechnung, mit sicheren Standard vorbelegt
-			let price = (msg.price = typeof msg.price !== "undefined" ? msg.price : 1.0);
-			let soc = (msg.soc = typeof msg.soc !== "undefined" ? msg.soc : 90);
-			let minPrice = (msg.minimum = typeof msg.minimum !== "undefined" ? msg.minimum : feedin);
-			let estimatedHousehold = (msg.energy_req = typeof msg.energy_req !== "undefined" ? msg.energy_req : 7000);
-			let pvforecast = (msg.pvforecast = typeof msg.pvforecast !== "undefined" ? msg.pvforecast : 16000);
-			let avgPrice = typeof msg.average !== "undefined" ? msg.average : 0.25;
-			let avgPriceWeekly = typeof msg.avgGridPriceWeekly !== "undefined" ? msg.avgGridPriceWeekly : avgPrice;
+            // Werte für die Berechnung, mit sicheren Standard vorbelegt
+            let price = (msg.price = typeof msg.price !== "undefined" ? msg.price : 1.0);
+            let soc = (msg.soc = typeof msg.soc !== "undefined" ? msg.soc : 90);
+            let minPrice = (msg.minimum = typeof msg.minimum !== "undefined" ? msg.minimum : feedin);
+            let estimatedHousehold = (msg.energy_req = typeof msg.energy_req !== "undefined" ? msg.energy_req : 7000);
+            let pvforecast = (msg.pvforecast = typeof msg.pvforecast !== "undefined" ? msg.pvforecast : 16000);
+            let avgPrice = typeof msg.average !== "undefined" ? msg.average : 0.25;
+            let avgPriceWeekly = typeof msg.avgGridPriceWeekly !== "undefined" ? msg.avgGridPriceWeekly : avgPrice;
 
-			// auch Ausgabewerte
-			let lastGridchargePrice = (msg.lastGridchargePrice = typeof msg.lastGridchargePrice !== "undefined" ? msg.lastGridchargePrice : feedin);
+            // auch Ausgabewerte
+            let lastGridchargePrice = (msg.lastGridchargePrice = typeof msg.lastGridchargePrice !== "undefined" ? msg.lastGridchargePrice : feedin);
 
-			// Maximum zur Steuerung heranziehen: Glättung des Verbrauches
-			let batteryControlLimit = (msg.batteryControlLimit = Math.max(lastGridchargePrice, avgPriceWeekly));
-			const loss = 1 + (100 - efficiency) / 100;
+            // Maximum zur Steuerung heranziehen: Glättung des Verbrauches
+            let batteryControlLimit = (msg.batteryControlLimit = Math.max(lastGridchargePrice, avgPriceWeekly));
+            const loss = 1 + (100 - efficiency) / 100;
 
-			// interne Berechnung überschreiben, wenn es einen externen Schätzer gibt
-			const estimator = typeof msg.estimator !== "undefined" ? true : false;
-			
-			// Hilfsfunktionen
-			function isWinter(month) {
-			    return month >= 11 || month <= 2; // November bis Februar
-			}
+            // interne Berechnung überschreiben, wenn es einen externen Schätzer gibt
+            const estimator = typeof msg.estimator !== "undefined" ? true : false;
 
-			function mayChargeBattery(price, minTotal, avgPrice) {
-			    let ret = price <= minTotal && price * loss < avgPrice;
-			    if (debug) {
-			        node.warn(`loss is ${loss}; return is ${ret}`);
-			    }
-			    return ret;
-			}
+            // Hilfsfunktionen
+            function isWinter(month) {
+                return month >= 11 || month <= 2; // November bis Februar
+            }
 
-			function evaluateEstimator(estimator) {
-			    if (debug) {
-			        node.warn("externe Prognose aktiv");
-			    }
+            function mayChargeBattery(price, minTotal, avgPrice) {
+                let ret = price <= minTotal && price * loss < avgPrice;
+                if (debug) {
+                    node.warn(`loss is ${loss}; return is ${ret}`);
+                }
+                return ret;
+            }
 
-			    // Aktuelle Zeit
-			    const currentTime = new Date();
+            function evaluateEstimator(estimator) {
+                if (debug) {
+                    node.warn("externe Prognose aktiv");
+                }
 
-			    // Funktion, um den Modus effizient zu ermitteln
-			    function getCurrentMode(currentTime, data) {
-			        return data.reduce((currentMode, entry) => {
-			            const startTime = new Date(entry.start);
-			            const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 Stunde hinzufügen
-			            if (currentTime >= startTime && currentTime < endTime) {
-			                currentMode = entry.mode;
-			            }
-			            return currentMode;
-			        }, "undefined");
-			    }
+                // Aktuelle Zeit
+                const currentTime = new Date();
 
-			    // Modus für die aktuelle Zeit ermitteln
-			    let batteryMode = "unknown";
-			    const mode = getCurrentMode(currentTime, estimator);
-			    if (debug) {
-			        node.warn("Der Modus für die aktuelle Zeit ist: " + mode);
-			    }
+                // Funktion, um den Modus effizient zu ermitteln
+                function getCurrentMode(currentTime, data) {
+                    return data.reduce((currentMode, entry) => {
+                        const startTime = new Date(entry.start);
+                        const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 Stunde hinzufügen
+                        if (currentTime >= startTime && currentTime < endTime) {
+                            currentMode = entry.mode;
+                        }
+                        return currentMode;
+                    }, "undefined");
+                }
 
-			    if (mode !== "undefined") {
-			        batteryMode = mode;
-			    }
-			    return batteryMode;
-			}
+                // Modus für die aktuelle Zeit ermitteln
+                let batteryMode = "unknown";
+                const mode = getCurrentMode(currentTime, estimator);
+                if (debug) {
+                    node.warn("Der Modus für die aktuelle Zeit ist: " + mode);
+                }
 
-			function checkGridchargeReset() {
-			    // Zurücksetzen des letzten Ladepreises bei geringem/hohem Füllstand
-			    switch (socControlMode) {
-			        case "highSOC":
-			            if (debug) {
-			                node.warn(`socControlMode is highSOC`);
-			            }
-			            if (soc > resetmaxsoc) {
-			                if (debug) {
-			                    node.warn(`soc (${soc}) > resetmaxsoc (${resetmaxsoc})`);
-			                }
-			                lastGridchargePrice = feedin * loss;
-			            }
-			            break;
-			        case "lowSOC":
-			            if (debug) {
-			                node.warn(`socControlMode is lowSOC`);
-			            }
-			            if (soc < resetminsoc) {
-			                if (debug) {
-			                    node.warn(`soc (${soc}) < resetminsoc (${resetminsoc})`);
-			                }
-			                lastGridchargePrice = feedin * loss;
-			            }
-			            break;
-			        case "mediumSOC":
-			            if (debug) {
-			                node.warn(`socControlMode is mediumSOC`);
-			            }
-			            break;
-			    }
-			}
+                if (mode !== "undefined") {
+                    batteryMode = mode;
+                }
+                return batteryMode;
+            }
+
+            function checkGridchargeReset() {
+                // Zurücksetzen des letzten Ladepreises bei geringem/hohem Füllstand
+                switch (socControlMode) {
+                    case "highSOC":
+                        if (debug) {
+                            node.warn(`socControlMode is highSOC`);
+                        }
+                        if (soc > resetmaxsoc) {
+                            if (debug) {
+                                node.warn(`soc (${soc}) > resetmaxsoc (${resetmaxsoc})`);
+                            }
+                            lastGridchargePrice = feedin * loss;
+                        }
+                        break;
+                    case "lowSOC":
+                        if (debug) {
+                            node.warn(`socControlMode is lowSOC`);
+                        }
+                        if (soc < resetminsoc) {
+                            if (debug) {
+                                node.warn(`soc (${soc}) < resetminsoc (${resetminsoc})`);
+                            }
+                            lastGridchargePrice = feedin * loss;
+                        }
+                        break;
+                    case "mediumSOC":
+                        if (debug) {
+                            node.warn(`socControlMode is mediumSOC`);
+                        }
+                        break;
+                }
+            }
 
             try {
-
                 // Initialisiere msg.batterymode, falls nicht vorhanden
                 if (typeof msg.batterymode === "undefined") {
                     msg.batterymode = "unknown";
