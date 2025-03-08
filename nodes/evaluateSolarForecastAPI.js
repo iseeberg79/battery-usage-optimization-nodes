@@ -10,19 +10,18 @@ module.exports = function (RED) {
             // Defaults to provided URL or local API
             msg.url = typeof msg.url !== "undefined" ? msg.url : node.url;
 
-			// Funktion, um die Erträge für einen bestimmten Tag zu berechnen
-			function calculateTotalForDay(rates, day) {
-			    return rates.reduce((sum, item) => {
-			        const startDate = new Date(item.start);
-			        if (startDate.toISOString().split("T")[0] === day) {
-			            return sum + item.value;
-			        }
-			        return sum;
-			    }, 0);
-			}
-			
-            try {
+            // Funktion, um die Erträge für einen bestimmten Tag zu berechnen
+            function calculateTotalForDay(rates, day) {
+                return rates.reduce((sum, item) => {
+                    const startDate = new Date(item.start);
+                    if (startDate.toISOString().split("T")[0] === day) {
+                        return sum + item.value;
+                    }
+                    return sum;
+                }, 0);
+            }
 
+            try {
                 // HTTP request
                 try {
                     const response = await axios.get(msg.url);

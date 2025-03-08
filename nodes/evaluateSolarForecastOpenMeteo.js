@@ -13,9 +13,9 @@ module.exports = function (RED) {
         node.ac = config.ac || 10000;
         node.efficiency = config.efficiency || 100;
         node.alphatemp = config.alphatemp || -0.004;
-        node.rossmodel = config.rossmodel || 0.0260;
+        node.rossmodel = config.rossmodel || 0.026;
         node.kwp = config.kwp || 11;
-		node.days = config.days || 3;
+        node.days = config.days || 3;
 
         node.on("input", async function (msg) {
             const url = typeof msg.url !== "undefined" ? msg.url : node.url;
@@ -28,7 +28,7 @@ module.exports = function (RED) {
             const alphatemp = typeof msg.alphatemp !== "undefined" ? msg.alphatemp : node.alphatemp;
             const rossmodel = typeof msg.rossmodel !== "undefined" ? msg.rossmodel : node.rossmodel;
             const kwp = typeof msg.kwp !== "undefined" ? msg.kwp : node.kwp;
-			const days = typeof msg.days !== "undefined" ? msg.days : node.days;
+            const days = typeof msg.days !== "undefined" ? msg.days : node.days;
 
             if (lat === "invalid" || lon === "invalid" || az === "invalid" || dec === "invalid") {
                 node.error("invalid configuration: lat/lon/az/dec", msg);
@@ -163,7 +163,7 @@ module.exports = function (RED) {
             alphatemp: { value: -0.004 },
             rossmodel: { value: 0.026 },
             kwp: { value: 11 },
-			days: { value: 3 },
+            days: { value: 3 },
         },
     });
 };
