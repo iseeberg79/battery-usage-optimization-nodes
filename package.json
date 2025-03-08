@@ -54,5 +54,8 @@
             "EstimateBatterymode": "nodes/estimateBatterymode.js",
             "TibberApiPrices": "nodes/tibberApiPrices.js"
         }
+    },
+    "engines": {
+        "node": ">=18.0.0"
     }
 }
