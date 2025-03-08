@@ -1,9 +1,6 @@
-name: Node.js CI
+name: Node.js CI (development)
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -43,16 +40,16 @@ jobs:
     - name: Generate JSDoc
       run: npx jsdoc -c jsdoc.json
 
-    - name: Pack project
-      run: npm pack --pack-destination ./build/${{ matrix.node-version }}/
+#    - name: Pack project
+#      run: npm pack --pack-destination ./build/${{ matrix.node-version }}/
 #
 #    - name: Publish project  
 #      run: npm publish
 #      env:
 #           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-
-    - name: Archive build artifacts 
-      uses: actions/upload-artifact@v4 
-      with: 
-        name: build-${{ matrix.node-version }} 
-        path: build/${{ matrix.node-version }}/
+#
+#    - name: Archive build artifacts 
+#      uses: actions/upload-artifact@v4 
+#      with: 
+#        name: build-${{ matrix.node-version }} 
+#        path: build/${{ matrix.node-version }}/
