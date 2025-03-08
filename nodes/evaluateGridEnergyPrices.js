@@ -1,96 +1,101 @@
-const axios = require('axios');
-module.exports = function(RED) {
-	function EvaluateGridEnergyPrices(config) {
-		RED.nodes.createNode(this, config);
-		var node = this;
-		node.bzn = config.bzn;
-		node.url = config.url;
+const axios = require("axios");
+module.exports = function (RED) {
+    function EvaluateGridEnergyPrices(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+        node.bzn = config.bzn;
+        node.url = config.url;
 
-		node.on('input', async function(msg) {
-			let heute = (new Date()).setHours(0, 0, 0, 0);
-			msg.start = Math.floor(heute / 1000);
-			msg.end = Math.floor(new Date((new Date(heute).getTime() + (1000 * 3600 * 24))).setHours(23, 59, 59, 999) / 1000);
+        node.on("input", async function (msg) {
+            let heute = new Date().setHours(0, 0, 0, 0);
+            msg.start = Math.floor(heute / 1000);
+            msg.end = Math.floor(new Date(new Date(heute).getTime() + 1000 * 3600 * 24).setHours(23, 59, 59, 999) / 1000);
 
-			msg.bzn = (typeof msg.bzn !== 'undefined') ? msg.bzn : (node.bzn || "DE-LU");
+            msg.bzn = typeof msg.bzn !== "undefined" ? msg.bzn : node.bzn || "DE-LU";
 
-			msg.payload = {
-				bzn: msg.bzn,
-				start: msg.start,
-				end: msg.end
-			};
+            msg.payload = {
+                bzn: msg.bzn,
+                start: msg.start,
+                end: msg.end,
+            };
 
-			msg.url = (typeof msg.url !== 'undefined') ? msg.url : (node.url || 'https://api.energy-charts.info/price');
+            msg.url = typeof msg.url !== "undefined" ? msg.url : node.url || "https://api.energy-charts.info/price";
 
-			try {
-				const response = await axios.get(msg.url, { params: msg.payload });
-				msg.payload = response.data;
-			} catch (error) {
-				node.error('HTTP-Anfrage Fehler: ' + error, msg);
-				return;
-			}
+            try {
+                try {
+                    const response = await axios.get(msg.url, { params: msg.payload });
+                    msg.payload = response.data;
+                } catch (error) {
+                    node.error("HTTP request error: " + error, msg);
+                    return;
+                }
 
-			let data = msg.payload;
-			const result = data.unix_seconds.map((timestamp, index) => {
-				return { start: timestamp, end: (timestamp + 3600), price: data.price[index] / 10 };
-			});
+                let data = msg.payload;
+                const result = data.unix_seconds.map((timestamp, index) => {
+                    return { start: timestamp, end: timestamp + 3600, price: data.price[index] / 10 };
+                });
 
-			// Berechnung der maximalen, minimalen und durchschnittlichen Werte (in Euro pro Kilowattstunde)
-			const pricesInCtPerKWh = data.price.map(price => (price / 10));
-			const minPrice = Math.min(...pricesInCtPerKWh);
-			const maxPrice = Math.max(...pricesInCtPerKWh);
-			const avgPrice = pricesInCtPerKWh.reduce((sum, price) => sum + price, 0) / pricesInCtPerKWh.length;
+                // Berechnung der maximalen, minimalen und durchschnittlichen Werte (in Euro pro Kilowattstunde)
+                const pricesInCtPerKWh = data.price.map((price) => price / 10);
+                const minPrice = Math.min(...pricesInCtPerKWh);
+                const maxPrice = Math.max(...pricesInCtPerKWh);
+                const avgPrice = pricesInCtPerKWh.reduce((sum, price) => sum + price, 0) / pricesInCtPerKWh.length;
 
-			msg.payload.prices = result;
-			let maximum = maxPrice;
-			let minimum = minPrice;
-			let average = avgPrice;
+                msg.payload.prices = result;
+                let maximum = maxPrice;
+                let minimum = minPrice;
+                let average = avgPrice;
 
-			msg.charges = (typeof msg.charges !== 'undefined') ? msg.charges : (node.charges || 0);
-			if (typeof msg.charges === 'string') {
-				msg.charges = parseFloat(msg.charges);
-			}
-			const charges = msg.charges;
-			const tax_percent = (typeof msg.tax !== 'undefined') ? msg.tax : (node.tax || 19);
-			const tax = msg.tax = 1 + (tax_percent / 100);
-			msg.payload.absMinimum = minimum = Math.round((minimum + charges) / 100 * tax * 1000) / 1000;
-			msg.payload.maximum = maximum = Math.round((maximum + charges) / 100 * tax * 1000) / 1000;
-			msg.payload.average = average = Math.round((average + charges) / 100 * tax * 1000) / 1000;
+                msg.charges = typeof msg.charges !== "undefined" ? msg.charges : node.charges || 0;
+                if (typeof msg.charges === "string") {
+                    msg.charges = parseFloat(msg.charges);
+                }
+                const charges = msg.charges;
+                const tax_percent = typeof msg.tax !== "undefined" ? msg.tax : node.tax || 19;
+                const tax = (msg.tax = 1 + tax_percent / 100);
+                msg.payload.absMinimum = minimum = Math.round(((minimum + charges) / 100) * tax * 1000) / 1000;
+                msg.payload.maximum = maximum = Math.round(((maximum + charges) / 100) * tax * 1000) / 1000;
+                msg.payload.average = average = Math.round(((average + charges) / 100) * tax * 1000) / 1000;
 
-			msg.payload.diff = Math.round((maximum - minimum) * 1000) / 1000;
-			msg.payload.deviation = Math.round(Math.max((average - minimum), (maximum - average)) * 1000) / 1000;
+                msg.payload.diff = Math.round((maximum - minimum) * 1000) / 1000;
+                msg.payload.deviation = Math.round(Math.max(average - minimum, maximum - average) * 1000) / 1000;
 
-			// Datenübernahme
-			data = msg.payload.prices;
+                // Datenübernahme
+                data = msg.payload.prices;
 
-			// Das Intervall mit dem maximalen Preis finden
-			const maxPriceInterval = data.reduce((max, interval) => interval.price > max.price ? interval : max, data[0]);
-			const maxPriceStartTime = new Date(maxPriceInterval.start);
+                // Das Intervall mit dem maximalen Preis finden
+                const maxPriceInterval = data.reduce((max, interval) => (interval.price > max.price ? interval : max), data[0]);
+                const maxPriceStartTime = new Date(maxPriceInterval.start);
 
-			// Die Intervalle vor dem maximalen Preis filtern
-			const validIntervals = data.filter(interval => new Date(interval.start) < maxPriceStartTime);
+                // Die Intervalle vor dem maximalen Preis filtern
+                const validIntervals = data.filter((interval) => new Date(interval.start) < maxPriceStartTime);
 
-			// Das günstigste Intervall aus den gültigen Intervallen finden, und übergeben
-			minimum = (validIntervals.reduce((min, interval) => interval.price < min.price ? interval : min, validIntervals[0])).price;
-			msg.payload.minimum = Math.round((minimum + charges) /100 * tax * 1000) / 1000;
+                // Das günstigste Intervall aus den gültigen Intervallen finden, und übergeben
+                minimum = validIntervals.reduce((min, interval) => (interval.price < min.price ? interval : min), validIntervals[0]).price;
+                msg.payload.minimum = Math.round(((minimum + charges) / 100) * tax * 1000) / 1000;
 
-			delete msg.payload.unix_seconds;
-			delete msg.payload.price;
-			delete msg.payload.unit;
+                delete msg.payload.unix_seconds;
+                delete msg.payload.price;
+                delete msg.payload.unit;
 
-			node.send(msg);
-		});
-	}
-	RED.nodes.registerType('@iseeberg79/EvaluateGridEnergyPrices', EvaluateGridEnergyPrices, {
-		defaults: {
-			name: { value: "" },
-			bzn: { value: "DE-LU" },
-			url: { value: "https://api.energy-charts.info/price" }
-		},
-		inputs: 1,
-		outputs: 1,
-		icon: "file.png",
-		label: function() {
-			return this.name || "Evaluate Grid Energy Prices";
-		}
-	});
+                node.send(msg);
+            } catch (error) {
+                node.error("general error: " + error, msg);
+                return;
+            }
+        });
+    }
+    RED.nodes.registerType("@iseeberg79/EvaluateGridEnergyPrices", EvaluateGridEnergyPrices, {
+        defaults: {
+            name: { value: "" },
+            bzn: { value: "DE-LU" },
+            url: { value: "https://api.energy-charts.info/price" },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file.png",
+        label: function () {
+            return this.name || "Evaluate Grid Energy Prices";
+        },
+    });
 };

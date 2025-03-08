@@ -6,9 +6,9 @@ module.exports = function (RED) {
         const axios = require("axios");
 
         node.on("input", async function (msg) {
-            const accessToken = (typeof msg.accessToken !== "undefined") ? msg.accessToken : config.accessToken;
+            const accessToken = typeof msg.accessToken !== "undefined" ? msg.accessToken : config.accessToken;
 
-            if (!accessToken ) {
+            if (!accessToken) {
                 node.error("Access Token is missing.");
                 return;
             }
@@ -39,12 +39,16 @@ module.exports = function (RED) {
             }`;
 
             try {
-                const response = await axios.post(msg.url, { query }, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessToken}`,
+                const response = await axios.post(
+                    msg.url,
+                    { query },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${accessToken}`,
+                        },
                     },
-                });
+                );
 
                 const prices = [];
 
@@ -64,22 +68,23 @@ module.exports = function (RED) {
                         prices.push({
                             start: price.startsAt,
                             end: array[index + 1].startsAt,
-                            price: price.total
+                            price: price.total,
                         });
                     }
                 });
 
                 msg.payload = { prices };
+
                 node.send(msg);
             } catch (error) {
-                node.error("HTTP request error: " + error.message, msg);
+                node.error("general error: " + error.message, msg);
             }
         });
     }
 
     RED.nodes.registerType("@iseeberg79/tibber-api-prices", TibberApiPrices, {
         credentials: {
-            accessToken: { type: "text" }
+            accessToken: { type: "text" },
         },
     });
 };

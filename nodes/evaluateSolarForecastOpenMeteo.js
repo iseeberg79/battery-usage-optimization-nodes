@@ -13,8 +13,9 @@ module.exports = function (RED) {
         node.ac = config.ac || 10000;
         node.efficiency = config.efficiency || 100;
         node.alphatemp = config.alphatemp || -0.004;
-        node.rossmodel = config.rossmodel || 0.0342;
+        node.rossmodel = config.rossmodel || 0.0260;
         node.kwp = config.kwp || 11;
+		node.days = config.days || 3;
 
         node.on("input", async function (msg) {
             const url = typeof msg.url !== "undefined" ? msg.url : node.url;
@@ -27,10 +28,10 @@ module.exports = function (RED) {
             const alphatemp = typeof msg.alphatemp !== "undefined" ? msg.alphatemp : node.alphatemp;
             const rossmodel = typeof msg.rossmodel !== "undefined" ? msg.rossmodel : node.rossmodel;
             const kwp = typeof msg.kwp !== "undefined" ? msg.kwp : node.kwp;
-            const days = typeof msg.days !== "undefined" ? msg.days : 3;
+			const days = typeof msg.days !== "undefined" ? msg.days : node.days;
 
             if (lat === "invalid" || lon === "invalid" || az === "invalid" || dec === "invalid") {
-                node.error("Ungültige Konfiguration: lat/lon/az/dec", msg);
+                node.error("invalid configuration: lat/lon/az/dec", msg);
                 return;
             }
 
@@ -46,7 +47,7 @@ module.exports = function (RED) {
 
                 // Überprüfen, ob `response.data` die erwartete Struktur hat
                 if (!response.data || typeof response.data !== "object" || !response.data.hourly) {
-                    node.error("Ungültige API-Antwort", msg);
+                    node.error("invalid API response", msg);
                     return;
                 }
 
@@ -60,7 +61,7 @@ module.exports = function (RED) {
                 const limit = (min, x, max) => (x < min ? min : x > max ? max : x);
 
                 if (!payload.hourly.time || !payload.hourly.global_tilted_irradiance) {
-                    node.error("Ungültige Daten im API-Antwort-Objekt", msg);
+                    node.error("invalid API response data", msg);
                     return [];
                 }
 
@@ -92,56 +93,61 @@ module.exports = function (RED) {
                 return transformedData;
             }
 
-            // Hier kommt die Konvertierung und die Berechnung der Erträge
-            msg.payload.forecast = transformData(msg.payload.result, {
-                alphatemp,
-                rossmodel,
-                efficiency,
-                kwp,
-                ac,
-            });
+            try {
+                // Hier kommt die Konvertierung und die Berechnung der Erträge
+                msg.payload.forecast = transformData(msg.payload.result, {
+                    alphatemp,
+                    rossmodel,
+                    efficiency,
+                    kwp,
+                    ac,
+                });
 
-            // Berechnung der Erträge
-            const now = new Date().getTime();
-            const timezoneOffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
-            const today = new Date(now - timezoneOffset).toISOString().split("T")[0];
-            const tomorrow = new Date(now - timezoneOffset + 24 * 3600000).toISOString().split("T")[0];
+                // Berechnung der Erträge
+                const now = new Date().getTime();
+                const timezoneOffset = new Date().getTimezoneOffset() * 60000; // offset in milliseconds
+                const today = new Date(now - timezoneOffset).toISOString().split("T")[0];
+                const tomorrow = new Date(now - timezoneOffset + 24 * 3600000).toISOString().split("T")[0];
 
-            if (!Array.isArray(msg.payload.forecast)) {
-                node.error("Ungültige Datenstruktur: msg.payload.forecast ist kein Array", msg);
+                if (!Array.isArray(msg.payload.forecast)) {
+                    node.error("invalid structure: msg.payload.forecast is not an array", msg);
+                    return;
+                }
+
+                const { todayTotal, tomorrowTotal, remainderToday } = msg.payload.forecast.reduce(
+                    (acc, { pv_estimate, end }) => {
+                        const periodDate = new Date(end);
+                        const periodDay = periodDate.toISOString().split("T")[0];
+                        if (periodDay === today) {
+                            if (periodDate > now) {
+                                acc.remainderToday.pv_estimate += pv_estimate || 0;
+                            }
+                            acc.todayTotal.pv_estimate += pv_estimate || 0;
+                        } else if (periodDay === tomorrow) {
+                            acc.tomorrowTotal.pv_estimate += pv_estimate || 0;
+                        }
+                        return acc;
+                    },
+                    {
+                        todayTotal: { pv_estimate: 0 },
+                        tomorrowTotal: { pv_estimate: 0 },
+                        remainderToday: { pv_estimate: 0 },
+                    },
+                );
+
+                // cleanup
+                delete msg.payload.result;
+
+                msg.payload.today = Math.round(todayTotal.pv_estimate);
+                msg.payload.remain = Math.round(remainderToday.pv_estimate);
+                msg.payload.tomorrow = Math.round(tomorrowTotal.pv_estimate);
+                msg.payload.lastchange = new Date().getTime();
+
+                node.send(msg);
+            } catch (error) {
+                node.error("general error: " + error, msg);
                 return;
             }
-
-            const { todayTotal, tomorrowTotal, remainderToday } = msg.payload.forecast.reduce(
-                (acc, { pv_estimate, end }) => {
-                    const periodDate = new Date(end);
-                    const periodDay = periodDate.toISOString().split("T")[0];
-                    if (periodDay === today) {
-                        if (periodDate > now) {
-                            acc.remainderToday.pv_estimate += pv_estimate || 0;
-                        }
-                        acc.todayTotal.pv_estimate += pv_estimate || 0;
-                    } else if (periodDay === tomorrow) {
-                        acc.tomorrowTotal.pv_estimate += pv_estimate || 0;
-                    }
-                    return acc;
-                },
-                {
-                    todayTotal: { pv_estimate: 0 },
-                    tomorrowTotal: { pv_estimate: 0 },
-                    remainderToday: { pv_estimate: 0 },
-                },
-            );
-
-            // cleanup
-            delete msg.payload.result;
-
-            msg.payload.today = Math.round(todayTotal.pv_estimate);
-            msg.payload.remain = Math.round(remainderToday.pv_estimate);
-            msg.payload.tomorrow = Math.round(tomorrowTotal.pv_estimate);
-            msg.payload.lastchange = new Date().getTime();
-
-            node.send(msg);
         });
     }
     RED.nodes.registerType("@iseeberg79/EvaluateSolarForecastOpenMeteo", EvaluateSolarForecastOpenMeteoNode, {
@@ -157,6 +163,7 @@ module.exports = function (RED) {
             alphatemp: { value: -0.004 },
             rossmodel: { value: 0.026 },
             kwp: { value: 11 },
+			days: { value: 3 },
         },
     });
 };

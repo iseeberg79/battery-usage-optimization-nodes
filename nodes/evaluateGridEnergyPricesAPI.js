@@ -63,7 +63,7 @@ module.exports = function (RED) {
 
                 node.send(msg);
             } catch (error) {
-                node.error("HTTP request error: " + error, msg);
+                node.error("general error: " + error, msg);
                 return;
             }
         });
