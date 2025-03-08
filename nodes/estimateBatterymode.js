@@ -24,6 +24,10 @@ module.exports = function (RED) {
                 debug = msg.debug;
             }
 
+            const factor = 1 + (100 - efficiency) / 100;
+            const rate = 1 + performance / 100;
+            const battery_capacity = batteryCapacity - (batteryCapacity / 100) * batteryBuffer; // available energy kWh
+
             // Berechnung der maximalen Netzladungsmenge
             function calculateLoadableHours(data, threshold) {
                 if (debug) {
@@ -413,12 +417,8 @@ module.exports = function (RED) {
                     node.status({ fill: "orange", shape: "dot", text: "processing" });
                 }
 
-                const factor = 1 + (100 - efficiency) / 100;
-                const rate = 1 + performance / 100;
-
                 const batteryEnergyPrice = feedin * factor; // Einspeisetarif inkl. Wandlungsverluste
                 let lastGridchargePrice = typeof msg.lastGridchargePrice !== "undefined" ? msg.lastGridchargePrice : batteryEnergyPrice; // Netzladungspreis pro kWh
-                const battery_capacity = batteryCapacity - (batteryCapacity / 100) * batteryBuffer; // available energy kWh
 
                 const startPower = ((soc - batteryBuffer) / 100) * battery_capacity; // batteryPower aus dem Nachrichtenfluss (Energiemenge des Batteriespeichers)
                 let startBatteryPower = startPower;
