@@ -24,367 +24,367 @@ module.exports = function (RED) {
                 debug = msg.debug;
             }
 
-			// Berechnung der maximalen Netzladungsmenge
-			function calculateLoadableHours(data, threshold) {
-			    if (debug) {
-			        node.warn("calculateLoadableHours");
-			    }
-			    const currentTime = new Date().toISOString();
+            // Berechnung der maximalen Netzladungsmenge
+            function calculateLoadableHours(data, threshold) {
+                if (debug) {
+                    node.warn("calculateLoadableHours");
+                }
+                const currentTime = new Date().toISOString();
 
-			    let maxPrice = -Infinity;
-			    let maxPriceIndex = -1;
-			    let avgPrice = 0;
+                let maxPrice = -Infinity;
+                let maxPriceIndex = -1;
+                let avgPrice = 0;
 
-			    if (debug) {
-			        node.warn("importPrice #19");
-			    }
+                if (debug) {
+                    node.warn("importPrice #19");
+                }
 
-			    // Schritt 1: Den Index des höchsten Importpreises finden, ohne das Array zu verändern
-			    for (let i = 0; i < data.length; i++) {
-			        if (data[i].importPrice > maxPrice) {
-			            maxPrice = data[i].importPrice;
-			            maxPriceIndex = i;
-			        }
-			    }
+                // Schritt 1: Den Index des höchsten Importpreises finden, ohne das Array zu verändern
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i].importPrice > maxPrice) {
+                        maxPrice = data[i].importPrice;
+                        maxPriceIndex = i;
+                    }
+                }
 
-			    // Schritt 2: Daten nach dem aktuellen Zeitpunkt und vor dem höchsten Importpreis filtern
-			    let loadableHours = 0;
-			    if (debug) {
-			        node.warn("importPrice #20");
-			    }
-			    for (let i = 0; i < maxPriceIndex; i++) {
-			        if (data[i].start > currentTime && data[i].importPrice < threshold) {
-			            loadableHours++;
-			            avgPrice += data[i].importPrice;
-			        }
-			    }
+                // Schritt 2: Daten nach dem aktuellen Zeitpunkt und vor dem höchsten Importpreis filtern
+                let loadableHours = 0;
+                if (debug) {
+                    node.warn("importPrice #20");
+                }
+                for (let i = 0; i < maxPriceIndex; i++) {
+                    if (data[i].start > currentTime && data[i].importPrice < threshold) {
+                        loadableHours++;
+                        avgPrice += data[i].importPrice;
+                    }
+                }
 
-			    // Mögliche Netzladungsmenge berechnen (pro Stunde maximal maxCharge kWh)
-			    const loadableEnergy = Math.min(loadableHours * maxCharge, battery_capacity) * 0.9; // Annahme etwas reduzieren!
-			    if (debug) {
-			        node.warn("Loadable Energy: " + loadableEnergy + ", Hours: " + loadableHours + ", Threshold: " + threshold);
-			    }
+                // Mögliche Netzladungsmenge berechnen (pro Stunde maximal maxCharge kWh)
+                const loadableEnergy = Math.min(loadableHours * maxCharge, battery_capacity) * 0.9; // Annahme etwas reduzieren!
+                if (debug) {
+                    node.warn("Loadable Energy: " + loadableEnergy + ", Hours: " + loadableHours + ", Threshold: " + threshold);
+                }
 
-			    return {
-			        loadableHours,
-			        loadableEnergy,
-			        avgPrice: (avgPrice / loadableHours) * factor,
-			    };
-			}
-			
-			// Filtern der Daten nach dem aktuellen Zeitpunkt, Vergleichbarkeit und Ausrichtung
-			function alignArray(array, minStartTime) {
-			    return array.filter((entry) => new Date(entry.start).getTime() >= minStartTime);
-			}
-			
-			// Zusammenfassen der PV-Produktion (stundenbasiert)
-			function transformSolarProductionArray(array) {
-			    if (debug) {
-			        node.warn("transformSolarProductionArray");
-			    }
-			    const hourlyProduction = {};
+                return {
+                    loadableHours,
+                    loadableEnergy,
+                    avgPrice: (avgPrice / loadableHours) * factor,
+                };
+            }
 
-			    array.forEach((entry) => {
-			        const date = new Date(entry.start);
-			        const hour = date.toISOString().slice(0, 13); // Extrahiert das Jahr, den Monat, den Tag und die Stunde
+            // Filtern der Daten nach dem aktuellen Zeitpunkt, Vergleichbarkeit und Ausrichtung
+            function alignArray(array, minStartTime) {
+                return array.filter((entry) => new Date(entry.start).getTime() >= minStartTime);
+            }
 
-			        if (!hourlyProduction[hour]) {
-			            hourlyProduction[hour] = {
-			                totalValue: 0,
-			                count: 0,
-			                originalFormat: entry.start,
-			            };
-			        }
-			        hourlyProduction[hour].totalValue += entry.value;
-			        hourlyProduction[hour].count += 1;
-			    });
+            // Zusammenfassen der PV-Produktion (stundenbasiert)
+            function transformSolarProductionArray(array) {
+                if (debug) {
+                    node.warn("transformSolarProductionArray");
+                }
+                const hourlyProduction = {};
 
-			    const transformedArray = Object.keys(hourlyProduction).map((hour) => {
-			        const { totalValue, count, originalFormat } = hourlyProduction[hour];
-			        return {
-			            start: originalFormat,
-			            value: totalValue / count, // Durchschnittswert pro Stunde
-			        };
-			    });
+                array.forEach((entry) => {
+                    const date = new Date(entry.start);
+                    const hour = date.toISOString().slice(0, 13); // Extrahiert das Jahr, den Monat, den Tag und die Stunde
 
-			    return transformedArray;
-			}
-			
-			// Zeitverschiebung der Verbrauchsprognose um 24 Stunden und Erweiterung auf 48 Felder
-			function extendForecast(forecast) {
-			    if (debug) {
-			        node.warn("extendForecast");
-			    }
-			    const extendedForecast = [...forecast];
-			    const oneHour = 60 * 60 * 1000; // eine Stunde in Millisekunden
-			    const numberOfHoursToExtend = 24;
+                    if (!hourlyProduction[hour]) {
+                        hourlyProduction[hour] = {
+                            totalValue: 0,
+                            count: 0,
+                            originalFormat: entry.start,
+                        };
+                    }
+                    hourlyProduction[hour].totalValue += entry.value;
+                    hourlyProduction[hour].count += 1;
+                });
 
-			    for (let i = 0; i < numberOfHoursToExtend; i++) {
-			        const lastEntry = new Date(extendedForecast[extendedForecast.length - 1].start);
-			        const newTimestamp = new Date(lastEntry.getTime() + oneHour);
-			        const newValue = forecast[i % forecast.length].value; // Verwenden Sie die Werte aus dem ursprünglichen Array, um die neuen Einträge zu füllen
+                const transformedArray = Object.keys(hourlyProduction).map((hour) => {
+                    const { totalValue, count, originalFormat } = hourlyProduction[hour];
+                    return {
+                        start: originalFormat,
+                        value: totalValue / count, // Durchschnittswert pro Stunde
+                    };
+                });
 
-			        extendedForecast.push({
-			            start: newTimestamp.toISOString(),
-			            value: newValue,
-			        });
-			    }
+                return transformedArray;
+            }
 
-			    return extendedForecast;
-			}
-			
-			// durchschnittlicher Importpreis
-			function calculateAverage(data) {
-			    if (debug) {
-			        node.warn("calculateAverage");
-			    }
-			    const sum = data.reduce((total, entry) => total + entry.importPrice, 0);
-			    const average = sum / data.length;
-			    return average;
-			}
-			
-			// maximaler morgiger SoC
-			function getMaximumSoC(data) {
-			    if (debug) {
-			        node.warn("getMaximumSoC");
-			    }
-			    return data.reduce((maxEntry, entry) => {
-			        return entry.soc > maxEntry.soc ? entry : maxEntry;
-			    });
-			}
+            // Zeitverschiebung der Verbrauchsprognose um 24 Stunden und Erweiterung auf 48 Felder
+            function extendForecast(forecast) {
+                if (debug) {
+                    node.warn("extendForecast");
+                }
+                const extendedForecast = [...forecast];
+                const oneHour = 60 * 60 * 1000; // eine Stunde in Millisekunden
+                const numberOfHoursToExtend = 24;
 
-			// aktuelle Stunde (des Tages: 0-23)
-			function getCurrentHourIndex(data) {
-			    if (debug) {
-			        node.warn("getCurrentHourIndex");
-			    }
-			    const currentTime = new Date().toISOString();
-			    return data.findIndex((entry) => {
-			        return entry.start.substring(0, 13) === currentTime.substring(0, 13);
-			    });
-			}
+                for (let i = 0; i < numberOfHoursToExtend; i++) {
+                    const lastEntry = new Date(extendedForecast[extendedForecast.length - 1].start);
+                    const newTimestamp = new Date(lastEntry.getTime() + oneHour);
+                    const newValue = forecast[i % forecast.length].value; // Verwenden Sie die Werte aus dem ursprünglichen Array, um die neuen Einträge zu füllen
 
-			// höchster absoluter Preis
-			function getMaximumAbs(data) {
-			    if (debug) {
-			        node.warn("getMaximumAbs");
-			    }
-			    return data.reduce((maxEntry, currentEntry) => {
-			        return currentEntry.importPrice > maxEntry.importPrice ? currentEntry : maxEntry;
-			    });
-			}
+                    extendedForecast.push({
+                        start: newTimestamp.toISOString(),
+                        value: newValue,
+                    });
+                }
 
-			// niedrigster Energieverbrauch (Fallback)
-			function getLowestEnergyEntry(data) {
-			    if (debug) {
-			        node.warn("getLowestCostEntry");
-			    }
-			    return data.reduce((min, current) => (current.value < min.value ? current : min), { value: Infinity });
-			}
+                return extendedForecast;
+            }
 
-			// niedrigster absoluter Preis
-			function getMinimumPriceAbs(data) {
-			    if (debug) {
-			        node.warn("getMinimumPriceAbs");
-			    }
-			    return data.reduce((prev, curr) => {
-			        return prev.importPrice < curr.importPrice ? prev : curr;
-			    });
-			}
+            // durchschnittlicher Importpreis
+            function calculateAverage(data) {
+                if (debug) {
+                    node.warn("calculateAverage");
+                }
+                const sum = data.reduce((total, entry) => total + entry.importPrice, 0);
+                const average = sum / data.length;
+                return average;
+            }
 
-			// niedrigster relativer Preis (vor dem Preismaximum)
-			function getMinimumPrice(data) {
-			    if (debug) {
-			        node.warn("getMinimumPrice");
-			    }
-			    const maxImportIndex = data.reduce((maxIdx, current, idx, array) => {
-			        return current.importPrice > array[maxIdx].importPrice ? idx : maxIdx;
-			    }, 0);
+            // maximaler morgiger SoC
+            function getMaximumSoC(data) {
+                if (debug) {
+                    node.warn("getMaximumSoC");
+                }
+                return data.reduce((maxEntry, entry) => {
+                    return entry.soc > maxEntry.soc ? entry : maxEntry;
+                });
+            }
 
-			    const dataBeforeMaxImport = data.slice(0, maxImportIndex);
+            // aktuelle Stunde (des Tages: 0-23)
+            function getCurrentHourIndex(data) {
+                if (debug) {
+                    node.warn("getCurrentHourIndex");
+                }
+                const currentTime = new Date().toISOString();
+                return data.findIndex((entry) => {
+                    return entry.start.substring(0, 13) === currentTime.substring(0, 13);
+                });
+            }
 
-			    if (debug) {
-			        node.warn("getMinimumPrice #2");
-			    }
-			    const cheapestEntry = dataBeforeMaxImport.reduce((prev, curr) => {
-			        return prev.importPrice < curr.importPrice ? prev : curr;
-			    }, dataBeforeMaxImport[0]);
+            // höchster absoluter Preis
+            function getMaximumAbs(data) {
+                if (debug) {
+                    node.warn("getMaximumAbs");
+                }
+                return data.reduce((maxEntry, currentEntry) => {
+                    return currentEntry.importPrice > maxEntry.importPrice ? currentEntry : maxEntry;
+                });
+            }
 
-			    // Wenn kein günstigerer Eintrag gefunden wurde, wird der günstigste Eintrag des gesamten Arrays zurückgegeben
-			    if (cheapestEntry === undefined) {
-			        if (debug) {
-			            node.warn("aktuell maximaler Wert, Fallback auf absolutes Minimum");
-			        }
-			        return getMinimumPriceAbs(data);
-			    } else {
-			        return cheapestEntry;
-			    }
-			}
+            // niedrigster Energieverbrauch (Fallback)
+            function getLowestEnergyEntry(data) {
+                if (debug) {
+                    node.warn("getLowestCostEntry");
+                }
+                return data.reduce((min, current) => (current.value < min.value ? current : min), { value: Infinity });
+            }
 
-			// höchster relativer Preis
-			function getMaximumPrice(data) {
-			    const startIndex = getCurrentHourIndex(data);
-			    const dataFromStart = data.slice(startIndex);
+            // niedrigster absoluter Preis
+            function getMinimumPriceAbs(data) {
+                if (debug) {
+                    node.warn("getMinimumPriceAbs");
+                }
+                return data.reduce((prev, curr) => {
+                    return prev.importPrice < curr.importPrice ? prev : curr;
+                });
+            }
 
-			    if (debug) {
-			        node.warn("getMaximumPrice");
-			    }
-			    return dataFromStart.reduce((maxEntry, currentEntry) => {
-			        return currentEntry.importPrice > maxEntry.importPrice ? currentEntry : maxEntry;
-			    });
-			}
+            // niedrigster relativer Preis (vor dem Preismaximum)
+            function getMinimumPrice(data) {
+                if (debug) {
+                    node.warn("getMinimumPrice");
+                }
+                const maxImportIndex = data.reduce((maxIdx, current, idx, array) => {
+                    return current.importPrice > array[maxIdx].importPrice ? idx : maxIdx;
+                }, 0);
 
-			// maximaler Preisunterschied
-			function getMaximumPriceGap(data) {
-			    if (debug) {
-			        node.warn("getMaximumPriceGap");
-			    }
-			    const max = getMaximumPrice(data);
-			    const min = getMinimumPriceAbs(data);
-			    if (debug) {
-			        node.warn("Max: " + JSON.stringify(max));
-			    }
-			    if (debug) {
-			        node.warn("Min: " + JSON.stringify(min));
-			    }
-			    if (debug) {
-			        node.warn("importPrice #7");
-			    }
-			    const diff = Math.floor((max.importPrice - min.importPrice) * 1000) / 1000;
-			    if (debug) {
-			        node.warn("Diff: " + diff);
-			    }
-			    return diff;
-			}
+                const dataBeforeMaxImport = data.slice(0, maxImportIndex);
 
-			// Effizienz der Netzladung berechnen
-			function calcPerformance(min) {
-			    if (debug) {
-			        node.warn("calcPerformance");
-			    }
-			    return min.importPrice * factor * rate;
-			}
+                if (debug) {
+                    node.warn("getMinimumPrice #2");
+                }
+                const cheapestEntry = dataBeforeMaxImport.reduce((prev, curr) => {
+                    return prev.importPrice < curr.importPrice ? prev : curr;
+                }, dataBeforeMaxImport[0]);
 
-			// Energiekosten berechnen
-			function calculateEnergyCosts2(modes, batteryCapacity, batteryBuffer, feedin, factor, startBatteryPower, debug) {
-			    // Sortierung nach Zeitstempeln wiederherstellen
-			    modes.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+                // Wenn kein günstigerer Eintrag gefunden wurde, wird der günstigste Eintrag des gesamten Arrays zurückgegeben
+                if (cheapestEntry === undefined) {
+                    if (debug) {
+                        node.warn("aktuell maximaler Wert, Fallback auf absolutes Minimum");
+                    }
+                    return getMinimumPriceAbs(data);
+                } else {
+                    return cheapestEntry;
+                }
+            }
 
-			    // nochmal über das Array iterieren und Kosten nachrechnen
-			    // refine costs and battery-soc
-			    let minEnergy = (batteryCapacity / 100) * batteryBuffer;
-			    let energyPrice = feedin * factor;
-			    let estimatedbatteryPower = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, startBatteryPower));
-			    let gridCharged = false;
-			    let costTotal = 0;
+            // höchster relativer Preis
+            function getMaximumPrice(data) {
+                const startIndex = getCurrentHourIndex(data);
+                const dataFromStart = data.slice(startIndex);
 
-			    for (let i = 0; i < modes.length; i++) {
-			        let chargedEnergy = 0;
+                if (debug) {
+                    node.warn("getMaximumPrice");
+                }
+                return dataFromStart.reduce((maxEntry, currentEntry) => {
+                    return currentEntry.importPrice > maxEntry.importPrice ? currentEntry : maxEntry;
+                });
+            }
 
-			        if (modes[i].mode == "charge" && typeof modes[i].energy !== "undefined") {
-			            // bei nachfolgenden den richtigen Preis verwenden
-			            let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower + Math.abs(modes[i].energy)));
-			            chargedEnergy = power - estimatedbatteryPower;
-			            if (chargedEnergy > 0) {
-			                gridCharged = true;
-			            }
-			            let grid = chargedEnergy * modes[i].importPrice * factor;
-			            let old = estimatedbatteryPower * energyPrice;
-			            energyPrice = (grid + old) / power;
+            // maximaler Preisunterschied
+            function getMaximumPriceGap(data) {
+                if (debug) {
+                    node.warn("getMaximumPriceGap");
+                }
+                const max = getMaximumPrice(data);
+                const min = getMinimumPriceAbs(data);
+                if (debug) {
+                    node.warn("Max: " + JSON.stringify(max));
+                }
+                if (debug) {
+                    node.warn("Min: " + JSON.stringify(min));
+                }
+                if (debug) {
+                    node.warn("importPrice #7");
+                }
+                const diff = Math.floor((max.importPrice - min.importPrice) * 1000) / 1000;
+                if (debug) {
+                    node.warn("Diff: " + diff);
+                }
+                return diff;
+            }
 
-			            if (debug) {
-			                console.warn(i + ": Power: " + power + " / Grid: " + grid + " / Old: " + old + " / homePrice: " + energyPrice);
-			            }
-			            estimatedbatteryPower = power;
-			        } else {
-			            // geladene PV Leistung reduziert den Netzladungspreis
-			            if (modes[i].mode == "hold" && modes[i].value < 0) {
-			                let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower + Math.abs(modes[i].value)));
-			                let pv = Math.abs(modes[i].value) * feedin * factor;
-			                let old = estimatedbatteryPower * energyPrice;
+            // Effizienz der Netzladung berechnen
+            function calcPerformance(min) {
+                if (debug) {
+                    node.warn("calcPerformance");
+                }
+                return min.importPrice * factor * rate;
+            }
 
-			                if (power - estimatedbatteryPower > 0 && gridCharged) {
-			                    // neue Preisberechnung nur, wenn Netzgeladen wurde, sonst bleibt's beim alten
-			                    energyPrice = Math.max((pv + old) / power, feedin * factor);
-			                }
+            // Energiekosten berechnen
+            function calculateEnergyCosts2(modes, batteryCapacity, batteryBuffer, feedin, factor, startBatteryPower, debug) {
+                // Sortierung nach Zeitstempeln wiederherstellen
+                modes.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
-			                if (debug) {
-			                    console.warn(i + ": Power: " + power + " / PV: " + pv + " / Old: " + old + " / homePrice: " + energyPrice);
-			                }
-			                estimatedbatteryPower = power;
-			            }
+                // nochmal über das Array iterieren und Kosten nachrechnen
+                // refine costs and battery-soc
+                let minEnergy = (batteryCapacity / 100) * batteryBuffer;
+                let energyPrice = feedin * factor;
+                let estimatedbatteryPower = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, startBatteryPower));
+                let gridCharged = false;
+                let costTotal = 0;
 
-			            // die Batterie wird zu den mittleren Kosten PV/Netz entladen
-			            if (modes[i].mode == "normal" && typeof modes[i].energy !== "undefined") {
-			                // berücksichtigt Entladung
-			                //let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower - Math.max(0, modes[i].energy)));
-			                // berücksichtigt Entladung und Ladung
-			                let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower - modes[i].value - Math.max(0, modes[i].energy)));
-			                estimatedbatteryPower = power;
-			                if (debug) {
-			                    console.warn(i + ": Power: " + power + " / homePrice: " + energyPrice);
-			                }
-			                // TODO Rücksetzungszeitpunkt ggf. anpassen (20% = (20-batteryBuffer)*(batteryCapacity/100))
-			                if (estimatedbatteryPower <= 0) {
-			                    gridCharged = false;
-			                    energyPrice = feedin * factor;
-			                }
-			            }
-			        }
+                for (let i = 0; i < modes.length; i++) {
+                    let chargedEnergy = 0;
 
-			        modes[i].soc = Math.max(batteryBuffer, Math.min(100, (estimatedbatteryPower / (batteryCapacity + minEnergy)) * 100));
-			        modes[i].homePrice = energyPrice;
+                    if (modes[i].mode == "charge" && typeof modes[i].energy !== "undefined") {
+                        // bei nachfolgenden den richtigen Preis verwenden
+                        let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower + Math.abs(modes[i].energy)));
+                        chargedEnergy = power - estimatedbatteryPower;
+                        if (chargedEnergy > 0) {
+                            gridCharged = true;
+                        }
+                        let grid = chargedEnergy * modes[i].importPrice * factor;
+                        let old = estimatedbatteryPower * energyPrice;
+                        energyPrice = (grid + old) / power;
 
-			        // Kosten nachrechnen
-			        if (modes[i].mode == "hold") {
-			            if (modes[i].value > 0) {
-			                // Bezugskosten
-			                modes[i].homePrice = modes[i].importPrice;
-			                modes[i].cost2 = modes[i].value * modes[i].importPrice;
-			            } else {
-			                // Überschuss
-			                modes[i].homePrice = feedin;
-			                modes[i].cost2 = 0; // bzw. Feedin-Kosten
-			            }
-			        }
-			        if (modes[i].mode == "charge") {
-			            // Netzladungskosten
-			            modes[i].cost2 = modes[i].importPrice * chargedEnergy * factor + modes[i].value * modes[i].importPrice;
-			        }
-			        if (modes[i].mode == "normal") {
-			            if (modes[i].energy > 0) {
-			                // Bezug und Speicherkosten (Kosten inkl. Verluste sicherstellen)
-			                energyPrice = Math.max(energyPrice, feedin * factor);
-			                modes[i].homePrice = energyPrice;
-			            }
-			            //modes[i].cost2 = energyPrice * modes[i].energy + modes[i].value * modes[i].importPrice;
-			            modes[i].cost2 = energyPrice * modes[i].energy + Math.max(0, modes[i].value) * modes[i].importPrice;
-			        }
+                        if (debug) {
+                            console.warn(i + ": Power: " + power + " / Grid: " + grid + " / Old: " + old + " / homePrice: " + energyPrice);
+                        }
+                        estimatedbatteryPower = power;
+                    } else {
+                        // geladene PV Leistung reduziert den Netzladungspreis
+                        if (modes[i].mode == "hold" && modes[i].value < 0) {
+                            let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower + Math.abs(modes[i].value)));
+                            let pv = Math.abs(modes[i].value) * feedin * factor;
+                            let old = estimatedbatteryPower * energyPrice;
 
-			        // formatieren
-			        let cost = Math.round(modes[i].cost2 * 10000) / 10000;
-			        costTotal += cost;
-			        modes[i].cost2 = cost;
-			    }
+                            if (power - estimatedbatteryPower > 0 && gridCharged) {
+                                // neue Preisberechnung nur, wenn Netzgeladen wurde, sonst bleibt's beim alten
+                                energyPrice = Math.max((pv + old) / power, feedin * factor);
+                            }
 
-			    //return parseFloat(costTotal.toFixed(2));
-			    return Math.round(costTotal * 100) / 100;
-			}
+                            if (debug) {
+                                console.warn(i + ": Power: " + power + " / PV: " + pv + " / Old: " + old + " / homePrice: " + energyPrice);
+                            }
+                            estimatedbatteryPower = power;
+                        }
 
-			// fehlende Energiemenge und Stunden mit Strombezug berechnen
-			function calculateSumAndCount(data) {
-			    return data.reduce(
-			        (acc, { value }) => {
-			            if (value > 0) {
-			                acc.delta += value;
-			                acc.count += 1;
-			            }
-			            return acc;
-			        },
-			        { delta: 0, count: 0 },
-			    );
-			}
-			
+                        // die Batterie wird zu den mittleren Kosten PV/Netz entladen
+                        if (modes[i].mode == "normal" && typeof modes[i].energy !== "undefined") {
+                            // berücksichtigt Entladung
+                            //let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower - Math.max(0, modes[i].energy)));
+                            // berücksichtigt Entladung und Ladung
+                            let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower - modes[i].value - Math.max(0, modes[i].energy)));
+                            estimatedbatteryPower = power;
+                            if (debug) {
+                                console.warn(i + ": Power: " + power + " / homePrice: " + energyPrice);
+                            }
+                            // TODO Rücksetzungszeitpunkt ggf. anpassen (20% = (20-batteryBuffer)*(batteryCapacity/100))
+                            if (estimatedbatteryPower <= 0) {
+                                gridCharged = false;
+                                energyPrice = feedin * factor;
+                            }
+                        }
+                    }
+
+                    modes[i].soc = Math.max(batteryBuffer, Math.min(100, (estimatedbatteryPower / (batteryCapacity + minEnergy)) * 100));
+                    modes[i].homePrice = energyPrice;
+
+                    // Kosten nachrechnen
+                    if (modes[i].mode == "hold") {
+                        if (modes[i].value > 0) {
+                            // Bezugskosten
+                            modes[i].homePrice = modes[i].importPrice;
+                            modes[i].cost2 = modes[i].value * modes[i].importPrice;
+                        } else {
+                            // Überschuss
+                            modes[i].homePrice = feedin;
+                            modes[i].cost2 = 0; // bzw. Feedin-Kosten
+                        }
+                    }
+                    if (modes[i].mode == "charge") {
+                        // Netzladungskosten
+                        modes[i].cost2 = modes[i].importPrice * chargedEnergy * factor + modes[i].value * modes[i].importPrice;
+                    }
+                    if (modes[i].mode == "normal") {
+                        if (modes[i].energy > 0) {
+                            // Bezug und Speicherkosten (Kosten inkl. Verluste sicherstellen)
+                            energyPrice = Math.max(energyPrice, feedin * factor);
+                            modes[i].homePrice = energyPrice;
+                        }
+                        //modes[i].cost2 = energyPrice * modes[i].energy + modes[i].value * modes[i].importPrice;
+                        modes[i].cost2 = energyPrice * modes[i].energy + Math.max(0, modes[i].value) * modes[i].importPrice;
+                    }
+
+                    // formatieren
+                    let cost = Math.round(modes[i].cost2 * 10000) / 10000;
+                    costTotal += cost;
+                    modes[i].cost2 = cost;
+                }
+
+                //return parseFloat(costTotal.toFixed(2));
+                return Math.round(costTotal * 100) / 100;
+            }
+
+            // fehlende Energiemenge und Stunden mit Strombezug berechnen
+            function calculateSumAndCount(data) {
+                return data.reduce(
+                    (acc, { value }) => {
+                        if (value > 0) {
+                            acc.delta += value;
+                            acc.count += 1;
+                        }
+                        return acc;
+                    },
+                    { delta: 0, count: 0 },
+                );
+            }
+
             try {
                 // grid charging
                 if (typeof msg.charge !== "undefined") {
