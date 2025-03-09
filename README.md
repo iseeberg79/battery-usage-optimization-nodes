@@ -109,7 +109,6 @@ npm install @iseeberg79/battery-usage-optimization-nodes
 ![image](https://github.com/user-attachments/assets/2c84af6d-33d7-43c3-afb8-75ec90aca0e8)
 
 
-t
 
 <h2>Links</h2>
 
