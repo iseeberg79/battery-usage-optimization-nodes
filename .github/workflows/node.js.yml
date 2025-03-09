@@ -1,9 +1,6 @@
 name: Node.js CI
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -14,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 20.x ]  # Aktualisierte Node.js-Versionen, vorher auch 18.x / 22.x
+        node-version: [ 20.x ]
 
     steps:
     - name: Checkout code
@@ -25,34 +22,34 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - name: Cache Node.js modules
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
     - name: Install dependencies
       run: npm install
 
-    - name: Update version 
-      run: node update-version.js 
+    - name: Update version
+      run: node update-version.js
       
-    - name: Display version 
+    - name: Display version
       run: cat package.json | grep version
   
-    - name: Clean build directory 
+    - name: Clean build directory
       run: rm -rf ./build; mkdir -p ./build/${{ matrix.node-version }}/
     
     - name: Run ESLint
       run: npx eslint nodes/*.js
+
+    #- name: Run tests
+    #  run: npm test
 
     - name: Generate JSDoc
       run: npx jsdoc -c jsdoc.json
 
     - name: Pack project
       run: npm pack --pack-destination ./build/${{ matrix.node-version }}/
-#
-#    - name: Publish project  
-#      run: npm publish
-#      env:
-#           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-
-    - name: Archive build artifacts 
-      uses: actions/upload-artifact@v4 
-      with: 
-        name: build-${{ matrix.node-version }} 
-        path: build/${{ matrix.node-version }}/
