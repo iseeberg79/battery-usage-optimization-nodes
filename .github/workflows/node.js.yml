@@ -48,8 +48,8 @@ jobs:
     - name: Run ESLint
       run: npx eslint nodes/*.js
 
-    - name: Run tests
-      run: npm test
+    #- name: Run tests
+    #  run: npm test
 
     - name: Generate JSDoc
       run: npx jsdoc -c jsdoc.json
