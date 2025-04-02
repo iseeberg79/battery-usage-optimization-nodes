@@ -558,7 +558,8 @@ module.exports = function (RED) {
                     }
                     const energy = calculateLoadableHours(energyNeeded, avg / rate / factor);
                     //TODO der Ladungsstand der Batterie muss berücksichtigt werden.
-                    estimatedbatteryPower = batteryCapacity * Math.min(1, energy.loadableEnergy / battery_capacity); // Netzladung wird vorher für eine volle Batterie sorgen
+					//TODO issue #51 - Min/Max der Kapazität nicht berücksichtigt?
+                    estimatedbatteryPower = Math.min(batteryCapacity * Math.min(1, energy.loadableEnergy / battery_capacity), batteryCapacity); // Netzladung wird vorher für eine volle Batterie sorgen
                     if (debug) {
                         node.warn("erwartete verfügbare batteryPower (Netzladung): " + estimatedbatteryPower);
                     }
@@ -656,10 +657,11 @@ module.exports = function (RED) {
 
                     // Berechnung der erwarteten Batterieleistung inkl. PV Überschuss / Netzladung
                     let minEnergy = (batteryCapacity / 100) * batteryBuffer;
-                    estimatedbatteryPower = Math.max(
+					//TODO check issue #51 - Min/Max Kapazität nicht berücksichtigt?
+                    estimatedbatteryPower = Math.min(Math.max(
                         minEnergy,
                         estimatedbatteryPower + Math.min(battery_capacity + minEnergy, remainingEnergy + (batteryCapacity / 100) * estimatedMaximumSoc.soc),
-                    );
+                    ), batteryCapacity);
                     if (debug) {
                         node.warn("erwartete verfügbare batteryPower (summiert): " + estimatedbatteryPower);
                     }
