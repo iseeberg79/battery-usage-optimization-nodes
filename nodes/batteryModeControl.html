@@ -1,39 +1,36 @@
 <script type="text/javascript">
-	RED.nodes.registerType("@iseeberg79/BatteryModeControl", {
-		category : "function",
-		color : "#a6bbcf",
-		defaults : {
-			name : {
-				value : ""
-			},
-			url : {
-				value : "http://localhost:7070/api/batterymode"
-			},
-			interval : {
-				value : 30
-			},
-			repeatMode : {
-				value : false
-			},
-		},
-		inputs : 1,
-		outputs : 1,
-		icon : "file.png",
-		label : function() {
-			return this.name || "Battery Mode Control";
-		}
-	});
+    RED.nodes.registerType("@iseeberg79/BatteryModeControl", {
+        category : "function",
+        color : "#a6bbcf",
+        defaults : {
+            name : { value : "" },
+            url : { value : "http://localhost:7070/api/batterymode" },
+            gridChargeUrl : { value : "http://localhost:7070/api/batterygridchargelimit" },
+            interval : { value : 30 },
+            repeatMode : { value : false },
+        },
+        inputs : 1,
+        outputs : 1,
+        icon : "file.png",
+        label : function() {
+            return this.name || "Battery Mode Control";
+        }
+    });
 </script>
 
 <script type="text/x-red"
-	data-template-name="@iseeberg79/BatteryModeControl">
+    data-template-name="@iseeberg79/BatteryModeControl">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-url"><i class="fa fa-link"></i> URL</label>
+        <label for="node-input-url"><i class="fa fa-link"></i> API-URL (Batteriemodus)</label>
         <input type="text" id="node-input-url" placeholder="http://localhost:7070/api/batterymode">
+    </div>
+    <div class="form-row">
+        <label for="node-input-gridChargeUrl"><i class="fa fa-link"></i> API-URL (Grid Charge Limit)</label>
+        <input type="text" id="node-input-gridChargeUrl" placeholder="http://localhost:7070/api/batterygridchargelimit">
     </div>
     <div class="form-row">
         <label for="node-input-interval"><i class="fa fa-clock"></i> Intervall (Sekunden)</label>
@@ -46,16 +43,18 @@
 </script>
 
 <script type="text/x-red"
-	data-help-name="@iseeberg79/BatteryModeControl">
-    <p>Dieser Node steuert den Batteriemodus auf Basis der bereitgestellten Daten von der evcc API.</p>
-    <p><b>Gültige Werte:</b> unknown, normal, hold, charge</p>
+    data-help-name="@iseeberg79/BatteryModeControl">
+    <p>Dieser Node steuert den Batteriemodus oder das Grid Charge Limit auf Basis der bereitgestellten Daten von der evcc API.</p>
+    <p><b>Gültige Werte für den Modus:</b> unknown, normal, hold, charge</p>
     <p><b>Inputs:</b></p>
     <ul>
-        <li><b>mode</b> - Der gewünschte Batteriemodus</li>
+        <li><b>mode</b> - Der gewünschte Batteriemodus (POST oder DELETE, abhängig vom Wert).</li>
+        <li><b>gridChargeLimit</b> - Setzt oder entfernt das Grid Charge Limit (POST oder DELETE, abhängig vom Wert).</li>
     </ul>
+    <p>Es muss entweder <b>mode</b> oder <b>gridChargeLimit</b> gesetzt sein – beide zusammen sind nicht erlaubt.</p>
     <p><b>Outputs:</b></p>
     <ul>
-        <li><b>payload</b> - Bestätigung des gesendeten Modus</li>
+        <li><b>payload</b> - Bestätigung der API-Anfragen.</li>
     </ul>
     <p><b>Wiederholung:</b> Falls aktiviert, werden „hold“ und „charge“ im konfigurierten Zeitintervall wiederholt gesendet.</p>
 </script>
