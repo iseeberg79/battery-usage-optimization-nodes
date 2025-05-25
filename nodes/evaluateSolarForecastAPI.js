@@ -31,13 +31,16 @@ module.exports = function (RED) {
                     return;
                 }
 
-                // Umbenennen von 'price' in 'value' und Umrechnung in kWh
-                const rates = msg.payload.result.rates.map((item) => {
-                    return {
-                        ...item,
-                        value: item.price / 1000, // Umrechnung von Wh in kWh
-                    };
-                });
+				const rates = msg.payload.result.rates.map((item) => {
+				    // Überprüfung, ob entweder 'price' oder 'value' existiert
+				    const relevantValue = item.value !== undefined ? item.value : item.price;
+
+				    return {
+				        ...item,
+				        value: relevantValue / 1000, // Umrechnung von Wh in kWh
+				    };
+				});
+
 
                 // Aktuelles Datum und Zeit
                 const now = new Date();
@@ -71,7 +74,7 @@ module.exports = function (RED) {
                 const formattedData = rates.map((item) => ({
                     start: formatTimestamp(item.start),
                     end: formatTimestamp(item.end),
-                    price: item.price,
+                    value: item.value,
                 }));
 
                 // Forward the JSON response as payload

@@ -29,7 +29,7 @@ module.exports = function (RED) {
                 // Calculate maximum, minimum, and average values
                 const maximal = parseFloat(Math.max(...prices).toFixed(3));
                 const minimal = parseFloat(Math.min(...prices).toFixed(3));
-                const average = parseFloat((prices.reduce((acc, val) => acc + val, 0) / prices.length).toFixed(3));
+                const average = parseFloat((prices.reduce((acc, val) => +acc + val, 0) / prices.length).toFixed(3));
                 const diff = parseFloat(((maximal - minimal) * 100).toFixed(1));
 
                 // Calculate deviation

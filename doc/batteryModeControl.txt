@@ -1,0 +1,40 @@
+# @iseeberg79/battery-mode-control
+
+## BatteryModeControl Node
+
+Dieser Node steuert den Batteriemodus auf Basis der bereitgestellten Daten von der **evcc API**.
+
+### Konfigurationsparameter
+
+- **Name**: Der Name des Nodes.
+- **URL**: Die API-URL für die Datenanfrage (z.B. `http://localhost:7070/api/batterymode`).
+- **Intervall**: Die Zeitspanne (in Sekunden) für wiederholtes Senden von „hold“ oder „charge“.
+- **Wiederholung aktivieren**: Falls aktiviert, werden „hold“ und „charge“ in regelmäßigen Abständen erneut gesendet.
+
+### Eingänge und Ausgänge
+
+- **Inputs**: 1  
+- **Outputs**: 1  
+
+### Verwendung
+
+1. Fügen Sie den Node zu Ihrem Flow hinzu.  
+2. Konfigurieren Sie die erforderlichen Parameter (Name, URL, Intervall, Wiederholung).  
+3. Verbinden Sie den Node mit anderen Nodes in Ihrem Flow.  
+
+### Beispiel
+
+```json
+[
+    {
+        "id": "837de17bbbd230b2",
+        "type": "@iseeberg79/BatteryModeControl",
+        "name": "BatteryModeControl",
+        "url": "http://localhost:7070/api/batterymode",
+        "interval": 30,
+        "repeatMode": true,
+        "wires": [
+            ["261d217663924080"]
+        ]
+    }
+]

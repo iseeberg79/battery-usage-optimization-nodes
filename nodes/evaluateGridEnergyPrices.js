@@ -39,7 +39,7 @@ module.exports = function (RED) {
                 const pricesInCtPerKWh = data.price.map((price) => price / 10);
                 const minPrice = Math.min(...pricesInCtPerKWh);
                 const maxPrice = Math.max(...pricesInCtPerKWh);
-                const avgPrice = pricesInCtPerKWh.reduce((sum, price) => sum + price, 0) / pricesInCtPerKWh.length;
+                const avgPrice = pricesInCtPerKWh.reduce((sum, price) => +sum + price, 0) / pricesInCtPerKWh.length;
 
                 msg.payload.prices = result;
                 let maximum = maxPrice;
@@ -53,9 +53,9 @@ module.exports = function (RED) {
                 const charges = msg.charges;
                 const tax_percent = typeof msg.tax !== "undefined" ? msg.tax : node.tax || 19;
                 const tax = (msg.tax = 1 + tax_percent / 100);
-                msg.payload.absMinimum = minimum = Math.round(((minimum + charges) / 100) * tax * 1000) / 1000;
-                msg.payload.maximum = maximum = Math.round(((maximum + charges) / 100) * tax * 1000) / 1000;
-                msg.payload.average = average = Math.round(((average + charges) / 100) * tax * 1000) / 1000;
+                msg.payload.absMinimum = minimum = Math.round(((+minimum + charges) / 100) * tax * 1000) / 1000;
+                msg.payload.maximum = maximum = Math.round(((+maximum + charges) / 100) * tax * 1000) / 1000;
+                msg.payload.average = average = Math.round(((+average + charges) / 100) * tax * 1000) / 1000;
 
                 msg.payload.diff = Math.round((maximum - minimum) * 1000) / 1000;
                 msg.payload.deviation = Math.round(Math.max(average - minimum, maximum - average) * 1000) / 1000;
@@ -72,7 +72,7 @@ module.exports = function (RED) {
 
                 // Das günstigste Intervall aus den gültigen Intervallen finden, und übergeben
                 minimum = validIntervals.reduce((min, interval) => (interval.price < min.price ? interval : min), validIntervals[0]).price;
-                msg.payload.minimum = Math.round(((minimum + charges) / 100) * tax * 1000) / 1000;
+                msg.payload.minimum = Math.round(((+minimum + charges) / 100) * tax * 1000) / 1000;
 
                 delete msg.payload.unix_seconds;
                 delete msg.payload.price;

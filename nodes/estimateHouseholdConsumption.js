@@ -22,7 +22,7 @@ module.exports = function (RED) {
                     const sum_today = remain.reduce((acc, val) => acc + val, 0);
                     const sum_tomorrow = tomorrow.reduce((acc, val) => acc + val, 0);
 
-                    msg.payload.energy_req = Math.round((sum_today + sum_tomorrow) * 1000);
+                    msg.payload.energy_req = Math.round((+sum_today + sum_tomorrow) * 1000);
                     msg.payload.energy_req_today = Math.round(sum_today * 1000);
                 } else {
                     msg.payload.energy_req = msg.payload.energy_req_today = remain[0];
