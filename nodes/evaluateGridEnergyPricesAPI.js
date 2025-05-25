@@ -20,12 +20,17 @@ module.exports = function (RED) {
                     throw new Error("Invalid response structure");
                 }
 
-                // Conversion node
-                const data = msg.response.result.rates.filter((item) => item && item.price !== undefined);
-
-                // Extract prices from the JSON object
+				// Conversion node
+				const data = msg.response.result.rates
+				    .filter((item) => item && (item.value !== undefined || item.price !== undefined))
+				    .map((item) => ({
+				        ...item,
+				        price: item.value !== undefined ? item.value : item.price // Einheitliches Mapping auf price (Umstellung evcc API)
+				    }));
+				
+				// Extract prices from the JSON object
                 const prices = data.map((item) => item.price);
-
+				
                 // Calculate maximum, minimum, and average values
                 const maximal = parseFloat(Math.max(...prices).toFixed(3));
                 const minimal = parseFloat(Math.min(...prices).toFixed(3));
@@ -37,7 +42,7 @@ module.exports = function (RED) {
 
                 // Assign calculated values to msg
                 msg.payload = {
-                    prices: msg.response.result.rates,
+                    prices: data,
                     maximum: maximal,
                     absMinimum: minimal,
                     average: average,
@@ -45,9 +50,9 @@ module.exports = function (RED) {
                     deviation: deviation,
                 };
 
-                // Transfer data
-                const validData = msg.payload.prices.filter((item) => item && item.price !== undefined);
-
+				// Sicherstellen, dass wir gültige Intervalle haben
+                const validData = data.filter((item) => item.start !== undefined);
+				
                 // Find the interval with the maximum price
                 const maxPriceInterval = validData.reduce((max, interval) => (interval.price > max.price ? interval : max), validData[0]);
                 const maxPriceStartTime = new Date(maxPriceInterval.start);

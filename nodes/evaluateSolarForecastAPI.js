@@ -41,7 +41,6 @@ module.exports = function (RED) {
 				    };
 				});
 
-
                 // Aktuelles Datum und Zeit
                 const now = new Date();
 
