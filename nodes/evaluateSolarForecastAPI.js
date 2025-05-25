@@ -32,13 +32,13 @@ module.exports = function (RED) {
                 }
 
 				const rates = msg.payload.result.rates.map((item) => {
-				    // Überprüfung, ob entweder 'price' oder 'value' existiert
-				    const relevantValue = item.value !== undefined ? item.value : item.price;
+                    // Überprüfung, ob entweder 'price' oder 'value' existiert
+                    const relevantValue = item.value !== undefined ? item.value : item.price;
 
-				    return {
-				        ...item,
-				        value: relevantValue / 1000, // Umrechnung von Wh in kWh
-				    };
+                    return {
+                        ...item,
+                        value: relevantValue / 1000, // Umrechnung von Wh in kWh
+                    };
 				});
 
                 // Aktuelles Datum und Zeit

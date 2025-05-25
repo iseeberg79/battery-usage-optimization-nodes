@@ -21,12 +21,12 @@ module.exports = function (RED) {
                 }
 
 				// Conversion node
-				const data = msg.response.result.rates
-				    .filter((item) => item && (item.value !== undefined || item.price !== undefined))
-				    .map((item) => ({
-				        ...item,
-				        price: item.value !== undefined ? item.value : item.price // Einheitliches Mapping auf price (Umstellung evcc API)
-				    }));
+                const data = msg.response.result.rates
+                    .filter((item) => item && (item.value !== undefined || item.price !== undefined))
+                    .map((item) => ({
+                        ...item,
+                        price: item.value !== undefined ? item.value : item.price // Einheitliches Mapping auf price (Umstellung evcc API)
+                    }));
 				
 				// Extract prices from the JSON object
                 const prices = data.map((item) => item.price);
