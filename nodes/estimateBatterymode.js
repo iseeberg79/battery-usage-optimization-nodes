@@ -276,9 +276,9 @@ module.exports = function (RED) {
 
                 // nochmal über das Array iterieren und Kosten nachrechnen
                 // refine costs and battery-soc
-                let minEnergy = (batteryCapacity / 100) * batteryBuffer;
+                let minEnergy = (+batteryCapacity / 100) * batteryBuffer;
                 let energyPrice = feedin * factor;
-                let estimatedbatteryPower = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, startBatteryPower));
+                let estimatedbatteryPower = Math.max(minEnergy, Math.min(+batteryCapacity + minEnergy, startBatteryPower));
                 let gridCharged = false;
                 let costTotal = 0;
 
@@ -287,7 +287,7 @@ module.exports = function (RED) {
 
                     if (modes[i].mode == "charge" && typeof modes[i].energy !== "undefined") {
                         // bei nachfolgenden den richtigen Preis verwenden
-                        let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower + Math.abs(modes[i].energy)));
+                        let power = Math.max(minEnergy, Math.min(+batteryCapacity + minEnergy, +estimatedbatteryPower + Math.abs(modes[i].energy)));
                         chargedEnergy = power - estimatedbatteryPower;
                         if (chargedEnergy > 0) {
                             gridCharged = true;
@@ -303,7 +303,7 @@ module.exports = function (RED) {
                     } else {
                         // geladene PV Leistung reduziert den Netzladungspreis
                         if (modes[i].mode == "hold" && modes[i].value < 0) {
-                            let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower + Math.abs(modes[i].value)));
+                            let power = Math.max(minEnergy, Math.min(+batteryCapacity + minEnergy, +estimatedbatteryPower + Math.abs(modes[i].value)));
                             let pv = Math.abs(modes[i].value) * feedin * factor;
                             let old = estimatedbatteryPower * energyPrice;
 
@@ -321,14 +321,14 @@ module.exports = function (RED) {
                         // die Batterie wird zu den mittleren Kosten PV/Netz entladen
                         if (modes[i].mode == "normal" && typeof modes[i].energy !== "undefined") {
                             // berücksichtigt Entladung
-                            //let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower - Math.max(0, modes[i].energy)));
+                            //let power = Math.max(minEnergy, Math.min(+batteryCapacity + minEnergy, estimatedbatteryPower - Math.max(0, modes[i].energy)));
                             // berücksichtigt Entladung und Ladung
-                            let power = Math.max(minEnergy, Math.min(batteryCapacity + minEnergy, estimatedbatteryPower - modes[i].value - Math.max(0, modes[i].energy)));
+                            let power = Math.max(minEnergy, Math.min(+batteryCapacity + minEnergy, +estimatedbatteryPower - modes[i].value - Math.max(0, modes[i].energy)));
                             estimatedbatteryPower = power;
                             if (debug) {
                                 console.warn(i + ": Power: " + power + " / homePrice: " + energyPrice);
                             }
-                            // TODO Rücksetzungszeitpunkt ggf. anpassen (20% = (20-batteryBuffer)*(batteryCapacity/100))
+                            // TODO Rücksetzungszeitpunkt ggf. anpassen (20% = (20-batteryBuffer)*(+batteryCapacity/100))
                             if (estimatedbatteryPower <= 0) {
                                 gridCharged = false;
                                 energyPrice = feedin * factor;
@@ -336,7 +336,7 @@ module.exports = function (RED) {
                         }
                     }
 
-                    modes[i].soc = Math.max(batteryBuffer, Math.min(100, (estimatedbatteryPower / (batteryCapacity + minEnergy)) * 100));
+                    modes[i].soc = Math.max(batteryBuffer, Math.min(100, (estimatedbatteryPower / (+batteryCapacity + minEnergy)) * 100));
                     modes[i].homePrice = energyPrice;
 
                     // Kosten nachrechnen
@@ -476,7 +476,7 @@ module.exports = function (RED) {
                                 batteryPower += chargedEnergy;
                             }
                         }
-                        let batterySoc = Math.floor(Math.min(batteryBuffer + (batteryPower / battery_capacity) * 100, 100)); // mehr als 100 geht nicht
+                        let batterySoc = Math.floor(Math.min(+batteryBuffer + (batteryPower / battery_capacity) * 100, 100)); // mehr als 100 geht nicht
                         if (debug) {
                             node.warn(price.start + "/" + mode + ": batterySoC: " + batterySoc);
                         }
@@ -558,7 +558,8 @@ module.exports = function (RED) {
                     }
                     const energy = calculateLoadableHours(energyNeeded, avg / rate / factor);
                     //TODO der Ladungsstand der Batterie muss berücksichtigt werden.
-                    estimatedbatteryPower = batteryCapacity * Math.min(1, energy.loadableEnergy / battery_capacity); // Netzladung wird vorher für eine volle Batterie sorgen
+					//TODO issue #51 - Min/Max der Kapazität nicht berücksichtigt?
+                    estimatedbatteryPower = Math.min(+batteryCapacity * Math.min(1, energy.loadableEnergy / battery_capacity), +batteryCapacity); // Netzladung wird vorher für eine volle Batterie sorgen
                     if (debug) {
                         node.warn("erwartete verfügbare batteryPower (Netzladung): " + estimatedbatteryPower);
                     }
@@ -656,10 +657,11 @@ module.exports = function (RED) {
 
                     // Berechnung der erwarteten Batterieleistung inkl. PV Überschuss / Netzladung
                     let minEnergy = (batteryCapacity / 100) * batteryBuffer;
-                    estimatedbatteryPower = Math.max(
+					//TODO check issue #51 - Min/Max Kapazität nicht berücksichtigt?
+                    estimatedbatteryPower = Math.min(Math.max(
                         minEnergy,
-                        estimatedbatteryPower + Math.min(battery_capacity + minEnergy, remainingEnergy + (batteryCapacity / 100) * estimatedMaximumSoc.soc),
-                    );
+                        estimatedbatteryPower + Math.min(+battery_capacity + minEnergy, +remainingEnergy + (batteryCapacity / 100) * estimatedMaximumSoc.soc),
+                    ), batteryCapacity);
                     if (debug) {
                         node.warn("erwartete verfügbare batteryPower (summiert): " + estimatedbatteryPower);
                     }
@@ -728,7 +730,7 @@ module.exports = function (RED) {
                     if (debug) {
                         node.warn("grid charging - option #1");
                     }
-                    batteryModes[0].cost = batteryModes[0].cost + batteryModes[0].importPrice * maxCharge; // worst-case
+                    batteryModes[0].cost = +batteryModes[0].cost + batteryModes[0].importPrice * maxCharge; // worst-case
                     hours += 1;
                     if (calcPerformance(batteryModes[1]) < avg && batteryModes[1].value > -1 * maxCharge) {
                         if (debug) {
@@ -739,7 +741,7 @@ module.exports = function (RED) {
                         if (debug) {
                             node.warn("grid charging - option #2");
                         }
-                        batteryModes[1].cost = batteryModes[1].cost + batteryModes[1].importPrice * maxCharge; // worst-case
+                        batteryModes[1].cost = +batteryModes[1].cost + batteryModes[1].importPrice * maxCharge; // worst-case
                         hours += 1;
                         if (calcPerformance(batteryModes[2]) < avg && batteryModes[2].value > -1 * maxCharge) {
                             if (debug) {
@@ -750,7 +752,7 @@ module.exports = function (RED) {
                             if (debug) {
                                 node.warn("grid charging - option #3");
                             }
-                            batteryModes[2].cost = batteryModes[2].cost + batteryModes[2].importPrice * maxCharge; // worst-case
+                            batteryModes[2].cost = +batteryModes[2].cost + batteryModes[2].importPrice * maxCharge; // worst-case
                             hours += 1;
                         }
                     }
