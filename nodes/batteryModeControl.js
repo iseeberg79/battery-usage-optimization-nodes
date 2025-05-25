@@ -38,8 +38,8 @@ module.exports = function(RED) {
 					// **Wiederholung für batteryMode**
 					if (node.repeatMode && ["hold", "charge"].includes(mode)) {
 						if (intervalId) { 
-							clearInterval(intervalId) 
-						};
+							clearInterval(intervalId); 
+						}
 						intervalId = setInterval(async () => {
 							try {
 								await axios.post(`${node.url}/${mode}`);
