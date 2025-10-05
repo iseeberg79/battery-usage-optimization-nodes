@@ -35,7 +35,7 @@ module.exports = function (RED) {
                 return;
             }
 
-            const fullUrl = `${url}?latitude=${lat}&longitude=${lon}&azimuth=${az}&tilt=${dec}&hourly=temperature_2m,global_tilted_irradiance&forecast_days=${days}&timezone=GMT&timeformat=unixtime`;
+            const fullUrl = `${url}?latitude=${lat}&longitude=${lon}&azimuth=${az}&tilt=${dec}&&minutely_15=temperature_2m,global_tilted_irradiance&forecast_days=${days}&timezone=GMT&timeformat=unixtime`;
 
             try {
                 const response = await axios.get(fullUrl);
@@ -72,7 +72,7 @@ module.exports = function (RED) {
 
                     return {
                         //ISO timestamp
-                        start: new Date(period_end.getTime() - 3600000).toISOString().replace(/\.\d{1,7}Z$/, "Z"),
+                        start: new Date(period_end.getTime() - (3600000/4)).toISOString().replace(/\.\d{1,7}Z$/, "Z"),
                         end: period_end.toISOString().replace(/\.\d{1,7}Z$/, "Z"),
                         pv_estimate: Math.round(
                             limit(
