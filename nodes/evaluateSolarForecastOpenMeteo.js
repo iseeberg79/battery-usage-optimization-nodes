@@ -38,7 +38,6 @@ module.exports = function (RED) {
             const fullUrl = `${url}?latitude=${lat}&longitude=${lon}&azimuth=${az}&tilt=${dec}&minutely_15=temperature_2m,global_tilted_irradiance&forecast_days=${days}&timezone=GMT&timeformat=unixtime`;
 
             try {
-				node.warn(fullUrl);
                 const response = await axios.get(fullUrl);
 
                 // Sicherstellen, dass `msg.payload` ein Objekt ist
