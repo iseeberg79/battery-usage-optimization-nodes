@@ -26,7 +26,7 @@ module.exports = function (RED) {
 
                 let gridPower = result.gridPower || (result.grid && result.grid.power) || 0;
                 let homePower = result.homePower || 0;
-                let pvPower = (result.pv && result.pv.power) || 0;
+                let pvPower = (result.pvPower) || (result.pv && result.pv.power) || 0;
                 let batteryPower = result.batteryPower || 0;
                 let batterySoc = result.batterySoc || 0;
                 let tariffGrid = result.tariffGrid || 0.0;
