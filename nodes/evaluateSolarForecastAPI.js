@@ -31,7 +31,7 @@ module.exports = function (RED) {
                     return;
                 }
 
-				const rates = msg.payload.result.rates.map((item) => {
+				const rates = msg.payload.rates.map((item) => {
                     // Überprüfung, ob entweder 'price' oder 'value' existiert
                     const relevantValue = item.value !== undefined ? item.value : item.price;
 

@@ -16,12 +16,12 @@ module.exports = function (RED) {
                 msg.response = response.data;
 
                 // Ensure response contains expected structure
-                if (!msg.response || !msg.response.result || !msg.response.result.rates) {
+                if (!msg.response || !msg.response.rates) {
                     throw new Error("Invalid response structure");
                 }
 
 				// Conversion node
-                const data = msg.response.result.rates
+                const data = msg.response.rates
                     .filter((item) => item && (item.value !== undefined || item.price !== undefined))
                     .map((item) => ({
                         ...item,

@@ -32,7 +32,7 @@ module.exports = function (RED) {
 
                 let data = msg.payload;
                 const result = data.unix_seconds.map((timestamp, index) => {
-                    return { start: timestamp, end: timestamp + 3600, price: data.price[index] / 10 };
+                    return { start: timestamp, end: timestamp + 900, price: data.price[index] / 10 };
                 });
 
                 // Berechnung der maximalen, minimalen und durchschnittlichen Werte (in Euro pro Kilowattstunde)
