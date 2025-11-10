@@ -1,0 +1,110 @@
+<script type="text/javascript">
+	RED.nodes.registerType('@iseeberg79/EvoptBatteryMode', {
+		category : 'function',
+		color : '#a6bbcf',
+		defaults : {
+			name : {
+				value : ""
+			},
+			url : {
+				value : "http://localhost:7070/api/state"
+			},
+			batteryIndex : {
+				value : ""
+			},
+			batteryName : {
+				value : ""
+			},
+			timeIndex : {
+				value : 0
+			}
+		},
+		inputs : 1,
+		outputs : 3,
+		icon : "file.png",
+		label : function() {
+			return this.name || "Evopt Battery Mode";
+		},
+		outputLabels: ["Battery Mode", "SOC Information", "Full evopt Data"]
+	});
+</script>
+
+<script type="text/x-red"
+	data-template-name="@iseeberg79/EvoptBatteryMode">
+    <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-url"><i class="fa fa-link"></i> API-URL (evopt state)</label>
+        <input type="text" id="node-input-url" placeholder="http://localhost:7070/api/state" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-batteryName"><i class="fa fa-battery-half"></i> Battery Name</label>
+        <input type="text" id="node-input-batteryName" placeholder="z.B. db:5" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-batteryIndex"><i class="fa fa-hashtag"></i> Battery Index (alternativ)</label>
+        <input type="number" id="node-input-batteryIndex" placeholder="0" min="0" class="input-typed"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-timeIndex"><i class="fa fa-clock-o"></i> Time Index</label>
+        <input type="number" id="node-input-timeIndex" placeholder="0" min="0" class="input-typed"/>
+    </div>
+</script>
+
+<script type="text/x-red"
+    data-help-name="@iseeberg79/EvoptBatteryMode">
+    <p>Dieser Node liest die Optimierungsdaten des EVCC evopt-Optimierers und bestimmt den aktuellen Batteriemodus.</p>
+    <p><b>Konfiguration:</b></p>
+    <ul>
+        <li><b>API-URL</b> - URL zum EVCC API-Endpunkt (Standard: http://localhost:7070/api/state)</li>
+        <li><b>Battery Name</b> - Name der Batterie (z.B. "db:5") - wird priorisiert wenn angegeben</li>
+        <li><b>Battery Index</b> - Alternativ: Index der Batterie im evopt.res.batteries Array (Standard: 0 wenn Name nicht angegeben)</li>
+        <li><b>Time Index</b> - Zeitindex für die Vorhersage (0 = aktueller Zeitpunkt, Standard: 0)</li>
+    </ul>
+    <p><b>Inputs:</b></p>
+    <ul>
+        <li><b>debug</b> - Optional: Aktiviert erweiterte Debug-Ausgaben (Boolean)</li>
+    </ul>
+    <p><b>Outputs:</b></p>
+    <ul>
+        <li><b>Output 1: Battery Mode</b> - Batteriemodus-Informationen
+            <ul>
+                <li><code>payload</code> - Batteriemodus als String: "charge", "hold" oder "normal"</li>
+                <li><code>batterymode</code> - Batteriemodus</li>
+                <li><code>chargingPower</code> - Ladeleistung in Watt</li>
+                <li><code>dischargingPower</code> - Entladeleistung in Watt</li>
+                <li><code>gridImport</code> - Netzbezug in Watt</li>
+                <li><code>gridExport</code> - Netzeinspeisung in Watt</li>
+                <li><code>timestamp</code> - Zeitstempel der Daten</li>
+            </ul>
+        </li>
+        <li><b>Output 2: SOC Information</b> - Ladestand-Informationen
+            <ul>
+                <li><code>payload</code> - SOC in Prozent (Number, falls Batteriekapazität bekannt, sonst null)</li>
+                <li><code>stateOfCharge</code> - State of Charge in Wh (absoluter Wert)</li>
+                <li><code>socPercentage</code> - SOC in Prozent (Number, falls Batteriekapazität bekannt)</li>
+                <li><code>batteryCapacity</code> - Batteriekapazität in kWh</li>
+                <li><code>batteryName</code> - Name der Batterie</li>
+                <li><code>batteryType</code> - Typ der Batterie (vehicle, battery, etc.)</li>
+            </ul>
+        </li>
+        <li><b>Output 3: Full evopt Data</b> - Vollständige evopt-Daten für Debugging und erweiterte Auswertungen</li>
+    </ul>
+    <p><b>Batteriemodus-Logik:</b></p>
+    <ul>
+        <li><b>charge</b> - Netzladung: wenn charging_power > 0 UND grid_import > 0</li>
+        <li><b>hold</b> - Batterie pausiert: wenn charging_power = 0 UND discharging_power = 0</li>
+        <li><b>normal</b> - Normalbetrieb: PV-Ladung oder Entladung für Hausverbrauch (alle anderen Fälle)</li>
+    </ul>
+    <p><b>Hinweise:</b></p>
+    <ul>
+        <li>Der Node verwendet die Optimierungsdaten des EVCC evopt-Moduls</li>
+        <li>Für Echtzeit-Daten sollte timeIndex = 0 verwendet werden</li>
+        <li>Höhere timeIndex-Werte zeigen zukünftige geplante Modi</li>
+        <li>Batterie-Auswahl: Entweder per <b>Battery Name</b> (z.B. "db:5") oder per <b>Battery Index</b> (0, 1, 2, ...)</li>
+        <li>Wenn Battery Name angegeben ist, wird dieser priorisiert und im Array gesucht</li>
+        <li>Wenn kein Name angegeben ist, wird der Battery Index verwendet (Standard: 0)</li>
+    </ul>
+</script>

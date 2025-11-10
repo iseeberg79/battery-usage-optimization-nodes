@@ -1,6 +1,6 @@
 {
     "name": "@iseeberg79/battery-usage-optimization-nodes",
-    "version": "0.2.0-3",
+    "version": "0.2.0-5",
     "description": "A custom Node-RED package for battery usage optimization",
     "main": "ControlBattery.js",
     "scripts": {
@@ -53,7 +53,8 @@
             "EstimateSolarEnergy": "nodes/estimateSolarEnergy.js",
             "EstimateBatterymode": "nodes/estimateBatterymode.js",
             "BatteryModeControl": "nodes/batteryModeControl.js",
-            "TibberApiPrices": "nodes/tibberApiPrices.js"
+            "TibberApiPrices": "nodes/tibberApiPrices.js",
+            "EvoptBatteryMode": "nodes/evoptBatteryMode.js"
         }
     },
     "engines": {
