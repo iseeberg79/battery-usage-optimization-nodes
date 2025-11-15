@@ -266,6 +266,11 @@ module.exports = function (RED) {
                 if (debug) {
                     node.warn("calcPerformance");
                 }
+                // Bei negativen Preisen wird man fürs Laden bezahlt - das ist immer optimal!
+                // Verwende einen sehr niedrigen Wert, damit die Performance-Prüfung immer true ist
+                if (min.importPrice < 0) {
+                    return min.importPrice; // negativ, also immer < avg
+                }
                 return min.importPrice * factor * rate;
             }
 
@@ -721,7 +726,9 @@ module.exports = function (RED) {
                 let hours = 0;
                 // TODO prüfen, könnte zufällig mit maximaler PV Leistung übereinstimmen (Bedingung ergänzt, prüfen!)
                 // maximale drei Stunden Netzladung - es wird nicht immer mit maximaler Ladeleistung geladen
-                if (gridchargePerformance && charge && batteryModes[0].value > -1 * maxCharge) {
+                // Bei negativen Preisen IMMER laden (man wird dafür bezahlt!)
+                const hasNegativePrice = batteryModes[0].importPrice < 0;
+                if (gridchargePerformance && charge && (hasNegativePrice || batteryModes[0].value > -1 * maxCharge)) {
                     if (debug) {
                         node.warn("Calculated efficient grid charge option, 1st hour");
                     }
@@ -732,7 +739,8 @@ module.exports = function (RED) {
                     }
                     batteryModes[0].cost = +batteryModes[0].cost + batteryModes[0].importPrice * maxCharge; // worst-case
                     hours += 1;
-                    if (calcPerformance(batteryModes[1]) < avg && batteryModes[1].value > -1 * maxCharge) {
+                    const hasNegativePrice2 = batteryModes[1].importPrice < 0;
+                    if (calcPerformance(batteryModes[1]) < avg && (hasNegativePrice2 || batteryModes[1].value > -1 * maxCharge)) {
                         if (debug) {
                             node.warn("Calculated efficient grid charge option, 2nd hour");
                         }
@@ -743,7 +751,8 @@ module.exports = function (RED) {
                         }
                         batteryModes[1].cost = +batteryModes[1].cost + batteryModes[1].importPrice * maxCharge; // worst-case
                         hours += 1;
-                        if (calcPerformance(batteryModes[2]) < avg && batteryModes[2].value > -1 * maxCharge) {
+                        const hasNegativePrice3 = batteryModes[2].importPrice < 0;
+                        if (calcPerformance(batteryModes[2]) < avg && (hasNegativePrice3 || batteryModes[2].value > -1 * maxCharge)) {
                             if (debug) {
                                 node.warn("Calculated efficient grid charge option, 3rd hour");
                             }
