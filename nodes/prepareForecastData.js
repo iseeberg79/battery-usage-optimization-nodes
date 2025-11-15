@@ -61,8 +61,14 @@ module.exports = function (RED) {
                     node.warn("Transforming data for EstimateBatterymode");
                 }
 
-                const startTimestamp = new Date().setHours(0, 0, 0, 0);
+                // UTC Midnight verwenden statt lokaler Zeitzone
+                const now = new Date();
+                const startTimestamp = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0);
                 const interval = timeInterval === "1h" ? 60 * 60 * 1000 : 15 * 60 * 1000;
+
+                if (debug) {
+                    node.warn(`Start timestamp (UTC): ${new Date(startTimestamp).toISOString()}`);
+                }
 
                 const transformedData = {
                     priceData: transformPriceData(priceData, exportPrice, debug),
@@ -157,16 +163,41 @@ module.exports = function (RED) {
             }));
         }
 
+        // Hilfsfunktion: ISO 8601 Period zu Millisekunden
+        function parsePeriod(period) {
+            if (!period) return 30 * 60 * 1000; // Fallback: 30 Minuten
+
+            // Parse ISO 8601 duration (z.B. "PT30M", "PT1H", "PT15M")
+            const match = period.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+            if (!match) return 30 * 60 * 1000; // Fallback
+
+            const hours = parseInt(match[1] || 0);
+            const minutes = parseInt(match[2] || 0);
+            const seconds = parseInt(match[3] || 0);
+
+            return (hours * 3600 + minutes * 60 + seconds) * 1000;
+        }
+
         // Hilfsfunktion: PV-Produktionsprognose transformieren
         function transformProductionForecast(data, debug) {
             if (!data || !Array.isArray(data)) {
                 throw new Error("productionForecast must be an array");
             }
 
-            return data.map((item) => ({
-                start: item.period_end,
-                value: item.pv_estimate,
-            }));
+            return data.map((item) => {
+                const periodEnd = new Date(item.period_end);
+                const periodDuration = parsePeriod(item.period);
+                const periodStart = new Date(periodEnd.getTime() - periodDuration);
+
+                if (debug && data.indexOf(item) === 0) {
+                    node.warn(`PV Forecast: period_end=${item.period_end}, period=${item.period}, calculated start=${periodStart.toISOString()}`);
+                }
+
+                return {
+                    start: periodStart.toISOString(),
+                    value: item.pv_estimate,
+                };
+            });
         }
 
         // Hilfsfunktion: Verbrauchsprognose transformieren

@@ -136,5 +136,7 @@
         <li>Zwei PV-Forecasts werden automatisch kombiniert wenn beide vorhanden sind</li>
         <li>Der Output ist direkt kompatibel mit dem EstimateBatterymode Node</li>
         <li>Intern wird noch mit 1h-Slots gerechnet - eine zukünftige Version könnte auch 15m-Slots unterstützen</li>
+        <li><b>Timezone:</b> Alle Zeitstempel werden in UTC verarbeitet. Consumption Forecast startet bei 00:00 UTC (nicht lokale Zeitzone)</li>
+        <li><b>PV Forecast:</b> <code>period_end</code> wird automatisch in <code>start</code> konvertiert basierend auf der <code>period</code> Dauer</li>
     </ul>
 </script>
