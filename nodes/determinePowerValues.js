@@ -17,8 +17,8 @@ module.exports = function (RED) {
             }
 
             try {
-                // Überprüfe, ob msg.response.result existiert und sinnvoll gefüllt ist
-                const result = msg.response;
+                // Abwärtskompatibel: Alte API hat .result Wrapper, neue API nicht
+                const result = msg.response.result || msg.response;
                 if (!result) {
                     node.error("invalid response", msg);
                     return;

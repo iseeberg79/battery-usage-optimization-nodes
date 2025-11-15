@@ -20,7 +20,9 @@ module.exports = function (RED) {
             try {
                 // Fetch evopt data from EVCC API
                 const response = await axios.get(node.url);
-                const evoptData = response.data?.evopt;
+                // Abwärtskompatibel: Alte API hat .result Wrapper, neue API nicht
+                const apiData = response.data.result || response.data;
+                const evoptData = apiData?.evopt;
 
                 if (!evoptData) {
                     node.error("No evopt data found in API response", msg);
