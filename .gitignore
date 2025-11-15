@@ -1,4 +1,23 @@
-# Build directory 
-build/ 
+# Build directory
+build/
 *.tgz
-.gitignore
+
+# Test coverage
+coverage/
+*.lcov
+
+# Jest cache
+.jest-cache/
+
+# Node modules
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
