@@ -75,10 +75,26 @@ module.exports = function (RED) {
                 const currentTime = new Date();
 
                 // Funktion, um den Modus effizient zu ermitteln
+                // Unterstützt jetzt variable Intervalle (1h, 15min, etc.)
                 function getCurrentMode(currentTime, data) {
-                    return data.reduce((currentMode, entry) => {
+                    return data.reduce((currentMode, entry, index, array) => {
                         const startTime = new Date(entry.start);
-                        const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 Stunde hinzufügen
+
+                        // Intervall dynamisch aus nächstem Eintrag berechnen
+                        let interval = 60 * 60 * 1000; // Standard: 1 Stunde (Fallback)
+
+                        if (index < array.length - 1) {
+                            // Berechne Intervall aus Differenz zum nächsten Eintrag
+                            const nextStartTime = new Date(array[index + 1].start);
+                            interval = nextStartTime.getTime() - startTime.getTime();
+
+                            if (debug && index === 0) {
+                                node.warn(`Detected interval: ${interval / 60000} minutes`);
+                            }
+                        }
+
+                        const endTime = new Date(startTime.getTime() + interval);
+
                         if (currentTime >= startTime && currentTime < endTime) {
                             currentMode = entry.mode;
                         }

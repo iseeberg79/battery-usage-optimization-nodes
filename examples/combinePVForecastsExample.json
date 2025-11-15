@@ -1,0 +1,185 @@
+[
+    {
+        "id": "example_inject_combine",
+        "type": "inject",
+        "name": "Test: Zwei PV-Forecasts kombinieren",
+        "props": [
+            {
+                "p": "forecast1",
+                "v": "pvForecast1.forecasts",
+                "vt": "flow"
+            },
+            {
+                "p": "forecast2",
+                "v": "pvForecast2.forecasts",
+                "vt": "flow"
+            },
+            {
+                "p": "debug",
+                "v": "true",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "wires": [
+            [
+                "example_combine_pv"
+            ]
+        ]
+    },
+    {
+        "id": "example_combine_pv",
+        "type": "@iseeberg79/CombinePVForecasts",
+        "name": "PV Forecasts kombinieren",
+        "wires": [
+            [
+                "example_debug_combined"
+            ]
+        ]
+    },
+    {
+        "id": "example_debug_combined",
+        "type": "debug",
+        "name": "Kombinierter Forecast",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "wires": []
+    },
+    {
+        "id": "example_full_flow_inject",
+        "type": "inject",
+        "name": "Kompletter Flow mit Kombination",
+        "props": [
+            {
+                "p": "input.household",
+                "v": "household.profile",
+                "vt": "flow"
+            },
+            {
+                "p": "input.priceData15",
+                "v": "gridPrices.prices",
+                "vt": "flow"
+            },
+            {
+                "p": "forecast1",
+                "v": "pvForecast1.forecasts",
+                "vt": "flow"
+            },
+            {
+                "p": "forecast2",
+                "v": "pvForecast2.forecasts",
+                "vt": "flow"
+            },
+            {
+                "p": "input.soc",
+                "v": "evcc.batterySoc",
+                "vt": "flow"
+            },
+            {
+                "p": "charge",
+                "v": "control.gridcharge",
+                "vt": "flow"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "wires": [
+            [
+                "example_full_combine"
+            ]
+        ]
+    },
+    {
+        "id": "example_full_combine",
+        "type": "@iseeberg79/CombinePVForecasts",
+        "name": "Schritt 1: PV kombinieren",
+        "wires": [
+            [
+                "example_full_prepare"
+            ]
+        ]
+    },
+    {
+        "id": "example_full_prepare",
+        "type": "function",
+        "name": "Schritt 2: Input strukturieren",
+        "func": "// Kombinierter Forecast kommt als msg.payload\nmsg.input.pvforecast = msg.payload;\n\n// Jetzt alles im msg.input Objekt\nreturn msg;",
+        "outputs": 1,
+        "wires": [
+            [
+                "example_full_prepare_data"
+            ]
+        ]
+    },
+    {
+        "id": "example_full_prepare_data",
+        "type": "@iseeberg79/PrepareForecastData",
+        "name": "Schritt 3: Daten vorbereiten",
+        "exportPrice": "0.079",
+        "timeInterval": "1h",
+        "wires": [
+            [
+                "example_full_save"
+            ]
+        ]
+    },
+    {
+        "id": "example_full_save",
+        "type": "change",
+        "name": "Schritt 4: Speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "energy",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "wires": [
+            [
+                "example_full_estimate"
+            ]
+        ]
+    },
+    {
+        "id": "example_full_estimate",
+        "type": "@iseeberg79/EstimateBatterymode",
+        "name": "Schritt 5: Batteriemodus schätzen",
+        "batteryBuffer": "5",
+        "batteryCapacity": "10",
+        "maxCharge": "5",
+        "feedin": "0.079",
+        "efficiency": "80",
+        "performance": "20",
+        "wires": [
+            [
+                "example_full_output"
+            ]
+        ]
+    },
+    {
+        "id": "example_full_output",
+        "type": "debug",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "wires": []
+    }
+]

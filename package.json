@@ -54,7 +54,9 @@
             "EstimateBatterymode": "nodes/estimateBatterymode.js",
             "BatteryModeControl": "nodes/batteryModeControl.js",
             "TibberApiPrices": "nodes/tibberApiPrices.js",
-            "EvoptBatteryMode": "nodes/evoptBatteryMode.js"
+            "EvoptBatteryMode": "nodes/evoptBatteryMode.js",
+            "PrepareForecastData": "nodes/prepareForecastData.js",
+            "CombinePVForecasts": "nodes/combinePVForecasts.js"
         }
     },
     "engines": {

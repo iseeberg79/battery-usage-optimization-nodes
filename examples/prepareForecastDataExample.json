@@ -1,0 +1,125 @@
+[
+    {
+        "id": "example_inject",
+        "type": "inject",
+        "name": "Bereitstellung (15min Daten)",
+        "props": [
+            {
+                "p": "input.household",
+                "v": "household.profile",
+                "vt": "flow"
+            },
+            {
+                "p": "input.priceData15",
+                "v": "gridPrices.prices",
+                "vt": "flow"
+            },
+            {
+                "p": "pvforecast1",
+                "v": "pvForecast1.forecasts",
+                "vt": "flow"
+            },
+            {
+                "p": "pvforecast2",
+                "v": "pvForecast2.forecasts",
+                "vt": "flow"
+            },
+            {
+                "p": "input.soc",
+                "v": "evcc.batterySoc",
+                "vt": "flow"
+            },
+            {
+                "p": "charge",
+                "v": "control.gridcharge",
+                "vt": "flow"
+            },
+            {
+                "p": "debug",
+                "v": "true",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "10 00 * * *",
+        "once": true,
+        "onceDelay": "35",
+        "topic": "",
+        "wires": [
+            [
+                "example_prepare"
+            ]
+        ]
+    },
+    {
+        "id": "example_prepare",
+        "type": "@iseeberg79/PrepareForecastData",
+        "name": "Daten vorbereiten",
+        "exportPrice": "0.079",
+        "timeInterval": "1h",
+        "wires": [
+            [
+                "example_save"
+            ]
+        ]
+    },
+    {
+        "id": "example_save",
+        "type": "change",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "energy",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "lastGridchargePrice",
+                "pt": "msg",
+                "to": "lastGridchargePrice",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "wires": [
+            [
+                "example_estimate"
+            ]
+        ]
+    },
+    {
+        "id": "example_estimate",
+        "type": "@iseeberg79/EstimateBatterymode",
+        "name": "Batteriemodus schätzen",
+        "batteryBuffer": "5",
+        "batteryCapacity": "10",
+        "maxCharge": "5",
+        "feedin": "0.079",
+        "efficiency": "80",
+        "performance": "20",
+        "wires": [
+            [
+                "example_output"
+            ]
+        ]
+    },
+    {
+        "id": "example_output",
+        "type": "debug",
+        "name": "Ergebnis",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "wires": []
+    }
+]
