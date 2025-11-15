@@ -61,13 +61,32 @@ module.exports = function (RED) {
                     node.warn("Transforming data for EstimateBatterymode");
                 }
 
-                // UTC Midnight verwenden statt lokaler Zeitzone
+                // Berechne Start-Timestamp
+                // Wichtig: Consumption Array hat keine Zeitzone-Info, daher müssen wir eine annehmen
+                // Standard: UTC Midnight (kann vom User überschrieben werden via msg.timezone)
                 const now = new Date();
-                const startTimestamp = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0);
+                let startTimestamp;
+
+                // Wenn msg.timezone angegeben ist, verwende diese für Consumption
+                // Beispiel: msg.timezone = "Europe/Berlin" oder offset in Minuten
+                if (msg.timezone) {
+                    // Vereinfachte Lösung: UTC-Offset in Minuten
+                    const timezoneOffsetMinutes = typeof msg.timezone === 'number' ? msg.timezone : 0;
+                    const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+                    startTimestamp = localMidnight.getTime() - (timezoneOffsetMinutes * 60 * 1000);
+
+                    if (debug) {
+                        node.warn(`Using timezone offset: ${timezoneOffsetMinutes} minutes`);
+                    }
+                } else {
+                    // Default: UTC Midnight
+                    startTimestamp = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0);
+                }
+
                 const interval = timeInterval === "1h" ? 60 * 60 * 1000 : 15 * 60 * 1000;
 
                 if (debug) {
-                    node.warn(`Start timestamp (UTC): ${new Date(startTimestamp).toISOString()}`);
+                    node.warn(`Start timestamp: ${new Date(startTimestamp).toISOString()}`);
                 }
 
                 const transformedData = {
@@ -155,12 +174,30 @@ module.exports = function (RED) {
                 throw new Error("priceData must be an array");
             }
 
-            return data.map((item) => ({
-                value: item.price || item.value,
-                start: item.start,
-                exportPrice: exportPrice,
-                importPrice: item.price || item.value,
-            }));
+            return data.map((item, index) => {
+                // Normalisiere Zeitstempel zu ISO-String (falls nicht schon)
+                let startTime = item.start;
+                if (typeof startTime === 'number') {
+                    // Unix timestamp (Sekunden oder Millisekunden)
+                    startTime = new Date(startTime > 9999999999 ? startTime : startTime * 1000).toISOString();
+                } else if (startTime instanceof Date) {
+                    startTime = startTime.toISOString();
+                } else if (typeof startTime === 'string') {
+                    // Stelle sicher, dass es ein gültiger ISO-String ist
+                    startTime = new Date(startTime).toISOString();
+                }
+
+                if (debug && index === 0) {
+                    node.warn(`Price data first entry: ${item.start} → ${startTime}`);
+                }
+
+                return {
+                    value: item.price || item.value,
+                    start: startTime,
+                    exportPrice: exportPrice,
+                    importPrice: item.price || item.value,
+                };
+            });
         }
 
         // Hilfsfunktion: ISO 8601 Period zu Millisekunden

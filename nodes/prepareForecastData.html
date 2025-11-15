@@ -66,6 +66,7 @@
         <li><b>msg.input.pvforecast</b> - Alternativ: Bereits kombinierter PV-Forecast</li>
         <li><b>msg.input.household</b> - Array mit Haushaltsverbrauchsprognose</li>
         <li><b>msg.input.soc</b> - Aktueller Batterie-Ladestand (State of Charge)</li>
+        <li><b>msg.timezone</b> - Optional: UTC-Offset in Minuten für Consumption Forecast (Standard: 0 = UTC). Beispiel: -60 für CET (Winter), -120 für CEST (Sommer)</li>
         <li><b>msg.debug</b> - Optional: Aktiviert erweiterte Debug-Ausgaben (Boolean)</li>
     </ul>
 
@@ -136,7 +137,14 @@
         <li>Zwei PV-Forecasts werden automatisch kombiniert wenn beide vorhanden sind</li>
         <li>Der Output ist direkt kompatibel mit dem EstimateBatterymode Node</li>
         <li>Intern wird noch mit 1h-Slots gerechnet - eine zukünftige Version könnte auch 15m-Slots unterstützen</li>
-        <li><b>Timezone:</b> Alle Zeitstempel werden in UTC verarbeitet. Consumption Forecast startet bei 00:00 UTC (nicht lokale Zeitzone)</li>
-        <li><b>PV Forecast:</b> <code>period_end</code> wird automatisch in <code>start</code> konvertiert basierend auf der <code>period</code> Dauer</li>
+        <li><b>Timezone Handling:</b>
+            <ul>
+                <li>Alle eingehenden Zeitstempel (ISO-Strings, Unix-Timestamps) werden automatisch zu UTC konvertiert</li>
+                <li>Price Data: Timestamps werden normalisiert (ISO-String, Unix timestamp in Sekunden/Millisekunden werden alle akzeptiert)</li>
+                <li>PV Forecast: <code>period_end</code> wird automatisch zu <code>start</code> konvertiert basierend auf <code>period</code></li>
+                <li>Consumption Forecast: Startet bei 00:00 UTC (Standard) oder bei <code>msg.timezone</code> Offset</li>
+                <li>Für deutsche Zeitzone (CET/CEST): <code>msg.timezone = -60</code> (Winter) oder <code>-120</code> (Sommer)</li>
+            </ul>
+        </li>
     </ul>
 </script>
