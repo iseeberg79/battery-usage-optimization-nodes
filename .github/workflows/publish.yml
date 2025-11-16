@@ -1,0 +1,61 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Run tests
+      run: npm test
+
+    - name: Build package
+      run: npm run grunt
+
+    - name: Generate JSDoc
+      run: npx jsdoc -c jsdoc.json
+
+    - name: Check version matches release tag
+      run: |
+        PACKAGE_VERSION=$(node -p "require('./package.json').version")
+        RELEASE_TAG=${GITHUB_REF#refs/tags/}
+        echo "Package version: $PACKAGE_VERSION"
+        echo "Release tag: $RELEASE_TAG"
+        if [ "$PACKAGE_VERSION" != "$RELEASE_TAG" ]; then
+          echo "❌ Version mismatch: package.json ($PACKAGE_VERSION) != release tag ($RELEASE_TAG)"
+          exit 1
+        fi
+        echo "✅ Version matches release tag"
+
+    - name: Publish to npm
+      run: npm publish --provenance
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Create package artifact
+      run: npm pack
+
+    - name: Upload release artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: npm-package
+        path: '*.tgz'
