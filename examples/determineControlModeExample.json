@@ -1,0 +1,15 @@
+[
+    {
+        "id": "c6ed6e04461115c3",
+        "type": "@iseeberg79/DetermineControlMode",
+        "name": "DetermineControlMode",
+        "minPvRequired": 16000,
+        "minPriceDeviation": 6,
+        "minPriceDifference": 15,
+        "priceLimit": 0.35,
+        "avg": 0.24,
+        "wires": [
+            ["90e1013fda31b0e7"]
+        ]
+    }
+]

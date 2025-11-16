@@ -1,0 +1,17 @@
+[
+    {
+        "id": "b2b9fef756e75401",
+        "type": "EstimateBatteryMode",
+        "name": "EstimateBatteryMode",
+        "batteryBuffer": 5,
+        "batteryCapacity": 10,
+        "maxCharge": 5,
+        "feedin": 0.079,
+        "efficiency": 80,
+        "performance": 20,
+        "wires": [
+            ["9d7c5cfee9cc6e0b"],
+            ["f9a1e3729bde8d3f"]
+        ]
+    }
+]

@@ -1,0 +1,75 @@
+[
+    {
+        "id": "31a983906e48f58a",
+        "type": "inject",
+        "z": "794bee8860f702f2",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "rooftopid",
+                "v": "xxxx-yyyy-zzzz-aaaa",
+                "vt": "str"
+            },
+            {
+                "p": "token",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "05 00 * * *",
+        "once": true,
+        "onceDelay": "10",
+        "topic": "",
+        "x": 130,
+        "y": 80,
+        "wires": [
+            [
+                "90b6c31b3a2925ae"
+            ]
+        ]
+    },
+    {
+        "id": "90b6c31b3a2925ae",
+        "type": "@iseeberg79/EvaluateSolarForecast",
+        "name": "Evaluate Solar Forecast",
+        "rooftopid": "your_rooftop_id",
+        "token": "your_auth_token",
+        "wires": [
+            [
+                "1a669e4a805a3853"
+            ]
+        ]
+    },
+    {
+        "id": "1a669e4a805a3853",
+        "type": "change",
+        "z": "794bee8860f702f2",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pvForecast1",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 80,
+        "wires": [
+            [
+                "8bb61eb703e8c270"
+            ]
+        ]
+    }
+]

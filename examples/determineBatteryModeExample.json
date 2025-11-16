@@ -1,0 +1,18 @@
+[
+    {
+        "id": "82dd0e75ab4e8057",
+        "type": "DetermineBatteryMode",
+        "name": "DetermineBatteryMode",
+        "enableGridchargeThreshold": 50,
+        "disableGridchargeThreshold": 80,
+        "batteryCapacity": 10000,
+        "minsoc": 10,
+        "maxsoc": 90,
+        "efficiency": 80,
+        "wires": [
+            ["92756aee73cf3429"],
+            ["bda0e3da5f255de3"],
+            ["80e651b549dd7fd6"]
+        ]
+    }
+]

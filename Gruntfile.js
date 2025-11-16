@@ -1,21 +1,13 @@
 module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		eslint: {
-			options: {
-				configFile: 'eslint.config.cjs' // Pfad zur ESLint-Konfigurationsdatei 
-			},
-			target: ['nodes/*.js'] // Pfad zu den JavaScript-Dateien
-		},
-		jsdoc: {
-			dist: {
-				src: ['nodes/*.js'],
-				options: {
-					destination: 'build/docs'
-				}
-			}
-		},
 		shell: {
+			eslint: {
+				command: 'npm run lint'
+			},
+			jsdoc: {
+				command: 'npx jsdoc -c jsdoc.json'
+			},
 			npm_pack: {
 				command: 'rm -rf ./build; mkdir -p ./build/ && npm pack --pack-destination ./build'
 			}
@@ -23,11 +15,9 @@ module.exports = function(grunt) {
 	});
 
 	//grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-eslint');
-	grunt.loadNpmTasks('grunt-jsdoc');
 	grunt.loadNpmTasks('grunt-shell');
 
 	// Default task(s).
 	//grunt.registerTask('default', ['jshint', 'jsdoc', 'shell:npm_pack']);
-	grunt.registerTask('default', ['eslint', 'jsdoc', 'shell:npm_pack']);
+	grunt.registerTask('default', ['shell:eslint', 'shell:jsdoc', 'shell:npm_pack']);
 };

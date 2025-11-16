@@ -1,3 +1,64 @@
+/**
+ * Node-RED node for determining battery operation mode based on price, SOC, and forecasts.
+ *
+ * @module DetermineBatteryMode
+ * @description Dieser Node ermöglicht die Bestimmung des Batteriemodus basierend auf
+ * Strompreisen, Batterieladezustand und PV-/Verbrauchsprognosen.
+ *
+ * @param {Object} RED - Node-RED runtime object
+ *
+ * @property {number} config.enableGridchargeThreshold - Schwellenwert zum Aktivieren der Netzladung (default: 50%)
+ * @property {number} config.disableGridchargeThreshold - Schwellenwert zum Deaktivieren der Netzladung (default: 80%)
+ * @property {number} config.batteryCapacity - Batteriekapazität in Wh (default: 10000)
+ * @property {number} config.minsoc - Batterielevel für Zurücksetzung des Netzladungspreises min (default: 10%)
+ * @property {number} config.maxsoc - Batterielevel für Zurücksetzung des Netzladungspreises max (default: 90%)
+ * @property {number} config.efficiency - Wirkungsgrad der Batterie in % (default: 80%)
+ *
+ * @input {Object} msg - Input message object
+ * @input {boolean} msg.optimize - Optimierung des Batteriemodus aktivieren
+ * @input {boolean} msg.enableGridcharge - Netzladung erlauben
+ * @input {number} msg.price - Aktueller Strompreis in €/kWh
+ * @input {number} msg.average - Durchschnittlicher Strompreis in €/kWh
+ * @input {number} msg.avgGridPriceWeekly - Wöchentlicher durchschnittlicher Strompreis in €/kWh
+ * @input {number} msg.lastGridchargePrice - Letzter Netzladungspreis (inkl. Verluste) in €/kWh
+ * @input {number} msg.minimum - Minimaler Strompreis in €/kWh
+ * @input {number} msg.soc - Aktueller Batterieladezustand in %
+ * @input {number} msg.energy_req - Geschätzter Haushaltsverbrauch in Wh
+ * @input {number} msg.pvforecast - Geschätzte PV-Erzeugung in Wh
+ * @input {number} msg.feedin - Einspeisevergütung in €/kWh (default: 0.079)
+ * @input {Array} msg.estimator - Optionaler externer Batteriemodus-Plan (Array mit {start, mode})
+ *
+ * @output {Object} Output 1 - Batteriemodus-Nachricht (nur bei Änderung)
+ * @output {string} msg.targetMode - Zielmodus: "normal" (entladen), "hold" (halten), "charge" (laden)
+ *
+ * @output {Object} Output 2 - Letzter Netzladungspreis (nur bei Änderung)
+ * @output {number} msg.lastGridchargePrice - Aktualisierter Netzladungspreis inkl. Verluste
+ *
+ * @output {Object} Output 3 - Vollständige Nachricht mit allen Parametern (debug)
+ *
+ * @example
+ * // Input message
+ * {
+ *   "optimize": true,
+ *   "enableGridcharge": true,
+ *   "price": 0.30,
+ *   "average": 0.25,
+ *   "avgGridPriceWeekly": 0.25,
+ *   "lastGridchargePrice": 0.28,
+ *   "soc": 75,
+ *   "pvforecast": 5000,
+ *   "energy_req": 5000,
+ *   "feedin": 0.079,
+ *   "minimum": 0.079
+ * }
+ *
+ * // Output on port 3 (full message)
+ * {
+ *   "targetMode": "hold",  // or "normal" or "charge"
+ *   "batteryControlLimit": 0.28,
+ *   ...
+ * }
+ */
 module.exports = function (RED) {
     function DetermineBatteryModeNode(config) {
         RED.nodes.createNode(this, config);
