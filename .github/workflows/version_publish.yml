@@ -19,6 +19,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        registry-url: 'https://registry.npmjs.org'
 
     - name: Cache Node.js modules
       uses: actions/cache@v3
@@ -29,7 +30,7 @@ jobs:
           ${{ runner.os }}-node-
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Update version
       run: node update-version.js
@@ -46,6 +47,9 @@ jobs:
     - name: Generate JSDoc
       run: npx jsdoc -c jsdoc.json
 
+    - name: Run tests
+      run: npm test
+
     - name: Pack project
       run: npm pack --pack-destination ./build/${{ matrix.node-version }}/
 
@@ -57,13 +61,17 @@ jobs:
 
     - name: Check version bump
       run: |
-        if [ "$(node -p "require('./package.json').version")" == "$(git describe --tags --abbrev=0)" ]; then
-          echo "Version not bumped!"
+        PACKAGE_VERSION=$(node -p "require('./package.json').version")
+        RELEASE_TAG=${GITHUB_REF#refs/tags/}
+        echo "Package version: $PACKAGE_VERSION"
+        echo "Release tag: $RELEASE_TAG"
+        if [ "$PACKAGE_VERSION" != "$RELEASE_TAG" ]; then
+          echo "Version mismatch: package.json ($PACKAGE_VERSION) != release tag ($RELEASE_TAG)"
           exit 1
         fi
 
     - name: Publish project
-      if: github.ref == 'refs/heads/main'
-      run: npm publish
+      if: github.event_name == 'release'
+      run: npm publish --provenance
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
