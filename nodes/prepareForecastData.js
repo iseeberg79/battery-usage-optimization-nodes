@@ -22,15 +22,30 @@ module.exports = function (RED) {
                     return;
                 }
 
-                // Schritt 1: 15min → Stundenwerte (falls nötig)
-                let priceData = msg.input.priceData15 || msg.input.priceData;
+                // Schritt 1: Preisdaten konvertieren (falls nötig)
+                let priceData = msg.input.priceData;
 
-                if (msg.input.priceData15 && timeInterval === "1h") {
+                // Auto-detect: Berechne Intervall zwischen ersten zwei Einträgen
+                let priceDataInterval = null;
+                if (priceData && priceData.length >= 2 && priceData[0].start && priceData[1].start) {
+                    const start1 = new Date(priceData[0].start).getTime();
+                    const start2 = new Date(priceData[1].start).getTime();
+                    priceDataInterval = start2 - start1;
+                }
+
+                const isPriceData15min = priceDataInterval === 15 * 60 * 1000;
+                const isPriceDataHourly = priceDataInterval === 60 * 60 * 1000;
+
+                if (isPriceData15min && timeInterval === "1h") {
                     if (debug) {
                         node.warn("Converting 15min price data to hourly averages");
                     }
-                    priceData = convert15MinToHourly(msg.input.priceData15, debug);
-                    msg.input.priceData = priceData;
+                    priceData = convert15MinToHourly(priceData, debug);
+                } else if (isPriceDataHourly && timeInterval === "15m") {
+                    if (debug) {
+                        node.warn("Converting hourly price data to 15min intervals");
+                    }
+                    priceData = convertHourlyTo15Min(priceData, debug);
                 }
 
                 // Schritt 2: PV-Forecasts kombinieren (falls zwei Arrays vorhanden)
@@ -41,19 +56,90 @@ module.exports = function (RED) {
                         node.warn("Combining two PV forecasts");
                     }
                     pvForecast = combinePVForecasts(msg.pvforecast1, msg.pvforecast2, debug);
-                    msg.input.pvforecast = pvForecast;
                     delete msg.pvforecast1;
                     delete msg.pvforecast2;
                 } else if (msg.pvforecast1) {
                     // Nur ein Forecast vorhanden
                     pvForecast = msg.pvforecast1;
-                    msg.input.pvforecast = pvForecast;
                     delete msg.pvforecast1;
                 } else if (msg.pvforecast2) {
                     // Nur zweiter Forecast vorhanden
                     pvForecast = msg.pvforecast2;
-                    msg.input.pvforecast = pvForecast;
                     delete msg.pvforecast2;
+                }
+
+                // Schritt 2b: PV-Forecast konvertieren (falls nötig)
+                if (pvForecast) {
+                    // Auto-detect: Berechne Intervall zwischen ersten zwei Einträgen
+                    let pvForecastInterval = null;
+                    if (pvForecast.length >= 2) {
+                        // Unterstütze verschiedene Feld-Namen
+                        const time1 = pvForecast[0].start || pvForecast[0].end || pvForecast[0].period_end;
+                        const time2 = pvForecast[1].start || pvForecast[1].end || pvForecast[1].period_end;
+
+                        if (time1 && time2) {
+                            const t1 = new Date(time1).getTime();
+                            const t2 = new Date(time2).getTime();
+                            pvForecastInterval = Math.abs(t2 - t1);
+                        }
+                    }
+
+                    const isPVForecast15min = pvForecastInterval === 15 * 60 * 1000;
+                    const isPVForecastHourly = pvForecastInterval === 60 * 60 * 1000;
+
+                    if (isPVForecast15min && timeInterval === "1h") {
+                        if (debug) {
+                            node.warn("Converting 15min PV forecast to hourly averages");
+                        }
+                        pvForecast = convert15MinToHourly(pvForecast, debug);
+                    } else if (isPVForecastHourly && timeInterval === "15m") {
+                        if (debug) {
+                            node.warn("Converting hourly PV forecast to 15min intervals");
+                        }
+                        pvForecast = convertHourlyTo15Min(pvForecast, debug);
+                    }
+                }
+
+                // Schritt 2c: Household consumption konvertieren (falls nötig)
+                let household = msg.input.household;
+                if (household) {
+                    // Für household Array: Vergleiche Länge mit priceData
+                    // Wenn priceData konvertiert wurde, nutze die Original-Info
+                    let householdNeedsConversion = false;
+
+                    if (priceDataInterval === 15 * 60 * 1000 && timeInterval === "1h") {
+                        // Price war 15min, wurde zu hourly konvertiert
+                        // Household sollte auch 15min sein → konvertieren zu hourly
+                        if (household.length === priceData.length * 4) {
+                            householdNeedsConversion = true;
+                            if (debug) {
+                                node.warn("Converting 15min household data to hourly averages");
+                            }
+                            household = convertArray15MinToHourly(household, debug);
+                        }
+                    } else if (priceDataInterval === 60 * 60 * 1000 && timeInterval === "15m") {
+                        // Price war hourly, wurde zu 15min konvertiert
+                        // Household sollte auch hourly sein → konvertieren zu 15min
+                        if (household.length * 4 === priceData.length) {
+                            householdNeedsConversion = true;
+                            if (debug) {
+                                node.warn("Converting hourly household data to 15min intervals");
+                            }
+                            household = convertArrayHourlyTo15Min(household, debug);
+                        }
+                    } else if (timeInterval === "15m" && household.length < priceData.length) {
+                        // Fallback: Wenn timeInterval 15m ist und household kürzer als priceData
+                        if (debug) {
+                            node.warn("Converting hourly household data to 15min intervals (fallback)");
+                        }
+                        household = convertArrayHourlyTo15Min(household, debug);
+                    } else if (timeInterval === "1h" && household.length > priceData.length) {
+                        // Fallback: Wenn timeInterval 1h ist und household länger als priceData
+                        if (debug) {
+                            node.warn("Converting 15min household data to hourly averages (fallback)");
+                        }
+                        household = convertArray15MinToHourly(household, debug);
+                    }
                 }
 
                 // Schritt 3: Daten transformieren für EstimateBatterymode
@@ -91,8 +177,8 @@ module.exports = function (RED) {
 
                 const transformedData = {
                     priceData: transformPriceData(priceData, exportPrice, debug),
-                    productionForecast: transformProductionForecast(pvForecast, debug),
-                    consumptionForecast: transformConsumptionForecast(msg.input.household, startTimestamp, interval, debug),
+                    productionForecast: transformProductionForecast(pvForecast, interval, debug),
+                    consumptionForecast: transformConsumptionForecast(household, startTimestamp, interval, debug),
                     soc: msg.input.soc || 0,
                 };
 
@@ -148,17 +234,88 @@ module.exports = function (RED) {
             return result;
         }
 
+        // Hilfsfunktion: Stundenwerte → 15min (Wert auf 4 Intervalle verteilen)
+        function convertHourlyTo15Min(data, debug) {
+            let result = [];
+
+            for (let entry of data) {
+                const hourStart = new Date(entry.start);
+                const value = entry.value || entry.price;
+
+                // Erstelle 4 Einträge à 15 Minuten mit gleichem Wert
+                for (let i = 0; i < 4; i++) {
+                    const start = new Date(hourStart.getTime() + i * 15 * 60 * 1000);
+                    const end = new Date(start.getTime() + 15 * 60 * 1000);
+
+                    result.push({
+                        start: start.toISOString(),
+                        end: end.toISOString(),
+                        value: value,
+                        price: value,
+                    });
+                }
+            }
+
+            if (debug) {
+                node.warn(`Converted ${data.length} hourly entries to ${result.length} 15min entries`);
+            }
+
+            return result;
+        }
+
+        // Hilfsfunktion: Array 15min → Stundenwerte (Durchschnitt)
+        function convertArray15MinToHourly(data, debug) {
+            let result = [];
+
+            // Gruppiere je 4 Werte zu einem Stundenwert
+            for (let i = 0; i < data.length; i += 4) {
+                const values = data.slice(i, i + 4);
+                const avg = values.reduce((a, b) => a + b, 0) / values.length;
+                result.push(parseFloat(avg.toFixed(4)));
+            }
+
+            if (debug) {
+                node.warn(`Converted ${data.length} 15min values to ${result.length} hourly values`);
+            }
+
+            return result;
+        }
+
+        // Hilfsfunktion: Array Stundenwerte → 15min (Wert auf 4 Intervalle verteilen)
+        function convertArrayHourlyTo15Min(data, debug) {
+            let result = [];
+
+            // Jeden Stundenwert auf 4x 15min verteilen
+            for (let value of data) {
+                for (let i = 0; i < 4; i++) {
+                    result.push(value);
+                }
+            }
+
+            if (debug) {
+                node.warn(`Converted ${data.length} hourly values to ${result.length} 15min values`);
+            }
+
+            return result;
+        }
+
         // Hilfsfunktion: Zwei PV-Forecasts kombinieren
         function combinePVForecasts(forecast1, forecast2, debug) {
+            // Detect which time fields are available (support multiple formats)
+            const matchKey = forecast1[0].end ? 'end' :
+                           forecast1[0].period_end ? 'period_end' :
+                           forecast1[0].start ? 'start' : null;
+
             const combined = forecast1.map((f1) => {
-                const f2 = forecast2.find((f) => f.period_end === f1.period_end);
-                return {
+                const f2 = forecast2.find((f) => f[matchKey] === f1[matchKey]);
+
+                // Combine pv_estimate values
+                const result = {
+                    ...f1,
                     pv_estimate: f1.pv_estimate + (f2 ? f2.pv_estimate : 0),
-                    pv_estimate10: f1.pv_estimate10 + (f2 ? f2.pv_estimate10 : 0),
-                    pv_estimate90: f1.pv_estimate90 + (f2 ? f2.pv_estimate90 : 0),
-                    period_end: f1.period_end,
-                    period: f1.period,
                 };
+
+                return result;
             });
 
             if (debug) {
@@ -216,22 +373,47 @@ module.exports = function (RED) {
         }
 
         // Hilfsfunktion: PV-Produktionsprognose transformieren
-        function transformProductionForecast(data, debug) {
+        function transformProductionForecast(data, interval, debug) {
             if (!data || !Array.isArray(data)) {
                 throw new Error("productionForecast must be an array");
             }
 
             return data.map((item) => {
-                const periodEnd = new Date(item.period_end);
-                const periodDuration = parsePeriod(item.period);
-                const periodStart = new Date(periodEnd.getTime() - periodDuration);
+                let startTime;
+
+                // Support multiple formats: start, end, start+end, period_end+period
+                if (item.start && item.end) {
+                    // Both start and end provided - use start
+                    startTime = item.start;
+                } else if (item.start) {
+                    // Only start provided - use it directly (end can be calculated if needed)
+                    startTime = item.start;
+                } else if (item.end) {
+                    // Only end provided - calculate start by subtracting interval
+                    const endDate = new Date(item.end);
+                    const startDate = new Date(endDate.getTime() - interval);
+                    startTime = startDate.toISOString();
+                } else if (item.period_end && item.period) {
+                    // Calculate start from period_end and period
+                    const periodEnd = new Date(item.period_end);
+                    const periodDuration = parsePeriod(item.period);
+                    const periodStart = new Date(periodEnd.getTime() - periodDuration);
+                    startTime = periodStart.toISOString();
+                } else if (item.period_end) {
+                    // Only period_end provided - calculate start by subtracting interval
+                    const endDate = new Date(item.period_end);
+                    const startDate = new Date(endDate.getTime() - interval);
+                    startTime = startDate.toISOString();
+                } else {
+                    throw new Error("PV forecast data must have 'start', 'end', or 'period_end' field");
+                }
 
                 if (debug && data.indexOf(item) === 0) {
-                    node.warn(`PV Forecast: period_end=${item.period_end}, period=${item.period}, calculated start=${periodStart.toISOString()}`);
+                    node.warn(`PV Forecast first entry: start=${startTime}, value=${item.pv_estimate}`);
                 }
 
                 return {
-                    start: periodStart.toISOString(),
+                    start: startTime,
                     value: item.pv_estimate,
                 };
             });

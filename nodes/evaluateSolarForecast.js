@@ -84,6 +84,9 @@ module.exports = function (RED) {
     RED.nodes.registerType("@iseeberg79/EvaluateSolarForecast", EvaluateSolarForecastNode, {
         defaults: {
             name: { value: "" },
+            rooftopid: { value: "" },
+            token: { value: "" },
+            url: { value: "https://api.solcast.com.au/rooftop_sites/" },
         },
     });
 };

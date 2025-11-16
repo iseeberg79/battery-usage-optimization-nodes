@@ -457,6 +457,15 @@ module.exports = function (RED) {
                         if (debug) {
                             node.warn("timestamp > recent");
                         }
+
+                        // Validierung: Stelle sicher, dass Daten vorhanden sind
+                        if (!consumptionForecast[i]) {
+                            throw new Error(`consumptionForecast missing at index ${i}. priceData has ${priceData.length} entries, but consumptionForecast only has ${consumptionForecast.length} entries. Check that all arrays have matching timestamps and lengths.`);
+                        }
+                        if (!productionForecast[i]) {
+                            throw new Error(`productionForecast missing at index ${i}. priceData has ${priceData.length} entries, but productionForecast only has ${productionForecast.length} entries. Possible cause: PV forecast data is outdated or has wrong timestamps. First PV timestamp: ${productionForecast[0]?.start}, first price timestamp: ${priceData[0]?.start}`);
+                        }
+
                         let mode = "hold";
                         const consumption = consumptionForecast[i].value;
                         const production = productionForecast[i].value;
