@@ -72,7 +72,7 @@ module.exports = function (RED) {
                 return {
                     loadableHours,
                     loadableEnergy,
-                    avgPrice: (avgPrice / loadableHours) * factor,
+                    avgPrice: loadableHours > 0 ? (avgPrice / loadableHours) * factor : 0,
                 };
             }
 
@@ -142,6 +142,7 @@ module.exports = function (RED) {
                 if (debug) {
                     node.warn("calculateAverage");
                 }
+                if (data.length === 0) return 0;
                 const sum = data.reduce((total, entry) => total + entry.importPrice, 0);
                 const average = sum / data.length;
                 return average;
@@ -206,6 +207,14 @@ module.exports = function (RED) {
                 }, 0);
 
                 const dataBeforeMaxImport = data.slice(0, maxImportIndex);
+
+                // Wenn maxImportIndex = 0, dann ist dataBeforeMaxImport leer - Fallback auf absolutes Minimum
+                if (dataBeforeMaxImport.length === 0) {
+                    if (debug) {
+                        node.warn("maxImportIndex ist 0, Fallback auf absolutes Minimum");
+                    }
+                    return getMinimumPriceAbs(data);
+                }
 
                 if (debug) {
                     node.warn("getMinimumPrice #2");
@@ -352,8 +361,9 @@ module.exports = function (RED) {
                         }
                     }
                     if (modes[i].mode == "charge") {
-                        // Netzladungskosten
-                        modes[i].cost2 = modes[i].importPrice * chargedEnergy * factor + modes[i].value * modes[i].importPrice;
+                        // Netzladungskosten (nur positive value zählt als Netzbezug)
+                        let effectivePrice = isFinite(modes[i].importPrice) ? modes[i].importPrice : 0;
+                        modes[i].cost2 = effectivePrice * chargedEnergy * factor + Math.max(0, modes[i].value) * effectivePrice;
                     }
                     if (modes[i].mode == "normal") {
                         if (modes[i].energy > 0) {
@@ -639,7 +649,7 @@ module.exports = function (RED) {
                             currentbatteryPower -= dischargeAmount;
                             hour.value -= dischargeAmount;
                             hour.energy = dischargeAmount;
-                            hour.cost = dischargeAmount * batteryEnergyPrice + hour.value * hour.importPrice;
+                            hour.cost = dischargeAmount * batteryEnergyPrice + Math.max(0, hour.value) * hour.importPrice;
                             hour.mode = "normal";
                             if (debug) {
                                 node.warn(hour.value + "/" + hour.mode + ": currentbatteryPower: " + currentbatteryPower);
@@ -688,7 +698,7 @@ module.exports = function (RED) {
                             estimatedbatteryPower -= dischargeAmount;
                             hour.value -= dischargeAmount;
                             hour.energy = dischargeAmount;
-                            hour.cost = dischargeAmount * chargedEnergyPrice + hour.value * hour.importPrice;
+                            hour.cost = dischargeAmount * chargedEnergyPrice + Math.max(0, hour.value) * hour.importPrice;
                             hour.mode = "normal";
                             if (debug) {
                                 node.warn(hour.value + "/" + hour.mode + ": estimatedbatteryPower: " + estimatedbatteryPower);
