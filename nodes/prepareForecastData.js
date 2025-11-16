@@ -6,6 +6,8 @@ module.exports = function (RED) {
         // Konfigurationsparameter
         const exportPrice = parseFloat(config.exportPrice) || 0.079;
         const timeInterval = config.timeInterval || "1h"; // "1h" oder "15m"
+		const convertWhToKWh = config.convertWhToKWh !== false;
+
         let debug = false;
 
         node.on("input", function (msg) {
@@ -416,15 +418,21 @@ module.exports = function (RED) {
                 } else {
                     throw new Error("PV forecast data must have 'start', 'end', or 'period_end' field");
                 }
+				
+				let value = item.pv_estimate ?? item.value ?? 0;
 
-                if (debug && data.indexOf(item) === 0) {
-                    node.warn(`PV Forecast first entry: start=${startTime}, value=${item.pv_estimate}`);
-                }
+				if (convertWhToKWh) {
+				    value = value / 1000; // Wh → kWh
+				}
 
-                return {
-                    start: startTime,
-                    value: item.pv_estimate ?? item.value ?? 0,
-                };
+				if (debug && data.indexOf(item) === 0) {
+				    node.warn(`PV Forecast first entry: start=${startTime}, value=${value}`);
+				}
+
+				return {
+				    start: startTime,
+				    value: parseFloat(value.toFixed(4)), // optional runden
+				};
             });
         }
 

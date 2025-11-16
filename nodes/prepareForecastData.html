@@ -10,6 +10,7 @@
                 value: 0.079,
                 validate: RED.validators.number()
             },
+            convertWhToKWh: { value: true, exportable: true },
             timeInterval: {
                 value: "1h"
             }
@@ -32,6 +33,12 @@
         <label for="node-input-exportPrice">Export Price (€/kWh)</label>
         <input type="text" id="node-input-exportPrice" placeholder="0.079" class="input-typed"/>
     </div>
+	<div class="form-row">
+    	<label for="node-input-convertWhToKWh">
+        	Convert PV from Wh to kWh
+    	</label>
+    	<input type="checkbox" id="node-input-convertWhToKWh" checked>
+	</div>
     <div class="form-row">
         <label for="node-input-timeInterval">Time Interval</label>
         <select id="node-input-timeInterval" class="input-typed">
