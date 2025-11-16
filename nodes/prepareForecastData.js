@@ -25,6 +25,11 @@ module.exports = function (RED) {
                 // Schritt 1: Preisdaten konvertieren (falls nötig)
                 let priceData = msg.input.priceData;
 
+                // Fallback: Support für priceData15
+                if (!priceData && msg.input.priceData15) {
+                    priceData = msg.input.priceData15;
+                }
+
                 // Auto-detect: Berechne Intervall zwischen ersten zwei Einträgen
                 let priceDataInterval = null;
                 if (priceData && priceData.length >= 2 && priceData[0].start && priceData[1].start) {
@@ -203,14 +208,16 @@ module.exports = function (RED) {
 
             for (let entry of data) {
                 // Zeit in JS-Datum umwandeln
-                let d = new Date(entry.start);
+                let d = new Date(entry.start || entry.end);
 
                 // Ganze Stunde als Schlüssel (UTC!)
                 d.setMinutes(0, 0, 0);
                 let hourKey = d.toISOString();
 
                 if (!grouped[hourKey]) grouped[hourKey] = [];
-                grouped[hourKey].push(entry.value || entry.price);
+                // Unterstütze value, price und pv_estimate
+                const val = entry.value ?? entry.price ?? entry.pv_estimate ?? 0;
+                grouped[hourKey].push(val);
             }
 
             // Stundenmittel berechnen
@@ -224,6 +231,7 @@ module.exports = function (RED) {
                         end: new Date(new Date(k).getTime() + 60 * 60 * 1000).toISOString(),
                         value: parseFloat(avg.toFixed(4)),
                         price: parseFloat(avg.toFixed(4)),
+                        pv_estimate: parseFloat(avg.toFixed(4)),
                     };
                 });
 
@@ -240,7 +248,7 @@ module.exports = function (RED) {
 
             for (let entry of data) {
                 const hourStart = new Date(entry.start);
-                const value = entry.value || entry.price;
+                const value = entry.value ?? entry.price ?? entry.pv_estimate ?? 0;
 
                 // Erstelle 4 Einträge à 15 Minuten mit gleichem Wert
                 for (let i = 0; i < 4; i++) {
@@ -252,6 +260,7 @@ module.exports = function (RED) {
                         end: end.toISOString(),
                         value: value,
                         price: value,
+                        pv_estimate: value,
                     });
                 }
             }
@@ -312,7 +321,7 @@ module.exports = function (RED) {
                 // Combine pv_estimate values
                 const result = {
                     ...f1,
-                    pv_estimate: f1.pv_estimate + (f2 ? f2.pv_estimate : 0),
+                    pv_estimate: (f1.pv_estimate ?? 0) + (f2 ? (f2.pv_estimate ?? 0) : 0),
                 };
 
                 return result;
@@ -414,7 +423,7 @@ module.exports = function (RED) {
 
                 return {
                     start: startTime,
-                    value: item.pv_estimate,
+                    value: item.pv_estimate ?? item.value ?? 0,
                 };
             });
         }
