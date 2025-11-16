@@ -142,7 +142,9 @@ module.exports = function (RED) {
                 if (debug) {
                     node.warn("calculateAverage");
                 }
-                if (data.length === 0) return 0;
+                if (data.length === 0) {
+                    return 0;
+                }
                 const sum = data.reduce((total, entry) => total + entry.importPrice, 0);
                 const average = sum / data.length;
                 return average;
@@ -419,7 +421,7 @@ module.exports = function (RED) {
                 }
 
                 // abort on missing forecast input
-                if (typeof msg.payload.priceData == "undefined" || typeof msg.payload.productionForecast == "undefined" || typeof msg.payload.consumptionForecast == "undefined") {
+                if (typeof msg.payload.priceData === "undefined" || typeof msg.payload.productionForecast === "undefined" || typeof msg.payload.consumptionForecast === "undefined") {
                     node.status({ fill: "red", shape: "ring", text: "missing forecasts" });
                     msg.error = "no forecasts";
                     error = true;

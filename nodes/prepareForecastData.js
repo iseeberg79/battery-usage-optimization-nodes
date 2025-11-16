@@ -216,7 +216,9 @@ module.exports = function (RED) {
                 d.setMinutes(0, 0, 0);
                 let hourKey = d.toISOString();
 
-                if (!grouped[hourKey]) grouped[hourKey] = [];
+                if (!grouped[hourKey]) {
+                    grouped[hourKey] = [];
+                }
                 // Unterstütze value, price und pv_estimate
                 const val = entry.value ?? entry.price ?? entry.pv_estimate ?? 0;
                 grouped[hourKey].push(val);
@@ -370,11 +372,15 @@ module.exports = function (RED) {
 
         // Hilfsfunktion: ISO 8601 Period zu Millisekunden
         function parsePeriod(period) {
-            if (!period) return 30 * 60 * 1000; // Fallback: 30 Minuten
+            if (!period) {
+                return 30 * 60 * 1000; // Fallback: 30 Minuten
+            }
 
             // Parse ISO 8601 duration (z.B. "PT30M", "PT1H", "PT15M")
             const match = period.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-            if (!match) return 30 * 60 * 1000; // Fallback
+            if (!match) {
+                return 30 * 60 * 1000; // Fallback
+            }
 
             const hours = parseInt(match[1] || 0);
             const minutes = parseInt(match[2] || 0);
