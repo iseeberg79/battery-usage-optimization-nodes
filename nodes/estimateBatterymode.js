@@ -1,3 +1,64 @@
+/**
+ * Node-RED node for creating optimized 24-hour battery charging/discharging plans.
+ *
+ * @module EstimateBatterymode
+ * @description Dieser Node erstellt einen 24-Stunden-Plan für die optimale Nutzung der Hausbatterie
+ * basierend auf Strompreisen, PV-Prognose und Verbrauchsprognose. Berücksichtigt Netzladung,
+ * Batterieverluste und Performance-Margen.
+ *
+ * @param {Object} RED - Node-RED runtime object
+ *
+ * @property {number} config.batteryBuffer - Mindest-SoC der Hausbatterie in % (default: 5)
+ * @property {number} config.batteryCapacity - Gesamtkapazität der Batterie in kWh (default: 10)
+ * @property {number} config.maxCharge - Maximale Ladeleistung in kWh (default: 5)
+ * @property {number} config.feedin - Einspeisevergütung in €/kWh (default: 0.079)
+ * @property {number} config.efficiency - Wirkungsgrad der Batterie in % (default: 80)
+ * @property {number} config.performance - Mindest-Preisvorteil in % für Optimierung (default: 20)
+ *
+ * @input {Object} msg - Input message object
+ * @input {Array} msg.payload.priceData - Array mit stündlichen Strompreisen
+ * @input {string} msg.payload.priceData[].start - ISO 8601 Zeitstempel
+ * @input {number} msg.payload.priceData[].importPrice - Importpreis in €/kWh
+ * @input {number} msg.payload.priceData[].exportPrice - Exportpreis in €/kWh
+ * @input {Array} msg.payload.productionForecast - PV-Erzeugungsprognose
+ * @input {string} msg.payload.productionForecast[].start - ISO 8601 Zeitstempel
+ * @input {number} msg.payload.productionForecast[].value - Prognostizierte Erzeugung in kWh
+ * @input {Array} msg.payload.consumptionForecast - Verbrauchsprognose
+ * @input {string} msg.payload.consumptionForecast[].start - ISO 8601 Zeitstempel
+ * @input {number} msg.payload.consumptionForecast[].value - Prognostizierter Verbrauch in kWh
+ * @input {number} msg.payload.soc - Aktueller Batterieladezustand in %
+ * @input {number} [msg.lastGridchargePrice] - Letzter Netzladungspreis (optional)
+ * @input {boolean} [msg.charge] - Netzladung erlauben (optional, default: true)
+ *
+ * @output {Object} msg.payload.batteryModes - Array mit geplanten Batteriemodi für 24h
+ * @output {string} msg.payload.batteryModes[].start - ISO 8601 Zeitstempel
+ * @output {string} msg.payload.batteryModes[].mode - Batteriemodus: "charge", "normal", "hold"
+ * @output {number} msg.payload.batteryModes[].soc - Erwarteter SoC in %
+ * @output {number} msg.payload.batteryModes[].cost - Erwartete Kosten in €
+ * @output {Object} msg.payload.stats - Statistiken
+ * @output {number} msg.payload.stats.totalCostOptimized - Gesamtkosten mit Optimierung in €
+ * @output {number} msg.payload.stats.totalCostNotOptimized - Gesamtkosten ohne Optimierung in €
+ *
+ * @example
+ * // Input message
+ * {
+ *   "payload": {
+ *     "priceData": [
+ *       {"start": "2025-02-15T00:00:00+01:00", "importPrice": 0.3123, "exportPrice": 0.079},
+ *       {"start": "2025-02-15T12:00:00+01:00", "importPrice": 0.2851, "exportPrice": 0.079}
+ *     ],
+ *     "productionForecast": [
+ *       {"start": "2025-02-15T08:00:00.000Z", "value": 0.1811},
+ *       {"start": "2025-02-15T12:00:00.000Z", "value": 5.087}
+ *     ],
+ *     "consumptionForecast": [
+ *       {"start": "2025-02-15T06:00:00.000Z", "value": 1},
+ *       {"start": "2025-02-15T18:00:00.000Z", "value": 1}
+ *     ],
+ *     "soc": 5
+ *   }
+ * }
+ */
 module.exports = function (RED) {
     function EstimateBatteryMode(config) {
         RED.nodes.createNode(this, config);
@@ -72,7 +133,7 @@ module.exports = function (RED) {
                 return {
                     loadableHours,
                     loadableEnergy,
-                    avgPrice: (avgPrice / loadableHours) * factor,
+                    avgPrice: loadableHours > 0 ? (avgPrice / loadableHours) * factor : 0,
                 };
             }
 
@@ -142,6 +203,9 @@ module.exports = function (RED) {
                 if (debug) {
                     node.warn("calculateAverage");
                 }
+                if (data.length === 0) {
+                    return 0;
+                }
                 const sum = data.reduce((total, entry) => total + entry.importPrice, 0);
                 const average = sum / data.length;
                 return average;
@@ -206,6 +270,14 @@ module.exports = function (RED) {
                 }, 0);
 
                 const dataBeforeMaxImport = data.slice(0, maxImportIndex);
+
+                // Wenn maxImportIndex = 0, dann ist dataBeforeMaxImport leer - Fallback auf absolutes Minimum
+                if (dataBeforeMaxImport.length === 0) {
+                    if (debug) {
+                        node.warn("maxImportIndex ist 0, Fallback auf absolutes Minimum");
+                    }
+                    return getMinimumPriceAbs(data);
+                }
 
                 if (debug) {
                     node.warn("getMinimumPrice #2");
@@ -352,8 +424,9 @@ module.exports = function (RED) {
                         }
                     }
                     if (modes[i].mode == "charge") {
-                        // Netzladungskosten
-                        modes[i].cost2 = modes[i].importPrice * chargedEnergy * factor + modes[i].value * modes[i].importPrice;
+                        // Netzladungskosten (nur positive value zählt als Netzbezug)
+                        let effectivePrice = isFinite(modes[i].importPrice) ? modes[i].importPrice : 0;
+                        modes[i].cost2 = effectivePrice * chargedEnergy * factor + Math.max(0, modes[i].value) * effectivePrice;
                     }
                     if (modes[i].mode == "normal") {
                         if (modes[i].energy > 0) {
@@ -409,7 +482,7 @@ module.exports = function (RED) {
                 }
 
                 // abort on missing forecast input
-                if (typeof msg.payload.priceData == "undefined" || typeof msg.payload.productionForecast == "undefined" || typeof msg.payload.consumptionForecast == "undefined") {
+                if (typeof msg.payload.priceData === "undefined" || typeof msg.payload.productionForecast === "undefined" || typeof msg.payload.consumptionForecast === "undefined") {
                     node.status({ fill: "red", shape: "ring", text: "missing forecasts" });
                     msg.error = "no forecasts";
                     error = true;
@@ -452,6 +525,15 @@ module.exports = function (RED) {
                         if (debug) {
                             node.warn("timestamp > recent");
                         }
+
+                        // Validierung: Stelle sicher, dass Daten vorhanden sind
+                        if (!consumptionForecast[i]) {
+                            throw new Error(`consumptionForecast missing at index ${i}. priceData has ${priceData.length} entries, but consumptionForecast only has ${consumptionForecast.length} entries. Check that all arrays have matching timestamps and lengths.`);
+                        }
+                        if (!productionForecast[i]) {
+                            throw new Error(`productionForecast missing at index ${i}. priceData has ${priceData.length} entries, but productionForecast only has ${productionForecast.length} entries. Possible cause: PV forecast data is outdated or has wrong timestamps. First PV timestamp: ${productionForecast[0]?.start}, first price timestamp: ${priceData[0]?.start}`);
+                        }
+
                         let mode = "hold";
                         const consumption = consumptionForecast[i].value;
                         const production = productionForecast[i].value;
@@ -630,7 +712,7 @@ module.exports = function (RED) {
                             currentbatteryPower -= dischargeAmount;
                             hour.value -= dischargeAmount;
                             hour.energy = dischargeAmount;
-                            hour.cost = dischargeAmount * batteryEnergyPrice + hour.value * hour.importPrice;
+                            hour.cost = dischargeAmount * batteryEnergyPrice + Math.max(0, hour.value) * hour.importPrice;
                             hour.mode = "normal";
                             if (debug) {
                                 node.warn(hour.value + "/" + hour.mode + ": currentbatteryPower: " + currentbatteryPower);
@@ -679,7 +761,7 @@ module.exports = function (RED) {
                             estimatedbatteryPower -= dischargeAmount;
                             hour.value -= dischargeAmount;
                             hour.energy = dischargeAmount;
-                            hour.cost = dischargeAmount * chargedEnergyPrice + hour.value * hour.importPrice;
+                            hour.cost = dischargeAmount * chargedEnergyPrice + Math.max(0, hour.value) * hour.importPrice;
                             hour.mode = "normal";
                             if (debug) {
                                 node.warn(hour.value + "/" + hour.mode + ": estimatedbatteryPower: " + estimatedbatteryPower);

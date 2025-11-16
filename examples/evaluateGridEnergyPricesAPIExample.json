@@ -1,0 +1,11 @@
+[
+    {
+        "id": "837de17bbbd230b2",
+        "type": "@iseeberg79/EvaluateGridEnergyPricesAPI",
+        "name": "EvaluateGridEnergyPricesAPI",
+        "url": "http://localhost:7070/api/tariff/grid",
+        "wires": [
+            ["261d217663924080"]
+        ]
+    }
+]

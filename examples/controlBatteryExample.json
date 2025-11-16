@@ -1,0 +1,16 @@
+[
+    {
+        "id": "d09f6df58df1c555",
+        "type": "@iseeberg79/ControlBattery",
+        "name": "ControlBattery",
+        "configuredMinSoC": 5,
+        "maximumGridprice": 0.35,
+        "configuredBatteryLock": false,
+        "wires": [
+            ["a1c7df7658c158df"],
+            ["5ca5af7eb067158a"],
+            ["02518b11ef345f08"],
+            ["75e92935fdb92674"]
+        ]
+    }
+]

@@ -7,9 +7,13 @@ module.exports = function (RED) {
         node.url = config.url;
 
         node.on("input", async function (msg) {
-            let heute = new Date().setHours(0, 0, 0, 0);
+            // UTC Midnight verwenden statt lokaler Zeitzone
+            const now = new Date();
+            const heute = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0);
             msg.start = Math.floor(heute / 1000);
-            msg.end = Math.floor(new Date(new Date(heute).getTime() + 1000 * 3600 * 24).setHours(23, 59, 59, 999) / 1000);
+            // Ende des Tages in UTC (23:59:59.999)
+            const morgen = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999);
+            msg.end = Math.floor(morgen / 1000);
 
             msg.bzn = typeof msg.bzn !== "undefined" ? msg.bzn : node.bzn || "DE-LU";
 
@@ -32,7 +36,7 @@ module.exports = function (RED) {
 
                 let data = msg.payload;
                 const result = data.unix_seconds.map((timestamp, index) => {
-                    return { start: timestamp, end: timestamp + 3600, price: data.price[index] / 10 };
+                    return { start: timestamp, end: timestamp + 900, price: data.price[index] / 10 };
                 });
 
                 // Berechnung der maximalen, minimalen und durchschnittlichen Werte (in Euro pro Kilowattstunde)

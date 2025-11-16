@@ -1,3 +1,64 @@
+/**
+ * Node-RED node for determining battery operation mode based on price, SOC, and forecasts.
+ *
+ * @module DetermineBatteryMode
+ * @description Dieser Node ermöglicht die Bestimmung des Batteriemodus basierend auf
+ * Strompreisen, Batterieladezustand und PV-/Verbrauchsprognosen.
+ *
+ * @param {Object} RED - Node-RED runtime object
+ *
+ * @property {number} config.enableGridchargeThreshold - Schwellenwert zum Aktivieren der Netzladung (default: 50%)
+ * @property {number} config.disableGridchargeThreshold - Schwellenwert zum Deaktivieren der Netzladung (default: 80%)
+ * @property {number} config.batteryCapacity - Batteriekapazität in Wh (default: 10000)
+ * @property {number} config.minsoc - Batterielevel für Zurücksetzung des Netzladungspreises min (default: 10%)
+ * @property {number} config.maxsoc - Batterielevel für Zurücksetzung des Netzladungspreises max (default: 90%)
+ * @property {number} config.efficiency - Wirkungsgrad der Batterie in % (default: 80%)
+ *
+ * @input {Object} msg - Input message object
+ * @input {boolean} msg.optimize - Optimierung des Batteriemodus aktivieren
+ * @input {boolean} msg.enableGridcharge - Netzladung erlauben
+ * @input {number} msg.price - Aktueller Strompreis in €/kWh
+ * @input {number} msg.average - Durchschnittlicher Strompreis in €/kWh
+ * @input {number} msg.avgGridPriceWeekly - Wöchentlicher durchschnittlicher Strompreis in €/kWh
+ * @input {number} msg.lastGridchargePrice - Letzter Netzladungspreis (inkl. Verluste) in €/kWh
+ * @input {number} msg.minimum - Minimaler Strompreis in €/kWh
+ * @input {number} msg.soc - Aktueller Batterieladezustand in %
+ * @input {number} msg.energy_req - Geschätzter Haushaltsverbrauch in Wh
+ * @input {number} msg.pvforecast - Geschätzte PV-Erzeugung in Wh
+ * @input {number} msg.feedin - Einspeisevergütung in €/kWh (default: 0.079)
+ * @input {Array} msg.estimator - Optionaler externer Batteriemodus-Plan (Array mit {start, mode})
+ *
+ * @output {Object} Output 1 - Batteriemodus-Nachricht (nur bei Änderung)
+ * @output {string} msg.targetMode - Zielmodus: "normal" (entladen), "hold" (halten), "charge" (laden)
+ *
+ * @output {Object} Output 2 - Letzter Netzladungspreis (nur bei Änderung)
+ * @output {number} msg.lastGridchargePrice - Aktualisierter Netzladungspreis inkl. Verluste
+ *
+ * @output {Object} Output 3 - Vollständige Nachricht mit allen Parametern (debug)
+ *
+ * @example
+ * // Input message
+ * {
+ *   "optimize": true,
+ *   "enableGridcharge": true,
+ *   "price": 0.30,
+ *   "average": 0.25,
+ *   "avgGridPriceWeekly": 0.25,
+ *   "lastGridchargePrice": 0.28,
+ *   "soc": 75,
+ *   "pvforecast": 5000,
+ *   "energy_req": 5000,
+ *   "feedin": 0.079,
+ *   "minimum": 0.079
+ * }
+ *
+ * // Output on port 3 (full message)
+ * {
+ *   "targetMode": "hold",  // or "normal" or "charge"
+ *   "batteryControlLimit": 0.28,
+ *   ...
+ * }
+ */
 module.exports = function (RED) {
     function DetermineBatteryModeNode(config) {
         RED.nodes.createNode(this, config);
@@ -48,7 +109,14 @@ module.exports = function (RED) {
 
             // Maximum zur Steuerung heranziehen: Glättung des Verbrauches
             let batteryControlLimit = (msg.batteryControlLimit = Math.max(lastGridchargePrice, avgPriceWeekly));
-            const loss = 1 + (100 - efficiency) / 100;
+
+            // Verlustfaktor: Bei 80% Effizienz → lossFactor = 1.25 (25% Verluste)
+            // Wird verwendet für: Ladekosten berechnen (price * lossFactor) und Performance-Marge (lastGridchargePrice * lossFactor)
+            const lossFactor = 1 + (100 - efficiency) / 100;
+            if (efficiency <= 0 || efficiency > 100) {
+                node.error("Invalid efficiency: must be between 0 and 100, got " + efficiency);
+                return;
+            }
 
             // interne Berechnung überschreiben, wenn es einen externen Schätzer gibt
             const estimator = typeof msg.estimator !== "undefined" ? true : false;
@@ -59,9 +127,9 @@ module.exports = function (RED) {
             }
 
             function mayChargeBattery(price, minTotal, avgPrice) {
-                let ret = price <= minTotal && price * loss < avgPrice;
+                let ret = price <= minTotal && price * lossFactor < avgPrice;
                 if (debug) {
-                    node.warn(`loss is ${loss}; return is ${ret}`);
+                    node.warn(`lossFactor is ${lossFactor}; return is ${ret}`);
                 }
                 return ret;
             }
@@ -75,10 +143,26 @@ module.exports = function (RED) {
                 const currentTime = new Date();
 
                 // Funktion, um den Modus effizient zu ermitteln
+                // Unterstützt jetzt variable Intervalle (1h, 15min, etc.)
                 function getCurrentMode(currentTime, data) {
-                    return data.reduce((currentMode, entry) => {
+                    return data.reduce((currentMode, entry, index, array) => {
                         const startTime = new Date(entry.start);
-                        const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 Stunde hinzufügen
+
+                        // Intervall dynamisch aus nächstem Eintrag berechnen
+                        let interval = 60 * 60 * 1000; // Standard: 1 Stunde (Fallback)
+
+                        if (index < array.length - 1) {
+                            // Berechne Intervall aus Differenz zum nächsten Eintrag
+                            const nextStartTime = new Date(array[index + 1].start);
+                            interval = nextStartTime.getTime() - startTime.getTime();
+
+                            if (debug && index === 0) {
+                                node.warn(`Detected interval: ${interval / 60000} minutes`);
+                            }
+                        }
+
+                        const endTime = new Date(startTime.getTime() + interval);
+
                         if (currentTime >= startTime && currentTime < endTime) {
                             currentMode = entry.mode;
                         }
@@ -110,7 +194,7 @@ module.exports = function (RED) {
                             if (debug) {
                                 node.warn(`soc (${soc}) > resetmaxsoc (${resetmaxsoc})`);
                             }
-                            lastGridchargePrice = feedin * loss;
+                            lastGridchargePrice = feedin * lossFactor;
                         }
                         break;
                     case "lowSOC":
@@ -121,7 +205,7 @@ module.exports = function (RED) {
                             if (debug) {
                                 node.warn(`soc (${soc}) < resetminsoc (${resetminsoc})`);
                             }
-                            lastGridchargePrice = feedin * loss;
+                            lastGridchargePrice = feedin * lossFactor;
                         }
                         break;
                     case "mediumSOC":
@@ -211,7 +295,7 @@ module.exports = function (RED) {
                                         node.warn(`gridcharge, enableGridcharge is true and mayChargeBattery returns true`);
                                     }
                                     msg.targetMode = "charge";
-                                    let gridchargePrice = price * loss;
+                                    let gridchargePrice = price * lossFactor;
                                     if (debug) {
                                         node.warn(`gridchargePrice is ${gridchargePrice}`);
                                     }
@@ -228,9 +312,11 @@ module.exports = function (RED) {
                                 }
                             }
                             // Batterie darf entladen, wenn Strompreis hoch und Batterie nicht teuer geladen wurde
-                            if (price > batteryControlLimit && price > lastGridchargePrice) {
+                            // Berücksichtige Performance-Marge: Entladung nur wenn Gewinn die Verluste übersteigt
+                            const minDischargePrice = lastGridchargePrice * lossFactor;
+                            if (price > batteryControlLimit && price > minDischargePrice) {
                                 if (debug) {
-                                    node.warn(`price (${price}) > batteryControlLimit (${batteryControlLimit}) and price > lastGridchargePrice (${lastGridchargePrice})`);
+                                    node.warn(`price (${price}) > batteryControlLimit (${batteryControlLimit}) and price (${price}) > minDischargePrice (${minDischargePrice})`);
                                 }
                                 msg.targetMode = "normal";
                             }
@@ -267,7 +353,7 @@ module.exports = function (RED) {
                             msg.targetMode = "hold";
                         }
                         if (msg.targetMode === "charge") {
-                            let gridchargePrice = price * loss;
+                            let gridchargePrice = price * lossFactor;
                             if (debug) {
                                 node.warn(`gridchargePrice is ${gridchargePrice}`);
                             }

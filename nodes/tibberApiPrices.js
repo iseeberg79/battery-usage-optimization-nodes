@@ -19,7 +19,7 @@ module.exports = function (RED) {
                 viewer {
                     homes {
                         currentSubscription {
-                            priceInfo {
+                            priceInfo(resolution: QUARTER_HOURLY) {
                                 today {
                                     total
                                     energy

@@ -17,16 +17,18 @@ module.exports = function (RED) {
             }
 
             try {
-                // Überprüfe, ob msg.response.result existiert und sinnvoll gefüllt ist
-                const result = msg.response.result;
+                // Abwärtskompatibel: Alte API hat .result Wrapper, neue API nicht
+                const result = msg.response.result || msg.response;
                 if (!result) {
-                    node.error("invalid response structure: result is undefined", msg);
+                    node.error("invalid response", msg);
                     return;
                 }
 
                 let gridPower = result.gridPower || (result.grid && result.grid.power) || 0;
                 let homePower = result.homePower || 0;
-                let pvPower = (result.pv && result.pv.power) || 0;
+                // Compatibility: Support both pvPower (flat) and pv.power (nested) formats
+                // If both exist, pvPower takes precedence
+                let pvPower = (result.pvPower) || (result.pv && result.pv.power) || 0;
                 let batteryPower = result.batteryPower || 0;
                 let batterySoc = result.batterySoc || 0;
                 let tariffGrid = result.tariffGrid || 0.0;

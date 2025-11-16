@@ -10,12 +10,13 @@ module.exports = function (RED) {
             // Defaults to provided URL or local API
             msg.url = typeof msg.url !== "undefined" ? msg.url : node.url;
 
-            // Funktion, um die Erträge für einen bestimmten Tag zu berechnen
+            // Funktion, um die Energie-Erträge für einen bestimmten Tag zu berechnen
+            // rates enthalten Leistung in W, wir berechnen Energie in Wh
             function calculateTotalForDay(rates, day) {
                 return rates.reduce((sum, item) => {
                     const startDate = new Date(item.start);
                     if (startDate.toISOString().split("T")[0] === day) {
-                        return sum + item.value;
+                        return sum + item.energy;
                     }
                     return sum;
                 }, 0);
@@ -31,13 +32,23 @@ module.exports = function (RED) {
                     return;
                 }
 
-				const rates = msg.payload.result.rates.map((item) => {
+				const rates = msg.payload.rates.map((item) => {
                     // Überprüfung, ob entweder 'price' oder 'value' existiert
-                    const relevantValue = item.value !== undefined ? item.value : item.price;
+                    const powerInWatts = item.value !== undefined ? item.value : item.price;
+
+                    // Berechne Zeitdauer in Stunden
+                    const startTime = new Date(item.start);
+                    const endTime = new Date(item.end);
+                    const durationHours = (endTime - startTime) / (1000 * 3600);
+
+                    // Energie (Wh) = Leistung (W) × Zeit (h)
+                    const energyWh = powerInWatts * durationHours;
 
                     return {
                         ...item,
-                        value: relevantValue / 1000, // Umrechnung von Wh in kWh
+                        // Convert Wh to kWh (assumes energyWh is in Wh from power calculation above)
+                        value: energyWh / 1000, // kWh für Ausgabe
+                        energy: energyWh, // Wh für interne Berechnungen
                     };
 				});
 
@@ -50,18 +61,17 @@ module.exports = function (RED) {
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 const tomorrowDateString = tomorrow.toISOString().split("T")[0];
 
-                const todayTotal = calculateTotalForDay(rates, today) * 1000;
-                const tomorrowTotal = calculateTotalForDay(rates, tomorrowDateString) * 1000;
+                const todayTotal = calculateTotalForDay(rates, today);
+                const tomorrowTotal = calculateTotalForDay(rates, tomorrowDateString);
 
                 // Berechnung der verbleibenden Erträge für heute
-                const remainderToday =
-                    rates.reduce((sum, item) => {
-                        const startDate = new Date(item.start);
-                        if (startDate > now && startDate.toISOString().split("T")[0] === today) {
-                            return sum + item.value;
-                        }
-                        return sum;
-                    }, 0) * 1000;
+                const remainderToday = rates.reduce((sum, item) => {
+                    const startDate = new Date(item.start);
+                    if (startDate > now && startDate.toISOString().split("T")[0] === today) {
+                        return sum + item.energy;
+                    }
+                    return sum;
+                }, 0);
 
                 // Funktion zur Formatierung des Zeitstempels nach ISO
                 const formatTimestamp = (timestamp) => {

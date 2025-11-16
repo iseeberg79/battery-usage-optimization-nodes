@@ -1,0 +1,14 @@
+[
+    {
+        "id": "6dcfc7b3890db5ed",
+        "type": "@iseeberg79/EvaluateGridEnergyPrices",
+        "name": "EvaluateGridEnergyPrices",
+        "bzn": "DE-LU",
+        "url": "https://api.energy-charts.info/price",
+        "charges": 12.945,
+        "tax": 19,
+        "wires": [
+            ["3cf2622713ccb5b6"]
+        ]
+    }
+]

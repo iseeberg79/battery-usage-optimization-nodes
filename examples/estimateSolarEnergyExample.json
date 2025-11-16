@@ -1,0 +1,68 @@
+[
+    {
+        "id": "5c4da12769a7e04a",
+        "type": "inject",
+        "z": "794bee8860f702f2",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "20",
+        "topic": "",
+        "payload": "pvForecast1",
+        "payloadType": "flow",
+        "x": 170,
+        "y": 180,
+        "wires": [
+            [
+                "e7830f2dc686b5d9"
+            ]
+        ]
+    },
+    {
+        "id": "e7830f2dc686b5d9",
+        "type": "@iseeberg79/EstimateSolarEnergy",
+        "name": "Estimate Solar Energy",
+        "wires": [
+            [
+                "4b58e49713f946cd"
+            ]
+        ]
+    },
+    {
+        "id": "4b58e49713f946cd",
+        "type": "change",
+        "z": "794bee8860f702f2",
+        "name": "speichern",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pvForecast1",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 180,
+        "wires": [
+            [
+                "997b5b87f81b6dd4"
+            ]
+        ]
+    }
+]

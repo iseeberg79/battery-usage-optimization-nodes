@@ -1,0 +1,14 @@
+[
+    {
+        "id": "837de17bbbd230b2",
+        "type": "@iseeberg79/BatteryModeControl",
+        "name": "BatteryModeControl",
+        "url": "http://localhost:7070/api/batterymode",
+        "gridChargeUrl": "http://localhost:7070/api/batterygridchargelimit",
+        "interval": 30,
+        "repeatMode": true,
+        "wires": [
+            ["261d217663924080"]
+        ]
+    }
+]

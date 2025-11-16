@@ -1,0 +1,10 @@
+[
+    {
+        "id": "4b901a7ba313e356",
+        "type": "@iseeberg79/EstimateHouseholdConsumption",
+        "name": "EstimateHouseholdConsumption",
+        "wires": [
+            ["c414e4e307a4dfd5"]
+        ]
+    }
+]

@@ -1,0 +1,127 @@
+<script type="text/javascript">
+    RED.nodes.registerType('@iseeberg79/CombinePVForecasts', {
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: {
+                value: ""
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file.png",
+        label: function() {
+            return this.name || "Combine PV Forecasts";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="@iseeberg79/CombinePVForecasts">
+    <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" class="input-typed"/>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="@iseeberg79/CombinePVForecasts">
+    <p>Dieser Node kombiniert zwei PV-Forecast-Arrays, z.B. von zwei separaten Dächern oder PV-Arrays.</p>
+
+    <h3>Funktionsweise:</h3>
+    <ul>
+        <li>Summiert die Werte von <code>pv_estimate</code>, <code>pv_estimate10</code> und <code>pv_estimate90</code></li>
+        <li>Matched die Forecasts anhand von <code>period_end</code> oder <code>start</code> Zeitstempeln</li>
+        <li>Behandelt fehlende Einträge intelligent (verwendet nur vorhandene Daten)</li>
+        <li>Sortiert das Ergebnis chronologisch</li>
+    </ul>
+
+    <h3>Eingaben:</h3>
+    <p>Der Node akzeptiert die Forecasts auf zwei Arten:</p>
+
+    <h4>Variante 1: Über msg.payload</h4>
+    <pre>
+{
+    "payload": {
+        "forecast1": [...],
+        "forecast2": [...]
+    }
+}
+    </pre>
+
+    <h4>Variante 2: Direkt als msg-Properties</h4>
+    <pre>
+{
+    "forecast1": [...],
+    "forecast2": [...]
+}
+    </pre>
+
+    <p>Mindestens einer der beiden Forecasts muss vorhanden sein. Wenn nur ein Forecast vorhanden ist, wird dieser unverändert durchgereicht.</p>
+
+    <h3>Input-Format (Forecast-Arrays):</h3>
+    <pre>
+[
+    {
+        "pv_estimate": 0.5,
+        "pv_estimate10": 0.3,
+        "pv_estimate90": 0.7,
+        "period_end": "2025-02-15T01:00:00Z",
+        "period": "PT30M"
+    },
+    {
+        "pv_estimate": 1.2,
+        "pv_estimate10": 0.8,
+        "pv_estimate90": 1.5,
+        "period_end": "2025-02-15T01:30:00Z",
+        "period": "PT30M"
+    },
+    ...
+]
+    </pre>
+
+    <h3>Ausgaben:</h3>
+    <ul>
+        <li><b>msg.payload</b> - Kombiniertes Forecast-Array</li>
+    </ul>
+
+    <h3>Output-Format:</h3>
+    <pre>
+[
+    {
+        "pv_estimate": 1.2,      // Summe: 0.5 + 0.7
+        "pv_estimate10": 0.8,    // Summe: 0.3 + 0.5
+        "pv_estimate90": 1.8,    // Summe: 0.7 + 1.1
+        "period_end": "2025-02-15T01:00:00Z",
+        "period": "PT30M"
+    },
+    ...
+]
+    </pre>
+
+    <h3>Beispiel-Anwendungsfall:</h3>
+    <p>Sie haben zwei PV-Arrays auf unterschiedlich ausgerichteten Dächern:</p>
+    <ul>
+        <li><b>Array 1:</b> Süd-Dach (forecast1)</li>
+        <li><b>Array 2:</b> Ost-Dach (forecast2)</li>
+    </ul>
+    <p>Dieser Node summiert die Prognosen beider Arrays, um die Gesamt-PV-Produktion zu erhalten.</p>
+
+    <h3>Hinweise:</h3>
+    <ul>
+        <li>Forecasts werden anhand der Zeitstempel (<code>period_end</code> oder <code>start</code>) gematched</li>
+        <li>Fehlende Werte werden als 0 behandelt</li>
+        <li>Wenn ein Zeitstempel nur in einem Forecast existiert, wird nur dieser Wert verwendet</li>
+        <li>Das Ergebnis wird chronologisch sortiert</li>
+        <li>Debug-Modus (<code>msg.debug = true</code>) zeigt detaillierte Informationen über den Kombinations-Prozess</li>
+        <li>Nach der Kombination werden <code>msg.forecast1</code> und <code>msg.forecast2</code> gelöscht</li>
+    </ul>
+
+    <h3>Verwendung mit anderen Nodes:</h3>
+    <p>Dieser Node kann vor dem <b>PrepareForecastData</b> Node verwendet werden:</p>
+    <pre>
+Forecast API 1 → \
+                  → Combine PV Forecasts → Prepare Forecast Data → Estimate Battery Mode
+Forecast API 2 → /
+    </pre>
+
+    <p>Oder als eigenständiger Node für allgemeine PV-Forecast-Kombinationen.</p>
+</script>

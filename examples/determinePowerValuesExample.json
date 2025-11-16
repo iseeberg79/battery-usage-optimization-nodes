@@ -1,0 +1,11 @@
+[
+    {
+        "id": "589d8efc8953672a",
+        "type": "@iseeberg79/DeterminePowerValues",
+        "name": "determinePowerValues",
+        "url": "http://localhost:7070/api/state",
+        "wires": [
+            ["9fc0a768b4993fb7"]
+        ]
+    }
+]

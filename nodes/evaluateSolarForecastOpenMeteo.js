@@ -35,7 +35,7 @@ module.exports = function (RED) {
                 return;
             }
 
-            const fullUrl = `${url}?latitude=${lat}&longitude=${lon}&azimuth=${az}&tilt=${dec}&hourly=temperature_2m,global_tilted_irradiance&forecast_days=${days}&timezone=GMT&timeformat=unixtime`;
+            const fullUrl = `${url}?latitude=${lat}&longitude=${lon}&azimuth=${az}&tilt=${dec}&minutely_15=temperature_2m,global_tilted_irradiance&forecast_days=${days}&timezone=GMT&timeformat=unixtime`;
 
             try {
                 const response = await axios.get(fullUrl);
@@ -46,7 +46,7 @@ module.exports = function (RED) {
                 }
 
                 // Überprüfen, ob `response.data` die erwartete Struktur hat
-                if (!response.data || typeof response.data !== "object" || !response.data.hourly) {
+                if (!response.data || typeof response.data !== "object" || !response.data.minutely_15) {
                     node.error("invalid API response", msg);
                     return;
                 }
@@ -60,19 +60,19 @@ module.exports = function (RED) {
             function transformData(payload, { alphatemp, rossmodel, efficiency, kwp, ac }) {
                 const limit = (min, x, max) => (x < min ? min : x > max ? max : x);
 
-                if (!payload.hourly.time || !payload.hourly.global_tilted_irradiance) {
+                if (!payload.minutely_15.time || !payload.minutely_15.global_tilted_irradiance) {
                     node.error("invalid API response data", msg);
                     return [];
                 }
 
-                const transformedData = payload.hourly.time.map((time, index) => {
-                    const globalTiltedIrradiance = payload.hourly.global_tilted_irradiance[index];
-                    const temperature = payload.hourly.temperature_2m ? payload.hourly.temperature_2m[index] : 25; // Beispielwert für Temperatur
+                const transformedData = payload.minutely_15.time.map((time, index) => {
+                    const globalTiltedIrradiance = payload.minutely_15.global_tilted_irradiance[index];
+                    const temperature = payload.minutely_15.temperature_2m ? payload.minutely_15.temperature_2m[index] : 25; // Beispielwert für Temperatur
                     const period_end = new Date(time * 1000);
 
                     return {
                         //ISO timestamp
-                        start: new Date(period_end.getTime() - 3600000).toISOString().replace(/\.\d{1,7}Z$/, "Z"),
+                        start: new Date(period_end.getTime() - (3600000/4)).toISOString().replace(/\.\d{1,7}Z$/, "Z"),
                         end: period_end.toISOString().replace(/\.\d{1,7}Z$/, "Z"),
                         pv_estimate: Math.round(
                             limit(
@@ -82,7 +82,7 @@ module.exports = function (RED) {
                                     (globalTiltedIrradiance / 1000) *
                                     (1 +
                                         alphatemp *
-                                            ((temperature + (payload.hourly.temperature_2m[index - 1] || temperature)) / 2 + (globalTiltedIrradiance / 800.0) * rossmodel - 25.0)) *
+                                            ((temperature + (payload.minutely_15.temperature_2m[index - 1] || temperature)) / 2 + (globalTiltedIrradiance / 800.0) * rossmodel - 25.0)) *
                                     (efficiency / 100),
                                 ac,
                             ),
@@ -138,9 +138,10 @@ module.exports = function (RED) {
                 // cleanup
                 delete msg.payload.result;
 
-                msg.payload.today = Math.round(todayTotal.pv_estimate);
-                msg.payload.remain = Math.round(remainderToday.pv_estimate);
-                msg.payload.tomorrow = Math.round(tomorrowTotal.pv_estimate);
+				// adjusted for 15min slots
+                msg.payload.today = Math.round(todayTotal.pv_estimate / 4);
+                msg.payload.remain = Math.round(remainderToday.pv_estimate / 4);
+                msg.payload.tomorrow = Math.round(tomorrowTotal.pv_estimate / 4);
                 msg.payload.lastchange = new Date().getTime();
 
                 node.send(msg);

@@ -28,13 +28,35 @@ Die Berechnung ermittelt den optimalen Batteriemodus. Die eigentliche Steuerung 
 
 ## Node-RED-Integration
 
-Das Node-RED-Paket enthält verschiedene Nodes zur Optimierung der Batterienutzung, darunter:
-- Bestimmung des Batteriemodus
-- Bewertung von Solarprognosen
-- Steuerung des Batteriemodus
-- Prognose einer optimierten Batteriesteuerung
+Das Node-RED-Paket enthält verschiedene Nodes zur Optimierung der Batterienutzung. Die Nodes sind flexibel nutzbar und können mit externen Datenquellen kombiniert werden. Es besteht die Möglichkeit, eigene Nodes für zusätzliche Datenquellen zu integrieren. So kann die Lösung mit oder ohne evcc betrieben werden. Die Nodes sind mit Standardwerten vorkonfiguriert, wobei die Nachrichteneingänge eine Konfigurationsanpassung ermöglichen. Das modulare Design erleichtert die Wiederverwendung und Anpassung an unterschiedliche Installationen.
 
-Die Nodes sind flexibel nutzbar und können mit externen Datenquellen kombiniert werden. Es besteht die Möglichkeit, eigene Nodes für zusätzliche Datenquellen zu integrieren. So kann die Lösung mit oder ohne evcc betrieben werden. Die Nodes sind mit Standardwerten vorkonfiguriert, wobei die Nachrichteneingänge eine Konfigurationsanpassung ermöglichen. Das modulare Design erleichtert die Wiederverwendung und Anpassung an unterschiedliche Installationen.
+### Verfügbare Nodes
+
+#### Hauptkomponenten
+- **DetermineBatteryMode** - Bestimmt den optimalen Batteriemodus basierend auf Preis, SOC und Prognosen ([Dokumentation](nodes/determineBatteryMode.html))
+- **EstimateBatterymode** - Erstellt 24-Stunden-Ladepläne mit Kostenoptimierung ([Dokumentation](nodes/estimateBatterymode.html) | [JSDoc](build/docs/module-EstimateBatterymode.html))
+- **BatteryModeControl** - Steuert den Batteriemodus ([Dokumentation](nodes/batteryModeControl.html))
+- **ControlBattery** - Batteriesteuerung ([Dokumentation](nodes/controlBattery.html))
+
+#### Prognose & Datenquellen
+- **EvaluateSolarForecast** - Verarbeitet Solcast PV-Prognosen ([Dokumentation](nodes/evaluateSolarForecast.html))
+- **EvaluateSolarForecastAPI** - Holt Solcast-Daten von API ([Dokumentation](nodes/evaluateSolarForecastAPI.html))
+- **EvaluateSolarForecastOpenMeteo** - OpenMeteo Solar-Prognosen ([Dokumentation](nodes/evaluateSolarForecastOpenMeteo.html))
+- **CombinePVForecasts** - Kombiniert mehrere PV-Prognosen ([Dokumentation](nodes/combinePVForecasts.html))
+- **EstimateSolarEnergy** - Schätzt Solarenergie aus Prognosen ([Dokumentation](nodes/estimateSolarEnergy.html))
+- **EstimateHouseholdConsumption** - Schätzt Haushaltsverbrauch ([Dokumentation](nodes/estimateHouseholdConsumption.html))
+- **EvaluateGridEnergyPrices** - Verarbeitet Strompreise ([Dokumentation](nodes/evaluateGridEnergyPrices.html))
+- **EvaluateGridEnergyPricesAPI** - Holt Strompreise von API ([Dokumentation](nodes/evaluateGridEnergyPricesAPI.html))
+- **TibberApiPrices** - Tibber Strompreise ([Dokumentation](nodes/tibberApiPrices.html))
+- **PrepareForecastData** - Bereitet Prognosedaten auf ([Dokumentation](nodes/prepareForecastData.html))
+
+#### Hilfsfunktionen
+- **DetermineControlMode** - Bestimmt Steuerungsmodus ([Dokumentation](nodes/determineControlMode.html))
+- **DeterminePowerValues** - Berechnet Leistungswerte ([Dokumentation](nodes/determinePowerValues.html))
+
+### Beispiele
+
+Vollständige Flow-Beispiele für alle Nodes finden Sie im [`examples/`](examples/) Verzeichnis. Importieren Sie diese in Node-RED über Menu → Import → Clipboard.
 
 Eine externe Steuerung kann eingebunden werden, die weiterhin den Status der evcc-Laderegelung und aktuelle Energiewerte berücksichtigt. 
 
