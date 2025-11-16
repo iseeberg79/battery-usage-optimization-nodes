@@ -262,6 +262,56 @@ describe('Battery Optimization Integration Tests', () => {
 
             jest.useRealTimers();
         });
+
+        test('sollte Batterie entladen wenn Preis die Performance-Marge übersteigt', () => {
+            const RED = helper.createRED();
+
+            const determineBatteryModeModule = require('../../nodes/determineBatteryMode.js');
+            determineBatteryModeModule(RED);
+            const DetermineBatteryModeNode = RED.nodes.registerType.mock.calls[0][1];
+
+            const config = {
+                enableGridchargeThreshold: 50,
+                disableGridchargeThreshold: 80,
+                batteryCapacity: 10000,
+                minsoc: 10,
+                maxsoc: 90,
+                efficiency: 80  // loss = 1.25
+            };
+
+            const node = helper.createNode('DetermineBatteryMode');
+            DetermineBatteryModeNode.call(node, config);
+
+            jest.useFakeTimers();
+            jest.setSystemTime(new Date('2025-12-15T18:00:00'));
+
+            // Batterie wurde bei 0.28€ geladen (inkl. Verluste)
+            // minDischargePrice = 0.28 * 1.25 = 0.35€
+            // Aktueller Preis 0.36€ übersteigt die Marge
+            const msg = {
+                soc: 75,
+                optimize: true,
+                price: 0.36,  // > minDischargePrice (0.35)
+                pvforecast: 5000,
+                energy_req: 5000,
+                feedin: 0.079,
+                minimum: 0.079,
+                average: 0.25,
+                avgGridPriceWeekly: 0.25,
+                lastGridchargePrice: 0.28  // teuer geladen
+            };
+
+            node.receive(msg);
+
+            expect(node.send).toHaveBeenCalled();
+            const outputs = node.send.mock.calls[0][0];
+
+            // Entladung sollte erlaubt sein, da Preis die Performance-Marge übersteigt
+            // price (0.36) > minDischargePrice (0.28 * 1.25 = 0.35)
+            expect(outputs[2].targetMode).toBe('normal');
+
+            jest.useRealTimers();
+        });
     });
 
     describe('Edge Cases', () => {

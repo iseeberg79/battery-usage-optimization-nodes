@@ -244,9 +244,11 @@ module.exports = function (RED) {
                                 }
                             }
                             // Batterie darf entladen, wenn Strompreis hoch und Batterie nicht teuer geladen wurde
-                            if (price > batteryControlLimit && price > lastGridchargePrice) {
+                            // Berücksichtige Performance-Marge: Entladung nur wenn Gewinn die Verluste übersteigt
+                            const minDischargePrice = lastGridchargePrice * loss;
+                            if (price > batteryControlLimit && price > minDischargePrice) {
                                 if (debug) {
-                                    node.warn(`price (${price}) > batteryControlLimit (${batteryControlLimit}) and price > lastGridchargePrice (${lastGridchargePrice})`);
+                                    node.warn(`price (${price}) > batteryControlLimit (${batteryControlLimit}) and price (${price}) > minDischargePrice (${minDischargePrice})`);
                                 }
                                 msg.targetMode = "normal";
                             }
