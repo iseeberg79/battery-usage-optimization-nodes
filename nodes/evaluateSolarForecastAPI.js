@@ -46,6 +46,7 @@ module.exports = function (RED) {
 
                     return {
                         ...item,
+                        // Convert Wh to kWh (assumes energyWh is in Wh from power calculation above)
                         value: energyWh / 1000, // kWh für Ausgabe
                         energy: energyWh, // Wh für interne Berechnungen
                     };

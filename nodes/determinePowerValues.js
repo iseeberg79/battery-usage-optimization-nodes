@@ -26,6 +26,8 @@ module.exports = function (RED) {
 
                 let gridPower = result.gridPower || (result.grid && result.grid.power) || 0;
                 let homePower = result.homePower || 0;
+                // Compatibility: Support both pvPower (flat) and pv.power (nested) formats
+                // If both exist, pvPower takes precedence
                 let pvPower = (result.pvPower) || (result.pv && result.pv.power) || 0;
                 let batteryPower = result.batteryPower || 0;
                 let batterySoc = result.batterySoc || 0;

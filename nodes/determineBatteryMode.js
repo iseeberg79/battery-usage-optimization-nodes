@@ -109,7 +109,14 @@ module.exports = function (RED) {
 
             // Maximum zur Steuerung heranziehen: Glättung des Verbrauches
             let batteryControlLimit = (msg.batteryControlLimit = Math.max(lastGridchargePrice, avgPriceWeekly));
-            const loss = 1 + (100 - efficiency) / 100;
+
+            // Verlustfaktor: Bei 80% Effizienz → lossFactor = 1.25 (25% Verluste)
+            // Wird verwendet für: Ladekosten berechnen (price * lossFactor) und Performance-Marge (lastGridchargePrice * lossFactor)
+            const lossFactor = 1 + (100 - efficiency) / 100;
+            if (efficiency <= 0 || efficiency > 100) {
+                node.error("Invalid efficiency: must be between 0 and 100, got " + efficiency);
+                return;
+            }
 
             // interne Berechnung überschreiben, wenn es einen externen Schätzer gibt
             const estimator = typeof msg.estimator !== "undefined" ? true : false;
@@ -120,9 +127,9 @@ module.exports = function (RED) {
             }
 
             function mayChargeBattery(price, minTotal, avgPrice) {
-                let ret = price <= minTotal && price * loss < avgPrice;
+                let ret = price <= minTotal && price * lossFactor < avgPrice;
                 if (debug) {
-                    node.warn(`loss is ${loss}; return is ${ret}`);
+                    node.warn(`lossFactor is ${lossFactor}; return is ${ret}`);
                 }
                 return ret;
             }
@@ -187,7 +194,7 @@ module.exports = function (RED) {
                             if (debug) {
                                 node.warn(`soc (${soc}) > resetmaxsoc (${resetmaxsoc})`);
                             }
-                            lastGridchargePrice = feedin * loss;
+                            lastGridchargePrice = feedin * lossFactor;
                         }
                         break;
                     case "lowSOC":
@@ -198,7 +205,7 @@ module.exports = function (RED) {
                             if (debug) {
                                 node.warn(`soc (${soc}) < resetminsoc (${resetminsoc})`);
                             }
-                            lastGridchargePrice = feedin * loss;
+                            lastGridchargePrice = feedin * lossFactor;
                         }
                         break;
                     case "mediumSOC":
@@ -288,7 +295,7 @@ module.exports = function (RED) {
                                         node.warn(`gridcharge, enableGridcharge is true and mayChargeBattery returns true`);
                                     }
                                     msg.targetMode = "charge";
-                                    let gridchargePrice = price * loss;
+                                    let gridchargePrice = price * lossFactor;
                                     if (debug) {
                                         node.warn(`gridchargePrice is ${gridchargePrice}`);
                                     }
@@ -306,7 +313,7 @@ module.exports = function (RED) {
                             }
                             // Batterie darf entladen, wenn Strompreis hoch und Batterie nicht teuer geladen wurde
                             // Berücksichtige Performance-Marge: Entladung nur wenn Gewinn die Verluste übersteigt
-                            const minDischargePrice = lastGridchargePrice * loss;
+                            const minDischargePrice = lastGridchargePrice * lossFactor;
                             if (price > batteryControlLimit && price > minDischargePrice) {
                                 if (debug) {
                                     node.warn(`price (${price}) > batteryControlLimit (${batteryControlLimit}) and price (${price}) > minDischargePrice (${minDischargePrice})`);
@@ -346,7 +353,7 @@ module.exports = function (RED) {
                             msg.targetMode = "hold";
                         }
                         if (msg.targetMode === "charge") {
-                            let gridchargePrice = price * loss;
+                            let gridchargePrice = price * lossFactor;
                             if (debug) {
                                 node.warn(`gridchargePrice is ${gridchargePrice}`);
                             }
