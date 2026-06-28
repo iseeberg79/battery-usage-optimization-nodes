@@ -106,7 +106,7 @@
     <ul>
         <li><b>charge</b> - Netzladung: wenn charging_power > 0 UND grid_import > 0</li>
         <li><b>hold</b> - Batterie pausiert: wenn charging_power = 0 UND discharging_power = 0 (Entladung zurückgehalten)</li>
-        <li><b>holdcharge</b> - <i>nur bei aktivem HoldCharge-Modus:</i> Leerlauf bei Einspeisung (grid_export > 0) - Laden zurückgehalten, Entladung erlaubt</li>
+        <li><b>holdcharge</b> - <i>nur bei aktivem HoldCharge-Modus:</i> Leerlauf mit Einspeisung: wenn charging_power = 0 UND discharging_power = 0 UND grid_export > 0 (Laden zurückgehalten; nachgelagerte Controller können Entladung erlauben)</li>
         <li><b>normal</b> - Normalbetrieb: PV-Ladung oder Entladung für Hausverbrauch (alle anderen Fälle)</li>
     </ul>
     <p><b>Hinweise:</b></p>
