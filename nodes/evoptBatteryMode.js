@@ -8,6 +8,9 @@ module.exports = function (RED) {
         node.batteryIndex = config.batteryIndex !== undefined ? parseInt(config.batteryIndex) : null;
         node.batteryName = config.batteryName || "";
         node.timeIndex = parseInt(config.timeIndex) || 0;
+        // Opt-in: distinguish withholding charge (idle + export) as "holdcharge".
+        // Default off so downstream nodes that only know charge/hold/normal are unaffected.
+        node.holdCharge = config.holdCharge === true || config.holdCharge === "true";
         let debug = false;
 
         node.on("input", async function (msg) {
@@ -98,8 +101,14 @@ module.exports = function (RED) {
                     // Battery is charging from grid
                     batteryMode = "charge";
                 } else if (chargingPower === 0 && dischargingPower === 0) {
-                    // Battery is not being used
-                    batteryMode = "hold";
+                    // Idle. With holdCharge enabled, mirror evcc's evopt suggestion:
+                    // idle while exporting means charging is deliberately withheld
+                    // (holdcharge); otherwise hold (withhold discharge).
+                    if (node.holdCharge && gridExportValue > 0) {
+                        batteryMode = "holdcharge";
+                    } else {
+                        batteryMode = "hold";
+                    }
                 } else {
                     // All other cases: PV charging, normal discharge for household
                     batteryMode = "normal";
@@ -159,6 +168,9 @@ module.exports = function (RED) {
                     case "hold":
                         node.status({ fill: "yellow", shape: "dot", text: "hold" });
                         break;
+                    case "holdcharge":
+                        node.status({ fill: "yellow", shape: "ring", text: `holdcharge (export ${gridExportValue}W)` });
+                        break;
                     case "normal":
                         if (chargingPower > 0) {
                             node.status({ fill: "green", shape: "dot", text: `normal (charging ${chargingPower}W from PV)` });
@@ -188,6 +200,7 @@ module.exports = function (RED) {
             url: { value: "http://controller:7070/api/state" },
             batteryIndex: { value: 0 },
             timeIndex: { value: 0 },
+            holdCharge: { value: false },
         },
         outputs: 3,
         outputLabels: ["Battery Mode", "SOC Information", "Full evopt Data"],

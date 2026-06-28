@@ -17,6 +17,9 @@
 			},
 			timeIndex : {
 				value : 0
+			},
+			holdCharge : {
+				value : false
 			}
 		},
 		inputs : 1,
@@ -51,6 +54,11 @@
         <label for="node-input-timeIndex"><i class="fa fa-clock-o"></i> Time Index</label>
         <input type="number" id="node-input-timeIndex" placeholder="0" min="0" class="input-typed"/>
     </div>
+    <div class="form-row">
+        <label for="node-input-holdCharge" style="width:auto"><i class="fa fa-toggle-on"></i> HoldCharge-Modus</label>
+        <input type="checkbox" id="node-input-holdCharge" style="display:inline-block; width:auto; vertical-align:top; margin-right:6px"/>
+        <span>idle + Einspeisung &rarr; <code>holdcharge</code> statt <code>hold</code></span>
+    </div>
 </script>
 
 <script type="text/x-red"
@@ -63,6 +71,7 @@
         <li><b>Battery Name</b> - Name der Batterie (z.B. "db:5") - wird priorisiert wenn angegeben</li>
         <li><b>Battery Index</b> - Alternativ: Index der Batterie im evopt.res.batteries Array (Standard: 0 wenn Name nicht angegeben)</li>
         <li><b>Time Index</b> - Zeitindex für die Vorhersage (0 = aktueller Zeitpunkt, Standard: 0)</li>
+        <li><b>HoldCharge-Modus</b> - Opt-in (Standard: aus). Wenn aktiv, liefert der Node im Leerlauf bei Einspeisung den Modus <code>holdcharge</code> (Laden zurückhalten) statt <code>hold</code> - passend zur evcc evopt-Suggestion. <b style="color:#ff9800;">Achtung:</b> nachgelagerte Nodes (z.B. controlBattery, batteryModeControl) müssen <code>holdcharge</code> dann kennen, sonst greift dort der Fallback. Default aus = unverändertes Verhalten.</li>
     </ul>
     <p><b>Inputs:</b></p>
     <ul>
@@ -72,7 +81,7 @@
     <ul>
         <li><b>Output 1: Battery Mode</b> - Batteriemodus-Informationen
             <ul>
-                <li><code>payload</code> - Batteriemodus als String: "charge", "hold" oder "normal"</li>
+                <li><code>payload</code> - Batteriemodus als String: "charge", "hold", "normal" (und "holdcharge", falls HoldCharge-Modus aktiv)</li>
                 <li><code>batterymode</code> - Batteriemodus</li>
                 <li><code>chargingPower</code> - Ladeleistung in Watt</li>
                 <li><code>dischargingPower</code> - Entladeleistung in Watt</li>
@@ -96,7 +105,8 @@
     <p><b>Batteriemodus-Logik:</b></p>
     <ul>
         <li><b>charge</b> - Netzladung: wenn charging_power > 0 UND grid_import > 0</li>
-        <li><b>hold</b> - Batterie pausiert: wenn charging_power = 0 UND discharging_power = 0</li>
+        <li><b>hold</b> - Batterie pausiert: wenn charging_power = 0 UND discharging_power = 0 (Entladung zurückgehalten)</li>
+        <li><b>holdcharge</b> - <i>nur bei aktivem HoldCharge-Modus:</i> Leerlauf mit Einspeisung: wenn charging_power = 0 UND discharging_power = 0 UND grid_export > 0 (Laden zurückgehalten; nachgelagerte Controller können Entladung erlauben)</li>
         <li><b>normal</b> - Normalbetrieb: PV-Ladung oder Entladung für Hausverbrauch (alle anderen Fälle)</li>
     </ul>
     <p><b>Hinweise:</b></p>
