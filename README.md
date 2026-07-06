@@ -1,68 +1,69 @@
+**🇬🇧 English** · [🇩🇪 Deutsch](README.de.md)
 
 [![92C08093-CA7B-463E-8BE3-9F03C6622BD6_klein](https://github.com/user-attachments/assets/7716fdb4-b872-445b-ae45-9caabe0a44a3)](## "generated using a public AI image generator")
 
-# Optimierung der Verwendung des Hausspeichers im Zusammenspiel von Node-RED, evcc und einem dynamischen Stromtarif
+# Optimizing home battery storage usage with Node-RED, evcc and a dynamic electricity tariff
 
-## Funktionsweise
+## How it works
 
-Der Batteriespeicher wird bevorzugt mit überschüssigem PV-Strom geladen. Eine Entladung in Zeiten günstigen Netzstroms wird vermieden. Ist die Preisdifferenz ausreichend hoch (z. B. > 15 ct/kWh), kann eine Netzladung zum günstigsten Zeitpunkt des Tages erfolgen, um die Batterie bis zu 80 % zu laden. Der Netzladungspreis wird bei der weiteren Steuerung berücksichtigt: Die Batterie gibt Energie nur frei, wenn der Netzstrompreis deutlich über dem Netzladungspreis liegt (~130 %). 
+The battery storage is preferentially charged with surplus PV power. Discharging during periods of cheap grid electricity is avoided. If the price difference is high enough (e.g. > 15 ct/kWh), grid charging can take place at the cheapest time of day to charge the battery up to 80 %. The grid-charging price is taken into account for further control: the battery only releases energy when the grid electricity price is clearly above the grid-charging price (~130 %).
 
-Um ein ineffizientes Laden und Entladen zu vermeiden, wird die Batterie erst bei einem Ladestand unter 30 % geladen. Die Steuerung fokussiert sich auf die Verschiebung der Energienutzung und die Optimierung des Speichereinsatzes. 
+To avoid inefficient charging and discharging, the battery is only charged once its state of charge drops below 30 %. The control focuses on shifting energy use and optimizing storage deployment.
 
-Die Schwellenwerte für Netzladung sind konfigurierbar und standardmäßig hoch eingestellt, da eine Netzladung oft nicht wirtschaftlich ist. Wenn für den Folgetag eine ausreichende PV-Erzeugung für die teuren Strompreiszeiten prognostiziert wird, erfolgt keine Netzladung.
+The thresholds for grid charging are configurable and set high by default, since grid charging is often not economical. If sufficient PV generation is forecast for the following day to cover the expensive price periods, no grid charging takes place.
 
-## Einflussgrößen
+## Input factors
 
-Die optimierte Steuerung ist nur aktiv, wenn die prognostizierte tägliche PV-Erzeugung unter dem Tagesstrombedarf liegt (PV-Prognose < 17,5 kWh). Die Prognosedaten können von [SOLCAST](https://solcast.com/free-rooftop-solar-forecasting) über eine persönliche Home-Use-API bezogen werden. Im Tagesverlauf wird der verbleibende PV-Ertrag dynamisch in die Steuerung einbezogen.
+The optimized control is only active when the forecast daily PV generation is below the daily electricity demand (PV forecast < 17.5 kWh). Forecast data can be obtained from [SOLCAST](https://solcast.com/free-rooftop-solar-forecasting) via a personal home-use API. Throughout the day, the remaining PV yield is dynamically fed into the control.
 
-Ein vordefiniertes Standardlastprofil für einen 4-Personen-Haushalt mit berufstätigen Eltern und Schulkindern (ca. 15 kWh/Tag) wird genutzt. Der Verbrauch wird von der aktuellen Stunde bis zum nächsten Morgen (8 Uhr) unter Berücksichtigung des stündlichen Bedarfs berechnet.
+A predefined standard load profile for a 4-person household with working parents and school-age children (approx. 15 kWh/day) is used. Consumption is calculated from the current hour until the next morning (8 a.m.), taking the hourly demand into account.
 
-Wenn Strompreise für den aktuellen und den kommenden Tag verfügbar sind, fließen diese in die Optimierung ein. Die Preise können über [evcc](https://evcc.io/) per HTTP-API oder alternativ von der Fraunhofer ISE [Energy-Charts](https://www.energy-charts.info/) bezogen werden.
+If electricity prices for the current and the upcoming day are available, they are included in the optimization. Prices can be obtained via [evcc](https://evcc.io/) through its HTTP API, or alternatively from the Fraunhofer ISE [Energy-Charts](https://www.energy-charts.info/).
 
-## Steuerung des Batteriespeichers
+## Controlling the battery storage
 
-Die Berechnung ermittelt den optimalen Batteriemodus. Die eigentliche Steuerung eines (hybriden) Wechselrichters ist aufgrund hardwareabhängiger Faktoren separat zu implementieren:
+The calculation determines the optimal battery mode. Actually controlling a (hybrid) inverter must be implemented separately due to hardware-dependent factors:
 
-- Eine Netzladung kann über die Übergabe des Netzladungspreises an eine [evcc](https://evcc.io/) Instanz per MQTT/HTTP-API gesteuert werden.
-- Eine Batteriesperre kann, wenn evcc dies unterstützt, basierend auf den Informationen aus dem [evcc-Wiki](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren) realisiert werden. Dabei kann entweder der ermittelte Preis direkt genutzt oder der Modus per MQTT/HTTP-API gesteuert werden (Lade-/Entlademodus).
+- Grid charging can be controlled by passing the grid-charging price to an [evcc](https://evcc.io/) instance via the MQTT/HTTP API.
+- Blocking the battery can, if evcc supports it, be realized based on the information in the [evcc wiki](https://github.com/evcc-io/evcc/wiki/aaa-Lifehacks#entladung-eines-steuerbaren-hausspeicher-preisgesteuert-oder-manuell-sperren). Either the calculated price can be used directly, or the mode can be controlled via the MQTT/HTTP API (charge/discharge mode).
 
-## Node-RED-Integration
+## Node-RED integration
 
-Das Node-RED-Paket enthält verschiedene Nodes zur Optimierung der Batterienutzung. Die Nodes sind flexibel nutzbar und können mit externen Datenquellen kombiniert werden. Es besteht die Möglichkeit, eigene Nodes für zusätzliche Datenquellen zu integrieren. So kann die Lösung mit oder ohne evcc betrieben werden. Die Nodes sind mit Standardwerten vorkonfiguriert, wobei die Nachrichteneingänge eine Konfigurationsanpassung ermöglichen. Das modulare Design erleichtert die Wiederverwendung und Anpassung an unterschiedliche Installationen.
+The Node-RED package contains several nodes for optimizing battery usage. The nodes are flexible and can be combined with external data sources. It is also possible to integrate your own nodes for additional data sources. This way the solution can be run with or without evcc. The nodes come preconfigured with default values, while the message inputs allow configuration overrides. The modular design makes it easy to reuse and adapt them to different installations.
 
-### Verfügbare Nodes
+### Available nodes
 
-#### Hauptkomponenten
-- **DetermineBatteryMode** - Bestimmt den optimalen Batteriemodus basierend auf Preis, SOC und Prognosen ([Dokumentation](nodes/determineBatteryMode.html))
-- **EstimateBatterymode** - Erstellt 24-Stunden-Ladepläne mit Kostenoptimierung ([Dokumentation](nodes/estimateBatterymode.html) | [JSDoc](build/docs/module-EstimateBatterymode.html))
-- **BatteryModeControl** - Steuert den Batteriemodus ([Dokumentation](nodes/batteryModeControl.html))
-- **ControlBattery** - Batteriesteuerung ([Dokumentation](nodes/controlBattery.html))
+#### Main components
+- **DetermineBatteryMode** - Determines the optimal battery mode based on price, SOC and forecasts ([documentation](nodes/determineBatteryMode.html))
+- **EstimateBatterymode** - Builds 24-hour charging schedules with cost optimization ([documentation](nodes/estimateBatterymode.html) | [JSDoc](build/docs/module-EstimateBatterymode.html))
+- **BatteryModeControl** - Controls the battery mode ([documentation](nodes/batteryModeControl.html))
+- **ControlBattery** - Battery control ([documentation](nodes/controlBattery.html))
 
-#### Prognose & Datenquellen
-- **EvaluateSolarForecast** - Verarbeitet Solcast PV-Prognosen ([Dokumentation](nodes/evaluateSolarForecast.html))
-- **EvaluateSolarForecastAPI** - Holt Solcast-Daten von API ([Dokumentation](nodes/evaluateSolarForecastAPI.html))
-- **EvaluateSolarForecastOpenMeteo** - OpenMeteo Solar-Prognosen ([Dokumentation](nodes/evaluateSolarForecastOpenMeteo.html))
-- **CombinePVForecasts** - Kombiniert mehrere PV-Prognosen ([Dokumentation](nodes/combinePVForecasts.html))
-- **EstimateSolarEnergy** - Schätzt Solarenergie aus Prognosen ([Dokumentation](nodes/estimateSolarEnergy.html))
-- **EstimateHouseholdConsumption** - Schätzt Haushaltsverbrauch ([Dokumentation](nodes/estimateHouseholdConsumption.html))
-- **EvaluateGridEnergyPrices** - Verarbeitet Strompreise ([Dokumentation](nodes/evaluateGridEnergyPrices.html))
-- **EvaluateGridEnergyPricesAPI** - Holt Strompreise von API ([Dokumentation](nodes/evaluateGridEnergyPricesAPI.html))
-- **TibberApiPrices** - Tibber Strompreise ([Dokumentation](nodes/tibberApiPrices.html))
-- **PrepareForecastData** - Bereitet Prognosedaten auf ([Dokumentation](nodes/prepareForecastData.html))
+#### Forecast & data sources
+- **EvaluateSolarForecast** - Processes Solcast PV forecasts ([documentation](nodes/evaluateSolarForecast.html))
+- **EvaluateSolarForecastAPI** - Fetches Solcast data from the API ([documentation](nodes/evaluateSolarForecastAPI.html))
+- **EvaluateSolarForecastOpenMeteo** - Open-Meteo solar forecasts ([documentation](nodes/evaluateSolarForecastOpenMeteo.html))
+- **CombinePVForecasts** - Combines multiple PV forecasts ([documentation](nodes/combinePVForecasts.html))
+- **EstimateSolarEnergy** - Estimates solar energy from forecasts ([documentation](nodes/estimateSolarEnergy.html))
+- **EstimateHouseholdConsumption** - Estimates household consumption ([documentation](nodes/estimateHouseholdConsumption.html))
+- **EvaluateGridEnergyPrices** - Processes electricity prices ([documentation](nodes/evaluateGridEnergyPrices.html))
+- **EvaluateGridEnergyPricesAPI** - Fetches electricity prices from the API ([documentation](nodes/evaluateGridEnergyPricesAPI.html))
+- **TibberApiPrices** - Tibber electricity prices ([documentation](nodes/tibberApiPrices.html))
+- **PrepareForecastData** - Prepares forecast data ([documentation](nodes/prepareForecastData.html))
 
-#### Hilfsfunktionen
-- **DetermineControlMode** - Bestimmt Steuerungsmodus ([Dokumentation](nodes/determineControlMode.html))
-- **DeterminePowerValues** - Berechnet Leistungswerte ([Dokumentation](nodes/determinePowerValues.html))
+#### Helper functions
+- **DetermineControlMode** - Determines the control mode ([documentation](nodes/determineControlMode.html))
+- **DeterminePowerValues** - Calculates power values ([documentation](nodes/determinePowerValues.html))
 
-### Beispiele
+### Examples
 
-Vollständige Flow-Beispiele für alle Nodes finden Sie im [`examples/`](examples/) Verzeichnis. Importieren Sie diese in Node-RED über Menu → Import → Clipboard.
+Complete flow examples for all nodes can be found in the [`examples/`](examples/) directory. Import them into Node-RED via Menu → Import → Clipboard.
 
-Eine externe Steuerung kann eingebunden werden, die weiterhin den Status der evcc-Laderegelung und aktuelle Energiewerte berücksichtigt. 
+An external control can be integrated that still takes the status of the evcc charging control and current energy values into account.
 
-Die Prognosefunktion der Steuerung bildet eine solche externe Vorgabe ab. Es wird ein JSON geliefert, das für die Steuerung verwendet werden kann: 
+The control's forecast function represents such an external input. It returns a JSON that can be used for control:
 
-| Startzeit                | Energie | Importpreis (€/kWh) | prog.Kosten (€) | Modus   | Verbrauch (-kWh) | Produktion (+kWh) | Entladung (-kWh) | SoC (%) | eff.Preis (€/kWh) | opt.Kosten (€) |
+| Start time                | Energy | Import price (€/kWh) | Est. cost (€) | Mode    | Consumption (-kWh) | Production (+kWh) | Discharge (-kWh) | SoC (%) | Eff. price (€/kWh) | Opt. cost (€) |
 |--------------------------|------|---------------------|------------|---------|------------------|------------------|---------------|---------|------------------------|--------------|
 | 2025-03-03 06:00:00+01:00 | 1    | 0.3150              | 0.3150     | normal  | 1                | 0                | 0             | 5       | 0.0948                 | 0.3150       |
 | 2025-03-03 07:00:00+01:00 | 0.427| 0.3453              | 0.2016     | normal  | 1                | 0.00265          | 0.57          | 5       | 0.0948                 | 0.2016       |
@@ -81,37 +82,37 @@ Die Prognosefunktion der Steuerung bildet eine solche externe Vorgabe ab. Es wir
 | 2025-03-03 20:00:00+01:00 | 0    | 0.3304              | 0.0948     | normal  | 1                | 0                | 1             | 77.18   | 0.0948                 | 0.0948       |
 
 
-Es wird der optimierte Verlauf der bekannten Prognosedaten (Preis, PV-Forecast) berechnet, dies schließt eine optionale Netzladung ein. Es werden Statistik- und Berechnungsdaten ausgegeben.
-Das obige Beispiel ist für einen Tag mit ausreichend Solarertrag und hohen Preisen außerhalb der Zeiten mit Solarerzeugung erstellt. Eine Steuerung ist nicht nötig, würde hier jedoch bei Stunden mit niedrigen Strompreisen verwendet. 
+The optimized trajectory of the known forecast data (price, PV forecast) is calculated, including an optional grid charge. Statistics and calculation data are returned.
+The example above is for a day with sufficient solar yield and high prices outside the hours of solar generation. Control is not required here, but would be used during hours with low electricity prices.
 
-Die Statistikdaten ermöglichen eine Berechnung, ob eine Optimierung zu Preisersparnissen führt:
+The statistics allow you to calculate whether an optimization leads to price savings:
 
 ![image](https://github.com/user-attachments/assets/c19cf251-4244-4232-b647-efa5c4d7c611)
 
-Die übergebene Standardverteilung des prognostizierten Strombedarfes entscheidet über die Genauigkeit des Ergebnisses. 
+The supplied standard distribution of the forecast electricity demand determines the accuracy of the result.
 
 
 
-## Einsatz und Weiterentwicklung
+## Usage and further development
 
-Ich setze die npm-Bausteine innerhalb einer Node-RED-Instanz auf ioBroker ein. Sie sollten jedoch auch mit anderen Plattformen wie Home Assistant kompatibel sein.
+I use the npm building blocks within a Node-RED instance on ioBroker. They should, however, also be compatible with other platforms such as Home Assistant.
 
-Eine Veröffentlichung des Pakets ist inzwischen erfolgt, weitere Erfahrungswerte und Optimierungen sind nötig.
+The package has since been published; further real-world experience and optimizations are still needed.
 
 ---
 
-*Bereitgestellt ohne Gewähr. Der Einsatz der bereitgestellten Inhalte erfolgt in eigener Verantwortung!*
+*Provided without warranty. Use of the provided content is at your own risk!*
 
 
 <h1>@iseeberg79/battery-usage-optimization-nodes</h1>
-<h2>Einführung</h2>
+<h2>Introduction</h2>
 
-Flowbeispiel
+Example flow
 
 ![image](https://github.com/user-attachments/assets/90dec152-1f59-4d89-aa5f-c28893201788)
 
 
-Kontextdaten des Flows
+Flow context data
 
 ![image](https://github.com/user-attachments/assets/68014f67-9ed2-49fe-8f56-b0fb2f8dc44f)
 
@@ -119,7 +120,7 @@ Kontextdaten des Flows
 <h2>Installation</h2>
 
 
-Zum Beispiel als Upload im Palettenmanager von node-red in ioBroker, bzw.:
+For example as an upload in the palette manager of Node-RED in ioBroker, or:
 
 npm install @iseeberg79/battery-usage-optimization-nodes
 
@@ -134,16 +135,14 @@ npm install @iseeberg79/battery-usage-optimization-nodes
 
 <h2>Links</h2>
 
-[evcc](https://evcc.io) 
+[evcc](https://evcc.io)
 
-[solcast](https://solcast.com.au) 
+[solcast](https://solcast.com.au)
 
 [Open-Meteo](https://open-meteo.com/)
 
 [Energy-Charts](https://www.energy-charts.info/)
 
-[iobroker.net](https://www.iobroker.net) 
+[iobroker.net](https://www.iobroker.net)
 
-[node-red](https://nodered.org) 
-
-
+[node-red](https://nodered.org)
