@@ -16,6 +16,7 @@ module.exports = function (RED) {
         node.rossmodel = config.rossmodel || 0.026;
         node.kwp = config.kwp || 11;
         node.days = config.days || 3;
+        node.model = config.model || "icon_seamless";
 
         node.on("input", async function (msg) {
             const url = typeof msg.url !== "undefined" ? msg.url : node.url;
@@ -29,13 +30,14 @@ module.exports = function (RED) {
             const rossmodel = typeof msg.rossmodel !== "undefined" ? msg.rossmodel : node.rossmodel;
             const kwp = typeof msg.kwp !== "undefined" ? msg.kwp : node.kwp;
             const days = typeof msg.days !== "undefined" ? msg.days : node.days;
+            const model = typeof msg.model !== "undefined" ? msg.model : node.model;
 
             if (lat === "invalid" || lon === "invalid" || az === "invalid" || dec === "invalid") {
                 node.error("invalid configuration: lat/lon/az/dec", msg);
                 return;
             }
 
-            const fullUrl = `${url}?latitude=${lat}&longitude=${lon}&azimuth=${az}&tilt=${dec}&minutely_15=temperature_2m,global_tilted_irradiance&forecast_days=${days}&timezone=GMT&timeformat=unixtime`;
+            const fullUrl = `${url}?latitude=${lat}&longitude=${lon}&azimuth=${az}&tilt=${dec}&minutely_15=temperature_2m,global_tilted_irradiance&forecast_days=${days}&timezone=GMT&timeformat=unixtime&models=${model}`;
 
             try {
                 const response = await axios.get(fullUrl);
@@ -165,6 +167,7 @@ module.exports = function (RED) {
             rossmodel: { value: 0.026 },
             kwp: { value: 11 },
             days: { value: 3 },
+            model: { value: "icon_seamless" },
         },
     });
 };
