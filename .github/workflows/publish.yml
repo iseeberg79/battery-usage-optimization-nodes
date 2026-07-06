@@ -50,10 +50,15 @@ jobs:
         fi
         echo "✅ Version matches release tag"
 
+    # Trusted Publishing (OIDC) needs npm >= 11.5.1; node 20 ships npm 10.
+    - name: Upgrade npm for trusted publishing
+      run: npm install -g npm@latest
+
+    # No NODE_AUTH_TOKEN: authenticates via OIDC against the trusted
+    # publisher configured for this package on npmjs.com. Provenance is
+    # generated automatically.
     - name: Publish to npm
-      run: npm publish --provenance
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: npm publish
 
     - name: Create package artifact
       run: npm pack
