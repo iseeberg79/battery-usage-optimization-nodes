@@ -16,11 +16,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    # No registry-url: it would write an .npmrc with a placeholder _authToken,
+    # which npm uses instead of OIDC and fails with 404. The default registry
+    # is registry.npmjs.org, which trusted publishing targets via OIDC.
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
-        registry-url: 'https://registry.npmjs.org'
         cache: 'npm'
 
     - name: Install dependencies
@@ -52,7 +54,9 @@ jobs:
 
     # Trusted Publishing (OIDC) needs npm >= 11.5.1; node 20 ships npm 10.
     - name: Upgrade npm for trusted publishing
-      run: npm install -g npm@latest
+      run: |
+        npm install -g npm@latest
+        npm --version
 
     # No NODE_AUTH_TOKEN: authenticates via OIDC against the trusted
     # publisher configured for this package on npmjs.com. Provenance is
