@@ -166,6 +166,19 @@ module.exports = function (RED) {
                         outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
                         node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
                     }
+
+                    // Kompatibilitäts-Guard: neuere evcc-Versionen kennen weitere Batteriemodi
+                    // (z. B. "holdcharge", perspektivisch "discharge"), die dieser Node (noch) nicht
+                    // aktiv steuert. Statt unbemerkt keinen Output zu erzeugen und die "changed"-
+                    // Erkennung unten fälschlich anschlagen zu lassen, wird der Modus nur angezeigt.
+                    if (!["charge", "unknown", "normal", "hold"].includes(msg.evccBatteryMode)) {
+                        if (debug) {
+                            node.warn(`Unbekannter EVCC Battery Mode: ${msg.evccBatteryMode} - keine Steuerung, nur Anzeige`);
+                        }
+                        msg.targetMode = msg.evccBatteryMode;
+                        node.status({ fill: "grey", shape: "ring", text: msg.targetMode });
+                    }
+
                     outputs[3] = msg;
                 } else {
                     node.warn("UI Sperre: forcierte Batteriesperre!");
