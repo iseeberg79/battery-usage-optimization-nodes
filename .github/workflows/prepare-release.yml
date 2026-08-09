@@ -1,0 +1,94 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: main
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Configure git identity
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    # main is protected (PR required) and the default GITHUB_TOKEN can't
+    # bypass that on a personal repo, so the bump goes through a real PR
+    # that this job opens and merges itself (0 approvals required).
+    - name: Bump version on release branch
+      id: bump
+      run: |
+        BRANCH="release-prep/${{ inputs.bump }}-${{ github.run_id }}"
+        git checkout -b "$BRANCH"
+        npm version ${{ inputs.bump }} --no-git-tag-version
+        NEW_VERSION=$(node -p "require('./package.json').version")
+        git commit -am "chore(release): v$NEW_VERSION"
+        git push origin "$BRANCH"
+        echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+        echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+      env:
+        GH_TOKEN: ${{ github.token }}
+
+    - name: Open and merge release PR
+      id: merge
+      run: |
+        PR_URL=$(gh pr create --base main --head "${{ steps.bump.outputs.branch }}" \
+          --title "chore(release): v${{ steps.bump.outputs.version }}" \
+          --body "Automated version bump to v${{ steps.bump.outputs.version }}.")
+        echo "Opened $PR_URL"
+
+        # Mergeability is computed async right after creation; poll for it.
+        for i in $(seq 1 10); do
+          MERGEABLE=$(gh pr view "$PR_URL" --json mergeable -q .mergeable)
+          [ "$MERGEABLE" = "MERGEABLE" ] && break
+          sleep 3
+        done
+
+        gh pr merge "$PR_URL" --merge --delete-branch
+      env:
+        GH_TOKEN: ${{ github.token }}
+
+    # gh release create with the default GITHUB_TOKEN does NOT fire the
+    # `release: published` event (GitHub suppresses follow-up events
+    # triggered by GITHUB_TOKEN itself), so publish.yml is dispatched
+    # explicitly below instead of relying on that event.
+    - name: Tag, release, and trigger publish
+      run: |
+        git fetch origin main
+        git checkout main
+        git reset --hard origin/main
+        VERSION="${{ steps.bump.outputs.version }}"
+        git tag "$VERSION"
+        git push origin "$VERSION"
+        gh release create "$VERSION" --title "v$VERSION" --generate-notes
+        gh workflow run publish.yml --ref main -f tag="$VERSION"
+      env:
+        GH_TOKEN: ${{ github.token }}

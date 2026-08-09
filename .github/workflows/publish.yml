@@ -3,6 +3,15 @@ name: Publish
 on:
   release:
     types: [published]
+  # prepare-release.yml dispatches this explicitly: a release created with
+  # the default GITHUB_TOKEN doesn't fire the `release: published` event
+  # above (GitHub suppresses follow-up events triggered by GITHUB_TOKEN
+  # itself), so it triggers this workflow directly instead.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish'
+        required: true
 
 jobs:
   publish:
@@ -15,6 +24,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.tag || github.ref }}
 
     # No registry-url: it would write an .npmrc with a placeholder _authToken,
     # which npm uses instead of OIDC and fails with 404. The default registry
@@ -32,7 +43,8 @@ jobs:
     # forgotten bump in package.json can no longer block/mismatch a release.
     - name: Set package version from release tag
       run: |
-        RELEASE_TAG=${GITHUB_REF#refs/tags/}
+        RELEASE_TAG="${{ inputs.tag }}"
+        RELEASE_TAG="${RELEASE_TAG:-${GITHUB_REF#refs/tags/}}"
         echo "Release tag: $RELEASE_TAG"
         npm version "$RELEASE_TAG" --no-git-tag-version --allow-same-version
         echo "✅ package.json version set to $RELEASE_TAG"
