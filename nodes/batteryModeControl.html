@@ -46,6 +46,7 @@
     data-help-name="@iseeberg79/BatteryModeControl">
     <p>Dieser Node steuert den Batteriemodus oder das Grid Charge Limit auf Basis der bereitgestellten Daten von der evcc API.</p>
     <p><b>Gültige Werte für den Modus:</b> unknown, normal, hold, charge</p>
+    <p>„hold“ wird an evcc als „holddischarge“ gesendet (ab evcc-io/evcc#36103); ältere evcc-Versionen erhalten automatisch „hold“. „holddischarge“ wird als Alias für „hold“ akzeptiert.</p>
     <p><b>Inputs:</b></p>
     <ul>
         <li><b>mode</b> - Der gewünschte Batteriemodus (POST oder DELETE, abhängig vom Wert).</li>

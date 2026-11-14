@@ -30,6 +30,10 @@ module.exports = function (RED) {
                 msg.optimize = typeof msg.optimize !== "undefined" ? msg.optimize : false;
                 msg.batterymode = typeof msg.batterymode !== "undefined" ? msg.batterymode : "normal";
                 msg.evccBatteryMode = typeof msg.evccBatteryMode !== "undefined" ? msg.evccBatteryMode : "unknown";
+                // evcc meldet "hold" seit evcc-io/evcc#36103 als "holddischarge"
+                if (msg.evccBatteryMode === "holddischarge") {
+                    msg.evccBatteryMode = "hold";
+                }
 
                 msg.price = typeof msg.price !== "undefined" ? msg.price : 0.5;
                 msg.minsoc = typeof msg.minsoc !== "undefined" ? msg.minsoc : 20;
