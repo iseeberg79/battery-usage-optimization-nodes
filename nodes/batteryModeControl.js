@@ -10,8 +10,24 @@ module.exports = function(RED) {
 		node.repeatMode = config.repeatMode || false;
 		let intervalId = null;
 
+		// evcc benennt "hold" seit evcc-io/evcc#36103 in "holddischarge" um; ältere Versionen lehnen den neuen Namen mit 400 ab
+		async function postMode(mode) {
+			if (mode !== "hold") {
+				return axios.post(`${node.url}/${mode}`);
+			}
+			try {
+				return await axios.post(`${node.url}/holddischarge`);
+			} catch (error) {
+				if (error.response?.status !== 400) {
+					throw error;
+				}
+				return axios.post(`${node.url}/hold`);
+			}
+		}
+
 		node.on("input", async function(msg) {
-			const mode = msg.payload?.mode;
+			// "holddischarge" (evcc-Name seit evcc-io/evcc#36103) als Alias für "hold" akzeptieren
+			const mode = msg.payload?.mode === "holddischarge" ? "hold" : msg.payload?.mode;
 			const gridChargeLimit = msg.payload?.gridChargeLimit;
 
 			// Prüfen, ob genau **einer** der beiden Werte gesetzt ist
@@ -31,7 +47,7 @@ module.exports = function(RED) {
 					if (mode === "normal") {
 						await axios.delete(`${node.url}`);
 					} else {
-						await axios.post(`${node.url}/${mode}`);
+						await postMode(mode);
 					}
 					node.status({ fill: "green", shape: "dot", text: `Modus: ${mode}` });
 
@@ -42,7 +58,7 @@ module.exports = function(RED) {
 						}
 						intervalId = setInterval(async () => {
 							try {
-								await axios.post(`${node.url}/${mode}`);
+								await postMode(mode);
 								node.status({ fill: "yellow", shape: "ring", text: `Sende erneut: ${mode}` });
 							} catch (error) {
 								node.error("Fehler bei wiederholendem Senden: " + error);
