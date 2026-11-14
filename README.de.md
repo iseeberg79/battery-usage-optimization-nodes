@@ -4,6 +4,9 @@
 
 # Optimierung der Verwendung des Hausspeichers im Zusammenspiel von Node-RED, evcc und einem dynamischen Stromtarif
 
+> [!WARNING]
+> **Angekündigter Breaking Change in 0.3.0:** evcc benennt ab Version 0.320.0 den Batteriemodus `hold` in `holddischarge` um ([evcc-io/evcc#36103](https://github.com/evcc-io/evcc/pull/36103)). Seit 0.2.3 akzeptieren die Nodes bereits beide Namen. Nach Veröffentlichung von evcc 0.320.0 geben die Nodes ab Version 0.3.0 `holddischarge` statt `hold` **aus** (DetermineBatteryMode, EstimateBatterymode, EvoptBatteryMode, ControlBattery). `hold` wird als Eingabe weiterhin akzeptiert. Flows, die die Ausgabe dieser Nodes auf `"hold"` prüfen, sollten auf beide Werte prüfen (`"hold"` oder `"holddischarge"`).
+
 ## Funktionsweise
 
 Der Batteriespeicher wird bevorzugt mit überschüssigem PV-Strom geladen. Eine Entladung in Zeiten günstigen Netzstroms wird vermieden. Ist die Preisdifferenz ausreichend hoch (z. B. > 15 ct/kWh), kann eine Netzladung zum günstigsten Zeitpunkt des Tages erfolgen, um die Batterie bis zu 80 % zu laden. Der Netzladungspreis wird bei der weiteren Steuerung berücksichtigt: Die Batterie gibt Energie nur frei, wenn der Netzstrompreis deutlich über dem Netzladungspreis liegt (~130 %). 

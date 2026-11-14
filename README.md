@@ -4,6 +4,9 @@
 
 # Optimizing home battery storage usage with Node-RED, evcc and a dynamic electricity tariff
 
+> [!WARNING]
+> **Upcoming breaking change in 0.3.0:** evcc renames the battery mode `hold` to `holddischarge` as of version 0.320.0 ([evcc-io/evcc#36103](https://github.com/evcc-io/evcc/pull/36103)). Since 0.2.3 the nodes already accept both names. Once evcc 0.320.0 is released, version 0.3.0 will **output** `holddischarge` instead of `hold` (DetermineBatteryMode, EstimateBatterymode, EvoptBatteryMode, ControlBattery). `hold` will still be accepted as input. Flows that check the output of these nodes for `"hold"` should check for both values (`"hold"` or `"holddischarge"`).
+
 ## How it works
 
 The battery storage is preferentially charged with surplus PV power. Discharging during periods of cheap grid electricity is avoided. If the price difference is high enough (e.g. > 15 ct/kWh), grid charging can take place at the cheapest time of day to charge the battery up to 80 %. The grid-charging price is taken into account for further control: the battery only releases energy when the grid electricity price is clearly above the grid-charging price (~130 %).
