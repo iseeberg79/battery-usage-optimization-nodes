@@ -30,12 +30,12 @@ module.exports = function (RED) {
                 msg.optimize = typeof msg.optimize !== "undefined" ? msg.optimize : false;
                 msg.batterymode = typeof msg.batterymode !== "undefined" ? msg.batterymode : "normal";
                 msg.evccBatteryMode = typeof msg.evccBatteryMode !== "undefined" ? msg.evccBatteryMode : "unknown";
-                // "holddischarge" (evcc-Name seit evcc-io/evcc#36103) ist gleichbedeutend mit "hold"
-                if (msg.evccBatteryMode === "holddischarge") {
-                    msg.evccBatteryMode = "hold";
+                // "hold" ist der historische Name von "holddischarge" (evcc-io/evcc#36103) und wird weiterhin akzeptiert
+                if (msg.evccBatteryMode === "hold") {
+                    msg.evccBatteryMode = "holddischarge";
                 }
-                if (msg.batterymode === "holddischarge") {
-                    msg.batterymode = "hold";
+                if (msg.batterymode === "hold") {
+                    msg.batterymode = "holddischarge";
                 }
 
                 msg.price = typeof msg.price !== "undefined" ? msg.price : 0.5;
@@ -78,7 +78,7 @@ module.exports = function (RED) {
                                     node.warn(`Optimize is false, transitional period`);
                                 }
                                 msg.targetMode = msg.batterymode;
-                                if (msg.targetMode === "hold") {
+                                if (msg.targetMode === "holddischarge") {
                                     node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
                                 } else {
                                     node.status({ fill: "green", shape: "dot", text: msg.targetMode });
@@ -133,11 +133,11 @@ module.exports = function (RED) {
                             if (debug) {
                                 node.warn(`Optimize is true`);
                             }
-                            if (msg.batterymode === "hold" || (msg.batterymode === "charge" && msg.price > msg.maximumGridprice)) {
+                            if (msg.batterymode === "holddischarge" || (msg.batterymode === "charge" && msg.price > msg.maximumGridprice)) {
                                 if (debug) {
-                                    node.warn(`Battery mode is hold or charge with price > maximumGridprice`);
+                                    node.warn(`Battery mode is holddischarge or charge with price > maximumGridprice`);
                                 }
-                                msg.targetMode = "hold";
+                                msg.targetMode = "holddischarge";
                                 outputs[0] = { payload: 100 };
                                 outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
                                 node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
@@ -165,11 +165,11 @@ module.exports = function (RED) {
                         }
                     }
 
-                    if (msg.evccBatteryMode === "hold") {
+                    if (msg.evccBatteryMode === "holddischarge") {
                         if (debug) {
-                            node.warn(`EVCC Battery Mode is hold`);
+                            node.warn(`EVCC Battery Mode is holddischarge`);
                         }
-                        msg.targetMode = "hold";
+                        msg.targetMode = "holddischarge";
                         outputs[1] = { payload: msg.targetMode, optimize: msg.optimize };
                         node.status({ fill: "orange", shape: "dot", text: msg.targetMode });
                     }
@@ -178,7 +178,7 @@ module.exports = function (RED) {
                     // (z. B. "holdcharge", perspektivisch "discharge"), die dieser Node (noch) nicht
                     // aktiv steuert. Statt unbemerkt keinen Output zu erzeugen und die "changed"-
                     // Erkennung unten fälschlich anschlagen zu lassen, wird der Modus nur angezeigt.
-                    if (!["charge", "unknown", "normal", "hold"].includes(msg.evccBatteryMode)) {
+                    if (!["charge", "unknown", "normal", "holddischarge"].includes(msg.evccBatteryMode)) {
                         if (debug) {
                             node.warn(`Unbekannter EVCC Battery Mode: ${msg.evccBatteryMode} - keine Steuerung, nur Anzeige`);
                         }
@@ -194,7 +194,7 @@ module.exports = function (RED) {
                         if (debug) {
                             node.warn(`Optimize is true - external forced battery lock`);
                         }
-                        msg.targetMode = "hold";
+                        msg.targetMode = "holddischarge";
                         outputs[0] = { payload: 100 };
                         outputs[1] = { payload: msg.targetMode, optimize: false };
                         node.status({ fill: "orange", shape: "dot", text: msg.targetMode });

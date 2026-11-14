@@ -103,11 +103,11 @@ module.exports = function (RED) {
                 } else if (chargingPower === 0 && dischargingPower === 0) {
                     // Idle. With holdCharge enabled, mirror evcc's evopt suggestion:
                     // idle while exporting means charging is deliberately withheld
-                    // (holdcharge); otherwise hold (withhold discharge).
+                    // (holdcharge); otherwise holddischarge (withhold discharge).
                     if (node.holdCharge && gridExportValue > 0) {
                         batteryMode = "holdcharge";
                     } else {
-                        batteryMode = "hold";
+                        batteryMode = "holddischarge";
                     }
                 } else {
                     // All other cases: PV charging, normal discharge for household
@@ -165,8 +165,8 @@ module.exports = function (RED) {
                     case "charge":
                         node.status({ fill: "red", shape: "dot", text: `charge (${chargingPower}W, grid: ${gridImportValue}W)` });
                         break;
-                    case "hold":
-                        node.status({ fill: "yellow", shape: "dot", text: "hold" });
+                    case "holddischarge":
+                        node.status({ fill: "yellow", shape: "dot", text: "holddischarge" });
                         break;
                     case "holdcharge":
                         node.status({ fill: "yellow", shape: "ring", text: `holdcharge (export ${gridExportValue}W)` });

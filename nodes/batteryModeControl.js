@@ -10,9 +10,9 @@ module.exports = function(RED) {
 		node.repeatMode = config.repeatMode || false;
 		let intervalId = null;
 
-		// evcc benennt "hold" seit evcc-io/evcc#36103 in "holddischarge" um; ältere Versionen lehnen den neuen Namen mit 400 ab
+		// "holddischarge" heißt in evcc vor evcc-io/evcc#36103 "hold"; ältere Versionen lehnen den neuen Namen mit 400 ab
 		async function postMode(mode) {
-			if (mode !== "hold") {
+			if (mode !== "holddischarge") {
 				return axios.post(`${node.url}/${mode}`);
 			}
 			try {
@@ -26,8 +26,8 @@ module.exports = function(RED) {
 		}
 
 		node.on("input", async function(msg) {
-			// "holddischarge" (evcc-Name seit evcc-io/evcc#36103) als Alias für "hold" akzeptieren
-			const mode = msg.payload?.mode === "holddischarge" ? "hold" : msg.payload?.mode;
+			// "hold" ist der historische Name von "holddischarge" und wird weiterhin akzeptiert
+			const mode = msg.payload?.mode === "hold" ? "holddischarge" : msg.payload?.mode;
 			const gridChargeLimit = msg.payload?.gridChargeLimit;
 
 			// Prüfen, ob genau **einer** der beiden Werte gesetzt ist
@@ -39,7 +39,7 @@ module.exports = function(RED) {
 			try {
 				// **Modus setzen**
 				if (mode !== undefined) {
-					if (!["unknown", "normal", "hold", "charge"].includes(mode)) {
+					if (!["unknown", "normal", "holddischarge", "charge"].includes(mode)) {
 						node.error("Ungültiger Modus: " + mode, msg);
 						return;
 					}
@@ -52,7 +52,7 @@ module.exports = function(RED) {
 					node.status({ fill: "green", shape: "dot", text: `Modus: ${mode}` });
 
 					// **Wiederholung für batteryMode**
-					if (node.repeatMode && ["hold", "charge"].includes(mode)) {
+					if (node.repeatMode && ["holddischarge", "charge"].includes(mode)) {
 						if (intervalId) { 
 							clearInterval(intervalId); 
 						}

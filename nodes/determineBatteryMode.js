@@ -29,7 +29,7 @@
  * @input {Array} msg.estimator - Optionaler externer Batteriemodus-Plan (Array mit {start, mode})
  *
  * @output {Object} Output 1 - Batteriemodus-Nachricht (nur bei Änderung)
- * @output {string} msg.targetMode - Zielmodus: "normal" (entladen), "hold" (halten), "charge" (laden)
+ * @output {string} msg.targetMode - Zielmodus: "normal" (entladen), "holddischarge" (Entladung sperren), "charge" (laden)
  *
  * @output {Object} Output 2 - Letzter Netzladungspreis (nur bei Änderung)
  * @output {number} msg.lastGridchargePrice - Aktualisierter Netzladungspreis inkl. Verluste
@@ -54,7 +54,7 @@
  *
  * // Output on port 3 (full message)
  * {
- *   "targetMode": "hold",  // or "normal" or "charge"
+ *   "targetMode": "holddischarge",  // or "normal" or "charge"
  *   "batteryControlLimit": 0.28,
  *   ...
  * }
@@ -178,7 +178,8 @@ module.exports = function (RED) {
                 }
 
                 if (mode !== "undefined") {
-                    batteryMode = mode;
+                    // "hold" ist der historische Name von "holddischarge" und wird weiterhin akzeptiert
+                    batteryMode = mode === "hold" ? "holddischarge" : mode;
                 }
                 return batteryMode;
             }
@@ -280,7 +281,7 @@ module.exports = function (RED) {
                             if (debug) {
                                 node.warn(`pvControlMode is insufficientPV and not highSOC`);
                             }
-                            msg.targetMode = "hold";
+                            msg.targetMode = "holddischarge";
                             // Netzladung erlauben?
                             if (socControlMode === "lowSOC" || (socControlMode === "mediumSOC" && msg.batterymode === "charge")) {
                                 if (debug) {
@@ -343,14 +344,14 @@ module.exports = function (RED) {
                             if (debug) {
                                 node.warn(`Batteriestand ist hoch, keine Netzladung.`);
                             }
-                            msg.targetMode = "hold";
+                            msg.targetMode = "holddischarge";
                         }
                         // Netzladung vermeiden, wenn nicht innerhalb der Schwellenwerte
                         if (msg.targetMode === "charge" && socControlMode == "mediumSOC") {
                             if (debug) {
                                 node.warn(`Batteriestand ist mittel, keine Netzladung vorgesehen - Threshold nicht erreicht.`);
                             }
-                            msg.targetMode = "hold";
+                            msg.targetMode = "holddischarge";
                         }
                         if (msg.targetMode === "charge") {
                             let gridchargePrice = price * lossFactor;
@@ -395,7 +396,7 @@ module.exports = function (RED) {
                     case "normal":
                         node.status({ fill: "green", shape: "dot", text: msg.batterymode });
                         break;
-                    case "hold":
+                    case "holddischarge":
                         node.status({ fill: "orange", shape: "dot", text: msg.batterymode });
                         break;
                     case "charge":

@@ -30,7 +30,7 @@ npm run test:coverage
 - **DetermineBatteryMode Node**
   - Konfigurationswerte
   - SOC-Bewertung (high/medium/low)
-  - Batteriemodus-Logik (normal/hold/charge)
+  - Batteriemodus-Logik (normal/holddischarge/charge)
   - Wintermodus-Erkennung
   - Preisbasierte Entscheidungen
   - Externe Prognosen

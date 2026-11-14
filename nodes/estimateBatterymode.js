@@ -32,7 +32,7 @@
  *
  * @output {Object} msg.payload.batteryModes - Array mit geplanten Batteriemodi für 24h
  * @output {string} msg.payload.batteryModes[].start - ISO 8601 Zeitstempel
- * @output {string} msg.payload.batteryModes[].mode - Batteriemodus: "charge", "normal", "hold"
+ * @output {string} msg.payload.batteryModes[].mode - Batteriemodus: "charge", "normal", "holddischarge"
  * @output {number} msg.payload.batteryModes[].soc - Erwarteter SoC in %
  * @output {number} msg.payload.batteryModes[].cost - Erwartete Kosten in €
  * @output {Object} msg.payload.stats - Statistiken
@@ -374,7 +374,7 @@ module.exports = function (RED) {
                         estimatedbatteryPower = power;
                     } else {
                         // geladene PV Leistung reduziert den Netzladungspreis
-                        if (modes[i].mode == "hold" && modes[i].value < 0) {
+                        if (modes[i].mode == "holddischarge" && modes[i].value < 0) {
                             let power = Math.max(minEnergy, Math.min(+batteryCapacity + minEnergy, +estimatedbatteryPower + Math.abs(modes[i].value)));
                             let pv = Math.abs(modes[i].value) * feedin * factor;
                             let old = estimatedbatteryPower * energyPrice;
@@ -412,7 +412,7 @@ module.exports = function (RED) {
                     modes[i].homePrice = energyPrice;
 
                     // Kosten nachrechnen
-                    if (modes[i].mode == "hold") {
+                    if (modes[i].mode == "holddischarge") {
                         if (modes[i].value > 0) {
                             // Bezugskosten
                             modes[i].homePrice = modes[i].importPrice;
@@ -534,7 +534,7 @@ module.exports = function (RED) {
                             throw new Error(`productionForecast missing at index ${i}. priceData has ${priceData.length} entries, but productionForecast only has ${productionForecast.length} entries. Possible cause: PV forecast data is outdated or has wrong timestamps. First PV timestamp: ${productionForecast[0]?.start}, first price timestamp: ${priceData[0]?.start}`);
                         }
 
-                        let mode = "hold";
+                        let mode = "holddischarge";
                         const consumption = consumptionForecast[i].value;
                         const production = productionForecast[i].value;
                         const netEnergy = consumption - production;
@@ -772,7 +772,7 @@ module.exports = function (RED) {
                         node.warn("Prüfung, ob Batterieleistung verfügbar");
                     }
                     // interne Steuerung der Batterie, wenn niedriger Ladungszustand vor dem Entscheidungszeitpunkt
-                    if (hour.mode == "hold" && hour.value > 0 && hour.start < breakevenPoint && currentbatteryPower <= 0) {
+                    if (hour.mode == "holddischarge" && hour.value > 0 && hour.start < breakevenPoint && currentbatteryPower <= 0) {
                         if (debug) {
                             node.warn(hour.start + ": Batterieladungszustand zu gering, interne Steuerung zulassen.");
                         }

@@ -159,10 +159,10 @@ describe('Battery Optimization Integration Tests', () => {
             expect(node.send).toHaveBeenCalled();
             const outputs = node.send.mock.calls[0][0];
 
-            // Bei normalem Preis sollte Batterie gesperrt sein (hold)
-            expect(outputs[2].targetMode).toBe('hold');
+            // Bei normalem Preis sollte Batterie gesperrt sein (holddischarge)
+            expect(outputs[2].targetMode).toBe('holddischarge');
             expect(node.status).toHaveBeenCalledWith(
-                expect.objectContaining({ fill: 'orange', text: 'hold' })
+                expect.objectContaining({ fill: 'orange', text: 'holddischarge' })
             );
 
             jest.useRealTimers();
@@ -258,7 +258,7 @@ describe('Battery Optimization Integration Tests', () => {
             const outputs = node.send.mock.calls[0][0];
 
             // Entladung sollte gesperrt sein, da Preis nicht deutlich höher als Ladepreis
-            expect(outputs[2].targetMode).toBe('hold');
+            expect(outputs[2].targetMode).toBe('holddischarge');
 
             jest.useRealTimers();
         });

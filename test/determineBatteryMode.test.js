@@ -164,7 +164,7 @@ describe('DetermineBatteryMode Node', () => {
     });
 
     describe('Batteriemodus-Bestimmung mit Optimierung', () => {
-        test('sollte "hold" bei niedriger PV-Prognose und normalem Preis setzen', () => {
+        test('sollte "holddischarge" bei niedriger PV-Prognose und normalem Preis setzen', () => {
             const config = {
                 enableGridchargeThreshold: 50,
                 disableGridchargeThreshold: 80,
@@ -198,8 +198,8 @@ describe('DetermineBatteryMode Node', () => {
             expect(node.send).toHaveBeenCalled();
             const outputs = node.send.mock.calls[0][0];
 
-            // Bei lowSOC, optimize=true und insufficientPV sollte hold gesetzt werden
-            expect(outputs[2].targetMode).toBe('hold');
+            // Bei lowSOC, optimize=true und insufficientPV sollte holddischarge gesetzt werden
+            expect(outputs[2].targetMode).toBe('holddischarge');
 
             jest.useRealTimers();
         });
@@ -430,7 +430,7 @@ describe('DetermineBatteryMode Node', () => {
             });
         });
 
-        test('sollte orangen Status bei "hold" setzen', () => {
+        test('sollte orangen Status bei "holddischarge" setzen', () => {
             const config = {
                 enableGridchargeThreshold: 50,
                 disableGridchargeThreshold: 80,
@@ -464,7 +464,7 @@ describe('DetermineBatteryMode Node', () => {
             expect(node.status).toHaveBeenCalledWith({
                 fill: 'orange',
                 shape: 'dot',
-                text: 'hold'
+                text: 'holddischarge'
             });
 
             jest.useRealTimers();
@@ -527,8 +527,8 @@ describe('DetermineBatteryMode Node', () => {
             node.receive(msg);
 
             const outputs = node.send.mock.calls[0][0];
-            // Aktuelle Zeit ist 10:30, sollte also 'hold' sein
-            expect(outputs[2].targetMode).toBe('hold');
+            // Aktuelle Zeit ist 10:30, historisches 'hold' wird als 'holddischarge' übernommen
+            expect(outputs[2].targetMode).toBe('holddischarge');
 
             jest.useRealTimers();
         });
